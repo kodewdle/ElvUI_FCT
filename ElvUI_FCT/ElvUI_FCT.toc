@@ -1,0 +1,9 @@
+## Interface: 80100
+## Author: Simpy and Lightspark
+## Version: 1.0
+## Title: |cfffe7b2cElvUI|r: |cFFF76ADBFloating Combat Text|r
+## SavedVariables: ElvFCT
+## RequiredDeps: ElvUI
+
+init.lua
+core.lua
