@@ -9,13 +9,8 @@ ns[1] = addon
 ns[2] = FCT
 
 local _G = _G
-local next = next
-local type = type
-local pairs = pairs
-local format = format
-local tinsert = tinsert
-local tonumber = tonumber
-local setmetatable = setmetatable
+local next, type, pairs, format, tinsert, tonumber = next, type, pairs, format, tinsert, tonumber
+local rawget, rawset, setmetatable = rawget, rawset, setmetatable
 local hooksecurefunc = hooksecurefunc
 local CreateFrame = CreateFrame
 
