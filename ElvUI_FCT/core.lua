@@ -1,10 +1,10 @@
 local addon, ns = ...
-
 local E, L, V, P, G = unpack(ElvUI)
-local S = E:GetModule('Skins')
 
 local oUF = E.oUF or oUF
 if not oUF then return end
+
+local S = E:GetModule('Skins')
 
 local wipe, tinsert, tremove = wipe, tinsert, tremove
 local bit, type, unpack, next = bit, type, unpack, next
@@ -13,18 +13,7 @@ local band, guid, uisu, gsi, cf = bit.band, UnitGUID, UnitIsUnit, GetSpellInfo, 
 local info = CombatLogGetCurrentEventInfo
 
 local spells, exclude = {}, {}
-local CT, SC = E:CopyTable({}, CombatFeedbackText), {
-	[-3] = {050/255, 255/255, 050/255}, -- [32FF32] Heal
-	[-2] = {102/255, 102/255, 102/255}, -- [666666] Ranged
-	[-1] = {153/255, 102/255, 051/255}, -- [996633] Physical
-	[00] = {255/255, 255/255, 255/255}, -- [FFFFFF] Standard
-	[01] = {255/255, 050/255, 050/255}, -- [FF3232] Damage
-	[02] = {255/255, 255/255, 075/255}, -- [FFFF4B] Holy
-	[04] = {255/255, 100/255, 000/255}, -- [FF6400] Fire
-	[08] = {150/255, 255/255, 050/255}, -- [96FF32] Nature
-	[16] = {075/255, 255/255, 255/255}, -- [4BFFFF] Frost
-	[32] = {175/255, 075/255, 255/255}, -- [AF4BFF] Shadow
-	[64] = {255/255, 075/255, 175/255}} -- [FF4BAF] Arcane
+local CT, SC = E:CopyTable({}, CombatFeedbackText), ns.colors
 CT.MISFIRE = _G.COMBAT_TEXT_MISFIRE
 
 local HS

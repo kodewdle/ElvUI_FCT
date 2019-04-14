@@ -4,8 +4,11 @@ local E, L, V, P, G = unpack(ElvUI)
 local FCT = E.Libs.AceAddon:NewAddon(addon, 'AceEvent-3.0')
 
 local _G = _G
-local ipairs = ipairs
+local next = next
+local type = type
+local pairs = pairs
 local format = format
+local setmetatable = setmetatable
 local hooksecurefunc = hooksecurefunc
 
 local Version = GetAddOnMetadata(addon, "Version")
@@ -19,21 +22,151 @@ FCT.frameOptions = {
 		type = "toggle",
 		name = L["Enable"],
 	},
+	showIcon = {
+		order = 2,
+		type = "toggle",
+		name = L["Show Icon"],
+	},
+	alternateIcon = {
+		order = 3,
+		type = "toggle",
+		name = L["Alternate Icon"],
+	},
+	showName = {
+		order = 4,
+		type = "toggle",
+		name = L["Show Name"],
+	},
+	showHots = {
+		order = 5,
+		type = "toggle",
+		name = L["Show Hots"],
+	},
+	showDots = {
+		order = 6,
+		type = "toggle",
+		name = L["Show Dots"],
+	},
+	isTarget = {
+		order = 7,
+		type = "toggle",
+		name = L["Is Target"],
+	},
+	isPlayer = {
+		order = 8,
+		type = "toggle",
+		name = L["From Player"],
+	},
+	showPet = {
+		order = 9,
+		type = "toggle",
+		name = L["Show Pet"],
+	},
+	critShake = {
+		order = 10,
+		type = "toggle",
+		name = L["Crit Shake"],
+	},
+	textShake = {
+		order = 11,
+		type = "toggle",
+		name = L["Text Shake"],
+	},
+	shakeDuration = {
+		order = 12,
+		name = L["Shake Duration"],
+		type = "range",
+		min = 0, max = 1, step = 0.1,
+	},
+	spacer1 = {
+		order = 13,
+		type = "description",
+		name = " ",
+		width = "full"
+	},
+	font = {
+		type = "select", dialogControl = 'LSM30_Font',
+		order = 14,
+		name = L["Font"],
+	},
+	fontOutline = {
+		order = 15,
+		name = L["Font Outline"],
+		desc = L["Set the font outline."],
+		type = "select",
+		values = {
+			['NONE'] = _G.NONE,
+			['OUTLINE'] = 'OUTLINE',
+			['MONOCHROMEOUTLINE'] = 'MONOCROMEOUTLINE',
+			['THICKOUTLINE'] = 'THICKOUTLINE',
+		},
+	},
+	fontSize = {
+		order = 16,
+		name = _G.FONT_SIZE,
+		type = "range",
+		min = 4, max = 60, step = 1,
+	},
+	spacer2 = {
+		order = 17,
+		type = "description",
+		name = " ",
+		width = "full"
+	},
+	numTexts = {
+		order = 18,
+		name = L["Text Amount"],
+		type = "range",
+		min = 1, max = 30, step = 1,
+	},
+	mode = {
+		order = 19,
+		name = L["Mode"],
+		type = "select",
+		values = {
+			['Simpy'] = 'Static',
+			['LS'] = 'Animation'
+		},
+	},
+	anim = {
+		order = 20,
+		name = L["Animation"],
+		type = "select",
+		values = {
+			["fountain"] = L["Fountain"],
+			["vertical"] = L["Vertical"],
+			["horizontal"] = L["Horizontal"],
+			["diagonal"] = L["Diagonal"],
+			["static"] = L["Static"],
+			["random"] = L["Random"]
+		},
+	},
 }
 
-function FCT.AddOptions(arg1, arg2)
+function FCT:AddOptions(arg1, arg2)
 	if E.Options.args.ElvFCT.args[arg1].args[arg2] then return end
-	E.Options.args.ElvFCT.args[arg1].args[arg2] = {
-		order = FCT.OptionsTable[arg2][1],
-		name = L[FCT.OptionsTable[arg2][2]],
-		type = "group",
-		get = function(info) return FCT.db[arg1].frames[arg2][ info[#info] ] end,
-		set = function(info, value) FCT.db[arg1].frames[arg2][ info[#info] ] = value end,
-		args = FCT.frameOptions
-	}
+
+	if arg1 == 'colors' then
+		E.Options.args.ElvFCT.args[arg1].args[arg2] = {
+			order = FCT.OptionsTable[arg2],
+			name = L[ns.colors[arg2].n],
+			type = 'color',
+		}
+	else
+		E.Options.args.ElvFCT.args[arg1].args[arg2] = {
+			order = FCT.OptionsTable[arg2][1],
+			name = L[FCT.OptionsTable[arg2][2]],
+			type = "group",
+			get = function(info) return FCT.db[arg1].frames[arg2][ info[#info] ] end,
+			set = function(info, value) FCT.db[arg1].frames[arg2][ info[#info] ] = value end,
+			args = FCT.frameOptions
+		}
+	end
 end
 
-function FCT.Options()
+function FCT:Options()
+	FCT.frameOptions.font.values = _G.AceGUIWidgetLSMlists.font
+
 	E.Options.args.ElvFCT = {
 		order = 1337,
 		type = 'group',
@@ -72,15 +205,33 @@ function FCT.Options()
 						name = L["Enable"],
 					}
 				}
+			},
+			colors = {
+				order = 4,
+				type = "group",
+				name = L["Colors"],
+				get = function(info)
+					local t = FCT.db.colors[ info[#info] ]
+					local d = ns.colors[ info[#info] ]
+					return t.r, t.g, t.b, t.a, d.r, d.g, d.b, d.a
+				end,
+				set = function(info, r, g, b)
+					local t = FCT.db.colors[ info[#info] ]
+					t.r, t.g, t.b = r, g, b
+				end,
+				args = {}
 			}
 		},
 	}
 
-	for _, name in ipairs({'Player','Target','FriendlyPlayer','FriendlyNPC','EnemyPlayer','EnemyNPC'}) do
-		FCT.AddOptions('nameplates', name)
+	for name in pairs(ns.defaults.nameplates.frames) do
+		FCT:AddOptions('nameplates', name)
 	end
-	for _, name in ipairs({'Player','Target','TargetTarget','TargetTargetTarget','Focus','FocusTarget','Pet','PetTarget','Arena','Boss','Party','Raid','Raid40','RaidPet','Assist','Tank'}) do
-		FCT.AddOptions('unitframes', name)
+	for name in pairs(ns.defaults.unitframes.frames) do
+		FCT:AddOptions('unitframes', name)
+	end
+	for index in pairs(ns.colors) do
+		FCT:AddOptions('colors', index)
 	end
 end
 
@@ -165,6 +316,7 @@ function FCT:Initialize()
 
 	-- Database
 	FCT.db = E:CopyTable({}, ns.defaults)
+	FCT.db.colors = E:CopyTable({}, ns.colors)
 	_G.ElvFCT = E:CopyTable(FCT.db, _G.ElvFCT)
 
 	FCT:RegisterEvent("PLAYER_LOGOUT")
