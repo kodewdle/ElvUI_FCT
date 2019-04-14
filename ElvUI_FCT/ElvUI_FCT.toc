@@ -5,5 +5,6 @@
 ## SavedVariables: ElvFCT
 ## RequiredDeps: ElvUI
 
+settings.lua
 init.lua
 core.lua

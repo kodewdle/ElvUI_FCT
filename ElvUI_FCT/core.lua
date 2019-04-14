@@ -239,6 +239,7 @@ local objects = {}
 local function hook(x)
 	local fb = x and x.Feedback
 	if not (fb and fb.owner) or objects[fb.owner] then return end
+
 	if fb.font			== nil then fb.font			= 'Expressway'	end
 	if fb.fontSize		== nil then fb.fontSize		= 14			end
 	if fb.fontOutline	== nil then fb.fontOutline	= 'OUTLINE'		end
