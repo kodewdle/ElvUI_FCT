@@ -14,7 +14,7 @@ local band, guid, uisu, gsi, cf = bit.band, UnitGUID, UnitIsUnit, GetSpellInfo, 
 local info = CombatLogGetCurrentEventInfo
 
 ns.objects, ns.spells, ns.color = {}, {}, {}
-ns.CT = E:CopyTable({}, CombatFeedbackText)
+ns.CT = E:CopyTable({}, _G.CombatFeedbackText)
 ns.CT.MISFIRE = _G.COMBAT_TEXT_MISFIRE
 
 local harlemShake = {
