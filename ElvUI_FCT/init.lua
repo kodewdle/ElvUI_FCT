@@ -421,6 +421,7 @@ end
 function FCT:Build(frame, RaisedElement)
 	local raised = CreateFrame('Frame', frame:GetDebugName()..'RaisedElvFCT', frame)
 	raised:SetFrameLevel(RaisedElement:GetFrameLevel() + 50)
+	raised:SetAllPoints()
 
 	return { owner = frame, parent = raised }
 end

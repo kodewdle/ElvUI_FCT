@@ -25,7 +25,7 @@ local harlemShake = {
 		end
 	end,
 	ShakeIt = function(object, delay)
-		if object and not object:IsForbidden() and object:IsShown() then
+		if object and object:IsShown() and not object:IsForbidden() then
 			E:Shake(object)
 			return E:Delay(delay, ns.HS.StopIt, object)
 		end
@@ -79,13 +79,17 @@ local lightspark = {
 		end
 	end,
 	onShowHide = function(frame)
-		wipe(frame.ElvFCT.objs)
+		if frame.ElvFCT.objs then
+			wipe(frame.ElvFCT.objs)
+		end
 
-		for i = 1, #frame.ElvFCT.texts do
-			frame.ElvFCT.texts[i]:Hide()
-			frame.ElvFCT.texts[i].Icon:Hide()
-			frame.ElvFCT.texts[i].Icon.backdrop:Hide()
-			frame.ElvFCT.texts[i].Spell:SetText('')
+		if frame.ElvFCT.texts then
+			for i = 1, #frame.ElvFCT.texts do
+				frame.ElvFCT.texts[i]:Hide()
+				frame.ElvFCT.texts[i].Icon:Hide()
+				frame.ElvFCT.texts[i].Icon.backdrop:Hide()
+				frame.ElvFCT.texts[i].Spell:SetText('')
+			end
 		end
 	end}
 ns.LS = lightspark
@@ -205,25 +209,30 @@ function FCT:Update(frame, fb)
 			end
 		end
 
-		if fb.critShake and b and not frame.isShaking then
-			frame.isShaking = ns.HS.ShakeIt(frame, fb.shakeDuration)
-		elseif fb.textShake and b and not text.isShaking then
-			text.isShaking = ns.HS.ShakeIt(text, fb.shakeDuration)
-		end
-
 		text:FontTemplate(fb.font, fb.fontSize + (b and 4 or 0), fb.fontOutline)
 		text:SetTextColor(unpack(d or (ns.CT[a] and ns.color[00]) or FCT:GP(c) or ns.color[01]))
 		text:SetText(ns.CT[a] or a)
+		text:Show()
+
+		if b then
+			if fb.critShake then
+				if not fb.owner.isShaking then
+					fb.owner.isShaking = ns.HS.ShakeIt(fb.owner, fb.shakeDuration)
+				end
+			elseif fb.textShake then
+				if not text.isShaking then
+					text.isShaking = ns.HS.ShakeIt(text, fb.shakeDuration)
+				end
+			end
+		end
 
 		if fb.mode == 'Simpy' then
 			if not fb.FadeOut then fb.FadeOut = { mode = 'OUT' } else fb.FadeOut.fadeTimer = nil end
 			if not fb.FaderIn then fb.FaderIn = { mode = 'IN' } else fb.FaderIn.fadeTimer = nil end
 			ns.SI.FadeIn(fb.FaderIn, fb.Frame, 0.2, text.fadeTime + (b and 0.3 or 0), 0.4, 0.0, 0.8)
-			text:Show()
 		elseif fb.mode == 'LS' then
 			tinsert(fb.objs, text)
 			text.frame:SetAlpha(1)
-			text:Show()
 		end
 end end
 
@@ -231,21 +240,23 @@ function FCT:EnableMode(fb, mode)
 	if mode == 'Simpy' then
 		if not fb.Frame then
 			fb.Frame = cf('Frame', fb.owner:GetDebugName()..'ElvFCT', fb.parent)
-			local frameName = fb.Frame:GetDebugName()
 			fb.Frame.owner = fb.owner
 
+			local frameName = fb.Frame:GetDebugName()
 			fb.Text = fb.Frame:CreateFontString(frameName..'Text', 'OVERLAY')
 			fb.Text:FontTemplate(fb.font, fb.fontSize, fb.fontOutline)
+
 			fb.Text.Icon = fb.Frame:CreateTexture(frameName..'Icon')
 			S:HandleIcon(fb.Text.Icon, true)
+
 			fb.Text.Spell = fb.Frame:CreateFontString(frameName..'Spell', 'OVERLAY')
 			fb.Text.Spell:FontTemplate(fb.font, fb.fontSize, fb.fontOutline)
 		end
 
-		fb.Text.Icon:Size(fb.iconSize)
-		fb.Text:Point('CENTER', fb.owner.Health, 'CENTER', fb.textX, fb.textY)
-		fb.Text.Icon:Point('RIGHT', fb.Text, 'LEFT', fb.iconX, fb.iconY)
+		fb.Text:Point('CENTER', fb.parent, 'CENTER', fb.textX, fb.textY)
 		fb.Text.Spell:Point('BOTTOM', fb.Text, 'TOP', fb.spellX, fb.spellY)
+		fb.Text.Icon:Point('RIGHT', fb.Text, 'LEFT', fb.iconX, fb.iconY)
+		fb.Text.Icon:Size(fb.iconSize)
 
 		fb.Text.fadeTime   = fb.FadeTime
 		fb.Text.xDirection = fb.DirectionX
@@ -262,14 +273,18 @@ function FCT:EnableMode(fb, mode)
 		for i=1, fb.numTexts do
 			if not fb.texts[i] then
 				local frame = cf('Frame', fb.owner:GetDebugName()..'ElvFCT'..i, fb.parent)
+
 				local frameName = frame:GetDebugName()
 				local text = frame:CreateFontString(frameName..'Text', 'OVERLAY')
 				text:FontTemplate(fb.font, fb.fontSize, fb.fontOutline)
+				text.frame = frame
+
 				text.Icon = frame:CreateTexture(frameName..'Icon')
 				S:HandleIcon(text.Icon, true)
+
 				text.Spell = frame:CreateFontString(frameName..'Spell', 'OVERLAY')
 				text.Spell:FontTemplate(fb.font, fb.fontSize, fb.fontOutline)
-				text.frame = frame
+
 				fb.texts[i] = text
 			end
 
@@ -376,7 +391,11 @@ end
 
 function FCT:Disable(frame)
 	local fb = frame.ElvFCT
-	if fb and ns.objects[fb.owner] then
-		ns.objects[fb.owner] = nil
+	if fb then
+		ns.LS.onShowHide(frame)
+
+		if ns.objects[fb.owner] then
+			ns.objects[fb.owner] = nil
+		end
 	end
 end
