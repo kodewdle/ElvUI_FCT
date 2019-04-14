@@ -14,8 +14,9 @@ local hooksecurefunc = hooksecurefunc
 local CreateFrame = CreateFrame
 
 local Version = GetAddOnMetadata(addon, "Version")
-local version = format("[v|cFF508cf7%s|r]", Version)
+local version = format("[|cFF508cf7v%s|r]", Version)
 local title = '|cfffe7b2cElvUI|r: |cFFF76ADBFCT|r'
+local titleLong = '|cfffe7b2cElvUI|r: |cFFF76ADBFloating Combat Text|r'
 local by = 'by |cFF8866ccSimpy|r and |cFF34dd61Lightspark|r (ls-)'
 
 FCT.options = {
@@ -26,37 +27,26 @@ FCT.options = {
 		name = "",
 		guiInline = true,
 		args = {
-			showIcon = { order = 1, type = "toggle", name = L["Show Icon"] },
-			alternateIcon = { order = 2, type = "toggle", name = L["Alternate Icon"] },
+			header = { order = 0, name = L["Toggles"], type = "header" },
+			alternateIcon = { order = 1, type = "toggle", name = L["Alternate Icon"] },
+			showIcon = { order = 2, type = "toggle", name = L["Show Icon"] },
 			showName = { order = 3, type = "toggle", name = L["Show Name"] },
-			showHots = { order = 4, type = "toggle", name = L["Show Hots"] },
-			showDots = { order = 5, type = "toggle", name = L["Show Dots"] },
-			isTarget = { order = 6, type = "toggle", name = L["Is Target"] },
-			isPlayer = { order = 7, type = "toggle", name = L["From Player"] },
-			showPet = { order = 8, type = "toggle", name = L["Show Pet"] },
-			critShake = { order = 9, type = "toggle", name = L["Crit Shake"] },
-			textShake = { order = 10, type = "toggle", name = L["Text Shake"] },
+			showPet = { order = 4, type = "toggle", name = L["Show Pet"] },
+			showHots = { order = 5, type = "toggle", name = L["Show Hots"] },
+			showDots = { order = 6, type = "toggle", name = L["Show Dots"] },
+			isTarget = { order = 7, type = "toggle", name = L["Is Target"] },
+			isPlayer = { order = 8, type = "toggle", name = L["From Player"] },
+			critShake = { order = 9, type = "toggle", name = L["Critical Frame Shake"] },
+			textShake = { order = 10, type = "toggle", name = L["Critical Text Shake"] },
 		}
 	},
-	settings = {
+	fonts = {
 		order = 3,
 		type = "group",
 		name = "",
 		guiInline = true,
 		args = {
-			mode = { order = 1, name = L["Mode"], type = "select",
-				values = { ['Simpy'] = L["Fade"], ['LS'] = L["Animation"] },
-			},
-			iconSize = { order = 2, name = L["Icon Size"], type = "range", min = 10, max = 30, step = 1 },
-			shakeDuration = { order = 3, name = L["Shake Duration"], type = "range", min = 0, max = 1, step = 0.1 },
-		}
-	},
-	fonts = {
-		order = 4,
-		type = "group",
-		name = "",
-		guiInline = true,
-		args = {
+			header = { order = 0, name = L["Fonts"], type = "header" },
 			font = { type = "select", dialogControl = 'LSM30_Font', order = 1, name = L["Font"] },
 			fontOutline = { order = 2, name = L["Font Outline"], desc = L["Set the font outline."], type = "select",
 				values = {
@@ -69,12 +59,27 @@ FCT.options = {
 			fontSize = { order = 3, name = _G.FONT_SIZE, type = "range", min = 4, max = 60, step = 1 },
 		}
 	},
+	settings = {
+		order = 4,
+		type = "group",
+		name = "",
+		guiInline = true,
+		args = {
+			header = { order = 0, name = L["Settings"], type = "header" },
+			mode = { order = 1, name = L["Mode"], type = "select",
+				values = { ['Simpy'] = L["Fade"], ['LS'] = L["Animation"] },
+			},
+			iconSize = { order = 2, name = L["Icon Size"], type = "range", min = 10, max = 30, step = 1 },
+			shakeDuration = { order = 3, name = L["Shake Duration"], type = "range", min = 0, max = 1, step = 0.1 },
+		}
+	},
 	offsets = {
 		order = 5,
 		type = "group",
 		name = "",
 		guiInline = true,
 		args = {
+			header = { order = 0, name = L["Offsets"], type = "header" },
 			textY = { order = 1, name = L["Text Y"], desc = L["Only applies to Fade mode."], type = "range", min = -100, max = 100, step = 1 },
 			textX = { order = 2, name = L["Text X"], desc = L["Only applies to Fade mode."], type = "range", min = -100, max = 100, step = 1 },
 			iconY = { order = 3, name = L["Icon Y"], type = "range", min = -100, max = 100, step = 1 },
@@ -89,6 +94,7 @@ FCT.options = {
 		name = "",
 		guiInline = true,
 		args = {
+			header = { order = 0, name = L["Animations: |cFFffffffOnly applies on Animation mode.|r"], type = "header" },
 			anim = { order = 1, name = L["Animation"], type = "select",
 				values = {
 					["fountain"] = L["Fountain"],
@@ -163,7 +169,7 @@ function FCT:Options()
 			name = {
 				order = 1,
 				type = "header",
-				name = title.." "..version.." "..by,
+				name = titleLong.." "..version.." "..by,
 			},
 			nameplates = {
 				order = 2,
