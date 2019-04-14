@@ -211,11 +211,6 @@ function FCT:AddOptions(arg1, arg2, arg3)
 			set = function(info, value) FCT.db[arg1].frames[arg2][ info[#info] ] = value end,
 			args = FCT.options
 		}
-
-		if arg3 then
-			E.Options.args.ElvFCT.args[arg1].args[arg2].get = function(info) return FCT.db[arg1].frames[arg2][arg3][ info[#info] ] end
-			E.Options.args.ElvFCT.args[arg1].args[arg2].set = function(info, value) FCT.db[arg1].frames[arg2][arg3][ info[#info] ] = value end
-		end
 	end
 end
 
@@ -279,15 +274,11 @@ function FCT:Options()
 		},
 	}
 
-	for name in pairs(ns.defaults.nameplates.frames) do
-		FCT:AddOptions('nameplates', name)
+	for name, obj in pairs(ns.defaults.nameplates.frames) do
+		FCT:AddOptions('nameplates', name, obj)
 	end
 	for name, obj in pairs(ns.defaults.unitframes.frames) do
-		if type(obj) == 'table' then
-			FCT:AddOptions('unitframes', name, obj)
-		else
-			FCT:AddOptions('unitframes', name)
-		end
+		FCT:AddOptions('unitframes', name, obj)
 	end
 	for index in pairs(ns.colors) do
 		FCT:AddOptions('colors', index)
@@ -342,7 +333,7 @@ local function removeDefaults(db, defaults, blocker)
 end
 
 function FCT:PLAYER_LOGOUT()
-	removeDefaults(_G.ElvFCT, ns.defaults)
+	removeDefaults(_G.ElvFCT, FCT.data)
 end
 
 function FCT:Initialize()
@@ -374,15 +365,16 @@ function FCT:Initialize()
 	}
 
 	-- Database
-	FCT.db = E:CopyTable({}, ns.defaults)
-	FCT.db.colors = E:CopyTable({}, ns.colors)
-
+	FCT.data = E:CopyTable({}, ns.defaults)
+	FCT.data.colors = E:CopyTable({}, ns.colors)
 	for name in pairs(ns.defaults.nameplates.frames) do
-		E:CopyTable(FCT.db.nameplates.frames[name], ns.frames)
+		E:CopyTable(FCT.data.nameplates.frames[name], ns.frames)
 	end
 	for name in pairs(ns.defaults.unitframes.frames) do
-		E:CopyTable(FCT.db.unitframes.frames[name], ns.frames)
+		E:CopyTable(FCT.data.unitframes.frames[name], ns.frames)
 	end
+
+	FCT.db = E:CopyTable({}, FCT.data)
 
 	_G.ElvFCT = E:CopyTable(FCT.db, _G.ElvFCT)
 
