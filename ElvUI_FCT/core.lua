@@ -13,7 +13,7 @@ local sin, cos, pi, rand = math.sin, math.cos, math.pi, math.random
 local band, guid, uisu, gsi, cf = bit.band, UnitGUID, UnitIsUnit, GetSpellInfo, CreateFrame
 local info = CombatLogGetCurrentEventInfo
 
-ns.objects, ns.spells, ns.exclude = {}, {}, {}
+ns.objects, ns.spells = {}, {}
 ns.CT, ns.SC = E:CopyTable({}, CombatFeedbackText), ns.colors
 ns.CT.MISFIRE = _G.COMBAT_TEXT_MISFIRE
 
@@ -143,7 +143,7 @@ function FCT:Update(frame, fb)
 	if tb or pb then return end
 
 	if e == 'SPELL_HEAL' or (fb.showHots and e == 'SPELL_PERIODIC_HEAL') then
-		if not ns.exclude[h] then a, b, d = j, k, ns.SC[-3] end
+		if not fb.exclude[h] then a, b, d = j, k, ns.SC[-3] end
 	elseif e == 'RANGE_DAMAGE' then
 		a, b, d = j, l, ns.SC[-2]
 	elseif e == 'SWING_DAMAGE' then

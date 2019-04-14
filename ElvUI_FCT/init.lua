@@ -193,7 +193,7 @@ FCT.options = {
 	},
 }
 
-function FCT:AddOptions(arg1, arg2, arg3)
+function FCT:AddOptions(arg1, arg2)
 	if E.Options.args.ElvFCT.args[arg1].args[arg2] then return end
 
 	if arg1 == 'colors' then
@@ -207,8 +207,20 @@ function FCT:AddOptions(arg1, arg2, arg3)
 			order = FCT.orders[arg2][1],
 			name = L[FCT.orders[arg2][2]],
 			type = "group",
-			get = function(info) return FCT.db[arg1].frames[arg2][ info[#info] ] end,
-			set = function(info, value) FCT.db[arg1].frames[arg2][ info[#info] ] = value end,
+			get = function(info)
+				if info[4] == 'advanced' or info[4] == 'exclude' then
+					return FCT.db[arg1].frames[arg2][info[4]][ info[#info] ]
+				else
+					return FCT.db[arg1].frames[arg2][ info[#info] ]
+				end
+			end,
+			set = function(info, value)
+				if info[4] == 'advanced' or info[4] == 'exclude' then
+					FCT.db[arg1].frames[arg2][info[4]][ info[#info] ] = value
+				else
+					FCT.db[arg1].frames[arg2][ info[#info] ] = value
+				end
+			end,
 			args = FCT.options
 		}
 	end
@@ -274,11 +286,11 @@ function FCT:Options()
 		},
 	}
 
-	for name, obj in pairs(ns.defaults.nameplates.frames) do
-		FCT:AddOptions('nameplates', name, obj)
+	for name in pairs(ns.defaults.nameplates.frames) do
+		FCT:AddOptions('nameplates', name)
 	end
-	for name, obj in pairs(ns.defaults.unitframes.frames) do
-		FCT:AddOptions('unitframes', name, obj)
+	for name in pairs(ns.defaults.unitframes.frames) do
+		FCT:AddOptions('unitframes', name)
 	end
 	for index in pairs(ns.colors) do
 		FCT:AddOptions('colors', index)
@@ -367,15 +379,10 @@ function FCT:Initialize()
 	-- Database
 	FCT.data = E:CopyTable({}, ns.defaults)
 	FCT.data.colors = E:CopyTable({}, ns.colors)
-	for name in pairs(ns.defaults.nameplates.frames) do
-		E:CopyTable(FCT.data.nameplates.frames[name], ns.frames)
-	end
-	for name in pairs(ns.defaults.unitframes.frames) do
-		E:CopyTable(FCT.data.unitframes.frames[name], ns.frames)
-	end
+	for name in pairs(ns.defaults.nameplates.frames) do E:CopyTable(FCT.data.nameplates.frames[name], ns.frames) end
+	for name in pairs(ns.defaults.unitframes.frames) do E:CopyTable(FCT.data.unitframes.frames[name], ns.frames) end
 
 	FCT.db = E:CopyTable({}, FCT.data)
-
 	_G.ElvFCT = E:CopyTable(FCT.db, _G.ElvFCT)
 
 	-- Events
