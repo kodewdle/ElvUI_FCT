@@ -2,6 +2,8 @@ local addon, ns = ...
 
 local E, L, V, P, G = unpack(ElvUI)
 local FCT = E.Libs.AceAddon:NewAddon(addon, 'AceEvent-3.0')
+ns[1] = addon
+ns[2] = FCT
 
 local _G = _G
 local next = next
@@ -16,7 +18,7 @@ local version = format("[v|cFF508cf7%s|r]", Version)
 local title = '|cfffe7b2cElvUI|r: |cFFF76ADBFCT|r'
 local by = 'by |cFF8866ccSimpy|r and |cFF34dd61Lightspark|r (ls-)'
 
-FCT.frameOptions = {
+FCT.options = {
 	enable = {
 		order = 1,
 		type = "toggle",
@@ -148,24 +150,24 @@ function FCT:AddOptions(arg1, arg2)
 
 	if arg1 == 'colors' then
 		E.Options.args.ElvFCT.args[arg1].args[arg2] = {
-			order = FCT.OptionsTable[arg2],
+			order = FCT.orders[arg2],
 			name = L[ns.colors[arg2].n],
 			type = 'color',
 		}
 	else
 		E.Options.args.ElvFCT.args[arg1].args[arg2] = {
-			order = FCT.OptionsTable[arg2][1],
-			name = L[FCT.OptionsTable[arg2][2]],
+			order = FCT.orders[arg2][1],
+			name = L[FCT.orders[arg2][2]],
 			type = "group",
 			get = function(info) return FCT.db[arg1].frames[arg2][ info[#info] ] end,
 			set = function(info, value) FCT.db[arg1].frames[arg2][ info[#info] ] = value end,
-			args = FCT.frameOptions
+			args = FCT.options
 		}
 	end
 end
 
 function FCT:Options()
-	FCT.frameOptions.font.values = _G.AceGUIWidgetLSMlists.font
+	FCT.options.font.values = _G.AceGUIWidgetLSMlists.font
 
 	E.Options.args.ElvFCT = {
 		order = 1337,
@@ -289,7 +291,7 @@ end
 function FCT:Initialize()
 	_G.ElvUI_FCT = FCT
 
-	FCT.OptionsTable = {
+	FCT.orders = {
 		-- Nameplates
 		Player = {1, "Player"},
 		Target = {2, "Target"},
@@ -317,9 +319,19 @@ function FCT:Initialize()
 	-- Database
 	FCT.db = E:CopyTable({}, ns.defaults)
 	FCT.db.colors = E:CopyTable({}, ns.colors)
+
+	for name in pairs(ns.defaults.nameplates.frames) do
+		E:CopyTable(FCT.db.nameplates.frames[name], ns.frames)
+	end
+	for name in pairs(ns.defaults.unitframes.frames) do
+		E:CopyTable(FCT.db.unitframes.frames[name], ns.frames)
+	end
+
 	_G.ElvFCT = E:CopyTable(FCT.db, _G.ElvFCT)
 
+	-- Events
 	FCT:RegisterEvent("PLAYER_LOGOUT")
+	FCT:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 
 	E.Libs.EP:RegisterPlugin(addon, FCT.Options)
 end
