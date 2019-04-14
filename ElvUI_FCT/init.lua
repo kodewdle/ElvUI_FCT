@@ -19,6 +19,10 @@ local title = '|cfffe7b2cElvUI|r: |cFFF76ADBFCT|r'
 local titleLong = '|cfffe7b2cElvUI|r: |cFFF76ADBFloating Combat Text|r'
 local by = 'by |cFF8866ccSimpy|r and |cFF34dd61Lightspark|r (ls-)'
 
+function FCT:ColorOption(name)
+	return format("|cFFF76ADB%s|r", name)
+end
+
 FCT.options = {
 	enable = { order = 1, type = "toggle", name = L["Enable"] },
 	toggles = {
@@ -27,7 +31,7 @@ FCT.options = {
 		name = "",
 		guiInline = true,
 		args = {
-			header = { order = 0, name = L["Toggles"], type = "header" },
+			header = { order = 0, name = FCT:ColorOption(L["Toggles"]), type = "header" },
 			alternateIcon = { order = 1, type = "toggle", name = L["Alternate Icon"] },
 			showIcon = { order = 2, type = "toggle", name = L["Show Icon"] },
 			showName = { order = 3, type = "toggle", name = L["Show Name"] },
@@ -46,7 +50,7 @@ FCT.options = {
 		name = "",
 		guiInline = true,
 		args = {
-			header = { order = 0, name = L["Fonts"], type = "header" },
+			header = { order = 0, name = FCT:ColorOption(L["Fonts"]), type = "header" },
 			font = { type = "select", dialogControl = 'LSM30_Font', order = 1, name = L["Font"] },
 			fontOutline = { order = 2, name = L["Font Outline"], desc = L["Set the font outline."], type = "select",
 				values = {
@@ -65,7 +69,7 @@ FCT.options = {
 		name = "",
 		guiInline = true,
 		args = {
-			header = { order = 0, name = L["Settings"], type = "header" },
+			header = { order = 0, name =  FCT:ColorOption(L["Settings"]), type = "header" },
 			mode = { order = 1, name = L["Mode"], type = "select",
 				values = { ['Simpy'] = L["Fade"], ['LS'] = L["Animation"] },
 			},
@@ -79,7 +83,7 @@ FCT.options = {
 		name = "",
 		guiInline = true,
 		args = {
-			header = { order = 0, name = L["Offsets"], type = "header" },
+			header = { order = 0, name =  FCT:ColorOption(L["Offsets"]), type = "header" },
 			textY = { order = 1, name = L["Text Y"], desc = L["Only applies to Fade mode."], type = "range", min = -100, max = 100, step = 1 },
 			textX = { order = 2, name = L["Text X"], desc = L["Only applies to Fade mode."], type = "range", min = -100, max = 100, step = 1 },
 			iconY = { order = 3, name = L["Icon Y"], type = "range", min = -100, max = 100, step = 1 },
@@ -94,7 +98,7 @@ FCT.options = {
 		name = "",
 		guiInline = true,
 		args = {
-			header = { order = 0, name = L["Animations: |cFFffffffOnly applies on Animation mode.|r"], type = "header" },
+			header = { order = 0, name =  FCT:ColorOption(L["Animations: |cFFffffffOnly applies on Animation mode.|r"]), type = "header" },
 			anim = { order = 1, name = L["Animation"], type = "select",
 				values = {
 					["fountain"] = L["Fountain"],
