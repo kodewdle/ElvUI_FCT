@@ -19,8 +19,12 @@ local title = '|cfffe7b2cElvUI|r: |cFFF76ADBFCT|r'
 local titleLong = '|cfffe7b2cElvUI|r: |cFFF76ADBFloating Combat Text|r'
 local by = 'by |cFF8866ccSimpy|r and |cFF34dd61Lightspark|r (ls-)'
 
-function FCT:ColorOption(name)
-	return format("|cFFF76ADB%s|r", name)
+function FCT:ColorOption(name, desc)
+	if desc then
+		return format("|cFFF76ADB%s:|r |cFFffffff%s|r", name, desc)
+	else
+		return format("|cFFF76ADB%s|r", name)
+	end
 end
 
 FCT.options = {
@@ -98,7 +102,7 @@ FCT.options = {
 		name = "",
 		guiInline = true,
 		args = {
-			header = { order = 0, name =  FCT:ColorOption(L["Animations: |cFFffffffOnly applies on Animation mode.|r"]), type = "header" },
+			header = { order = 0, name =  FCT:ColorOption(L["Animations"], L["Only applies on Animation mode."]), type = "header" },
 			anim = { order = 1, name = L["Animation"], type = "select",
 				values = {
 					["fountain"] = L["Fountain"],
