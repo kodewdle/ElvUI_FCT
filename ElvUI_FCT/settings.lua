@@ -91,6 +91,7 @@ ns.frames = {
 	isTarget = false,
 	isPlayer = true,
 	showPet = true,
+	iconSize = 16,
 	textY = 0,
 	textX = 0,
 	iconY = 0,

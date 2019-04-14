@@ -130,8 +130,14 @@ FCT.options = {
 			['LS'] = L["Animation"]
 		},
 	},
-	offsets = {
+	iconSize = {
 		order = 19,
+		name = L["Icon Size"],
+		type = "range",
+		min = 10, max = 30, step = 1,
+	},
+	offsets = {
+		order = 20,
 		type = "group",
 		name = L["Offsets"],
 		guiInline = true,
@@ -177,7 +183,7 @@ FCT.options = {
 		}
 	},
 	advanced = {
-		order = 20,
+		order = 21,
 		type = "group",
 		name = L["Animation Settings"],
 		guiInline = true,
