@@ -12,6 +12,8 @@ ns.defaults = {
 				alternateIcon = true,
 				isTarget = true,
 				showIcon = true,
+				iconX = -5,
+				spellY = 5
 			},
 			FriendlyNPC = {
 				enable = true,
@@ -19,6 +21,8 @@ ns.defaults = {
 				alternateIcon = true,
 				isTarget = true,
 				showIcon = true,
+				iconX = -5,
+				spellY = 5
 			},
 			EnemyPlayer = {
 				enable = true,
@@ -26,6 +30,8 @@ ns.defaults = {
 				alternateIcon = true,
 				isTarget = true,
 				showIcon = true,
+				iconX = -5,
+				spellY = 5
 			},
 			EnemyNPC = {
 				enable = true,
@@ -33,6 +39,8 @@ ns.defaults = {
 				alternateIcon = true,
 				isTarget = true,
 				showIcon = true,
+				iconX = -5,
+				spellY = 5
 			},
 		}
 	},
@@ -41,28 +49,38 @@ ns.defaults = {
 		frames = {
 			Player = {
 				enable = true,
-				showName = true
+				showName = true,
+				iconX = -5,
+				spellY = 2
 			},
 			Target = {
 				enable = true,
-				showName = true
+				showName = true,
+				iconX = -5,
+				spellY = 2
 			},
 			TargetTarget = {},
 			TargetTargetTarget = {},
 			Focus = {
 				enable = true,
-				showIcon = true
+				showIcon = true,
+				iconX = -5,
+				spellY = 2
 			},
 			FocusTarget = {
 				enable = true,
-				showIcon = true
+				showIcon = true,
+				iconX = -5,
+				spellY = 2
 			},
 			Pet = {},
 			PetTarget = {},
 			Arena = {},
 			Boss = {
 				enable = true,
-				showIcon = true
+				showIcon = true,
+				iconX = -5,
+				spellY = 2
 			},
 			Party = {},
 			Raid = {},

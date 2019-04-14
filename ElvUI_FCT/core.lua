@@ -185,9 +185,9 @@ function FCT:Update(frame, fb)
 						if fb.alternateIcon then
 							text.Icon:ClearAllPoints()
 							if text.xDirection < 0 then
-								text.Icon:Point('RIGHT', text, 'LEFT', -5, 0)
+								text.Icon:Point('RIGHT', text, 'LEFT', fb.iconX, fb.iconY)
 							else
-								text.Icon:Point('LEFT', text, 'RIGHT', 5, 0)
+								text.Icon:Point('LEFT', text, 'RIGHT', fb.iconX * -1, fb.iconY)
 							end
 						end
 					else
@@ -268,14 +268,14 @@ function FCT:EnableMode(fb, mode)
 				text.Icon = frame:CreateTexture(frameName..'Icon')
 				S:HandleIcon(text.Icon, true)
 				text.Spell = frame:CreateFontString(frameName..'Spell', 'OVERLAY')
-				text.Spell:Point('BOTTOM', text, 'TOP', fb.spellX, fb.spellY)
+				text.Spell:FontTemplate(fb.font, fb.fontSize, fb.fontOutline)
 				text.frame = frame
 				fb.texts[i] = text
 			end
 
 			fb.texts[i].Icon:Size(fb.iconSize)
 			fb.texts[i].Icon:Point('RIGHT', fb.texts[i], 'LEFT', fb.iconX, fb.iconY)
-			fb.texts[i].Spell:FontTemplate(fb.font, fb.fontSize, fb.fontOutline)
+			fb.texts[i].Spell:Point('BOTTOM', fb.texts[i], 'TOP', fb.spellX, fb.spellY)
 
 			fb.texts[i].fadeTime   = fb.FadeTime
 			fb.texts[i].xDirection = fb.DirectionX
