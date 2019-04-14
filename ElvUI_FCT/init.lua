@@ -13,13 +13,23 @@ local version = format("[v|cFF508cf7%s|r]", Version)
 local title = '|cfffe7b2cElvUI|r: |cFFF76ADBFCT|r'
 local by = 'by |cFF8866ccSimpy|r and |cFF34dd61Lightspark|r (ls-)'
 
+FCT.frameOptions = {
+	enable = {
+		order = 1,
+		type = "toggle",
+		name = L["Enable"],
+	},
+}
+
 function FCT.AddOptions(arg1, arg2)
 	if E.Options.args.ElvFCT.args[arg1].args[arg2] then return end
 	E.Options.args.ElvFCT.args[arg1].args[arg2] = {
 		order = FCT.OptionsTable[arg2][1],
 		name = L[FCT.OptionsTable[arg2][2]],
 		type = "group",
-		args = {}
+		get = function(info) return FCT.db[arg1].frames[arg2][ info[#info] ] end,
+		set = function(info, value) FCT.db[arg1].frames[arg2][ info[#info] ] = value end,
+		args = FCT.frameOptions
 	}
 end
 
