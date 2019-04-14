@@ -6,7 +6,6 @@ ns.defaults = {
 		enable = false,
 		frames = {
 			Player = {},
-			Target = {},
 			FriendlyPlayer = {},
 			FriendlyNPC = {},
 			EnemyPlayer = {},

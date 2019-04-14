@@ -1,6 +1,9 @@
 local addon, ns = ...
 
 local E, L, V, P, G = unpack(ElvUI)
+local NP = E:GetModule('NamePlates')
+local UF = E:GetModule('UnitFrames')
+
 local FCT = E.Libs.AceAddon:NewAddon(addon, 'AceEvent-3.0')
 ns[1] = addon
 ns[2] = FCT
@@ -10,8 +13,11 @@ local next = next
 local type = type
 local pairs = pairs
 local format = format
+local tinsert = tinsert
+local tonumber = tonumber
 local setmetatable = setmetatable
 local hooksecurefunc = hooksecurefunc
+local CreateFrame = CreateFrame
 
 local Version = GetAddOnMetadata(addon, "Version")
 local version = format("[v|cFF508cf7%s|r]", Version)
@@ -220,6 +226,11 @@ function FCT:AddOptions(arg1, arg2)
 				else
 					FCT.db[arg1].frames[arg2][ info[#info] ] = value
 				end
+				if arg1 == 'unitframes' then
+					UF:Update_AllFrames()
+				else
+					NP:ConfigureAll()
+				end
 			end,
 			args = FCT.options
 		}
@@ -280,6 +291,7 @@ function FCT:Options()
 				set = function(info, r, g, b)
 					local t = FCT.db.colors[ info[#info] ]
 					t.r, t.g, t.b = r, g, b
+					FCT:UpdateColors();
 				end,
 				args = {}
 			}
@@ -348,18 +360,43 @@ function FCT:PLAYER_LOGOUT()
 	removeDefaults(_G.ElvFCT, FCT.data)
 end
 
+function FCT:FetchDB(Module, Type)
+	return FCT.db[Module].frames[FCT.frameTypes[Type]]
+end
+
+function FCT:ToggleFrame(frame)
+	if frame.unitframeType then
+		FCT:Toggle(frame, FCT:FetchDB('unitframes', frame.unitframeType))
+	elseif frame.frameType then
+		FCT:Toggle(frame, FCT:FetchDB('nameplates', frame.frameType))
+	end
+end
+
+function FCT:UpdateColors()
+	for k, v in pairs(FCT.db.colors) do
+		k = tonumber(k)
+		if not ns.color[k] then
+			ns.color[k] = {}
+		end
+
+		tinsert(ns.color[k], 1, v.r)
+		tinsert(ns.color[k], 2, v.g)
+		tinsert(ns.color[k], 3, v.b)
+	end
+end
+
 function FCT:Initialize()
 	_G.ElvUI_FCT = FCT
 
 	FCT.orders = {
 		-- Nameplates
 		Player = {1, "Player"},
-		Target = {2, "Target"},
 		FriendlyPlayer = {3, "FRIENDLY_PLAYER"},
 		FriendlyNPC = {4, "FRIENDLY_NPC"},
 		EnemyPlayer = {5, "ENEMY_PLAYER"},
 		EnemyNPC = {6, "ENEMY_NPC"},
 		-- Unitframes
+		Target = {2, "Target"},
 		TargetTarget = {3, "TargetTarget"},
 		TargetTargetTarget = {4, "TargetTargetTarget"},
 		Focus = {5, "Focus"},
@@ -376,6 +413,31 @@ function FCT:Initialize()
 		Tank = {16, "Tank"},
 	}
 
+	FCT.frameTypes = {
+		-- NamePlates
+		["PLAYER"] = "Player",
+		["FRIENDLY_PLAYER"] = "FriendlyPlayer",
+		["FRIENDLY_NPC"] = "FriendlyNPC",
+		["ENEMY_PLAYER"] = "EnemyPlayer",
+		["ENEMY_NPC"] = "EnemyNPC",
+
+		-- Unitframes
+		["arena"] = "Arena",
+		["assist"] = "Assist",
+		["party"] = "Party",
+		["raid"] = "Raid",
+		["raid40"] = "Raid40",
+		["tank"] = "Tank",
+		["focus"] = "Focus",
+		["focustarget"] = "FocusTarget",
+		["pet"] = "Pet",
+		["pettarget"] = "PetTarget",
+		["player"] = "Player",
+		["target"] = "Target",
+		["targettarget"] = "TargetTarget",
+		["targettargettarget"] = "TargetTargetTarget",
+	}
+
 	-- Database
 	FCT.data = E:CopyTable({}, ns.defaults)
 	FCT.data.colors = E:CopyTable({}, ns.colors)
@@ -385,6 +447,8 @@ function FCT:Initialize()
 	FCT.db = E:CopyTable({}, FCT.data)
 	_G.ElvFCT = E:CopyTable(FCT.db, _G.ElvFCT)
 
+	FCT:UpdateColors()
+
 	-- Events
 	FCT:RegisterEvent("PLAYER_LOGOUT")
 	FCT:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
@@ -392,4 +456,25 @@ function FCT:Initialize()
 	E.Libs.EP:RegisterPlugin(addon, FCT.Options)
 end
 
+function FCT:Build(frame, RaisedElement)
+	local raised = CreateFrame('Frame', frame:GetDebugName()..'RaisedElvFCT', frame)
+	raised:SetFrameLevel(RaisedElement:GetFrameLevel() + 50)
+
+	return { owner = frame, parent = raised }
+end
+
 hooksecurefunc(E, 'Initialize', FCT.Initialize)
+hooksecurefunc(NP, 'Update_Health', function(_, nameplate)
+	if not nameplate.ElvFCT then
+		nameplate.ElvFCT = FCT:Build(nameplate, nameplate.RaisedElement)
+	end
+
+	FCT:ToggleFrame(nameplate)
+end)
+hooksecurefunc(UF, 'Configure_HealthBar', function(_, frame)
+	if not frame.ElvFCT then
+		frame.ElvFCT = FCT:Build(frame, frame.RaisedElementParent)
+	end
+
+	FCT:ToggleFrame(frame)
+end)
