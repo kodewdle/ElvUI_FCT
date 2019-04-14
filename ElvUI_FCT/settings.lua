@@ -1,5 +1,6 @@
+local _, ns = ...
 
-ElvFCT = {
+ns.defaults = {
 	nameplates = {
 		enable = false,
 		frames = {
@@ -12,7 +13,7 @@ ElvFCT = {
 		}
 	},
 	unitframes = {
-		enabled = false,
+		enable = false,
 		frames = {
 			TargetTarget = {},
 			TargetTargetTarget = {},

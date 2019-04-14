@@ -1,20 +1,24 @@
-local addon = ...
+local addon, ns = ...
 
 local E, L, V, P, G = unpack(ElvUI)
-local FCT = E.Libs.AceAddon:NewAddon(addon)
+local FCT = E.Libs.AceAddon:NewAddon(addon, 'AceEvent-3.0')
 
+local _G = _G
+local ipairs = ipairs
 local format = format
-local version = GetAddOnMetadata(addon, "Version")
+local hooksecurefunc = hooksecurefunc
+
+local Version = GetAddOnMetadata(addon, "Version")
+local version = format("[v|cFF508cf7%s|r]", Version)
 local title = '|cfffe7b2cElvUI|r: |cFFF76ADBFCT|r'
 local by = 'by |cFF8866ccSimpy|r and |cFF34dd61Lightspark|r (ls-)'
-local ver = format("[v|cFF508cf7%s|r]", version)
 
 function FCT.AddOptions(arg1, arg2)
 	if E.Options.args.ElvFCT.args[arg1].args[arg2] then return end
 	E.Options.args.ElvFCT.args[arg1].args[arg2] = {
 		order = FCT.OptionsTable[arg2][1],
-		type = "group",
 		name = L[FCT.OptionsTable[arg2][2]],
+		type = "group",
 		args = {}
 	}
 end
@@ -29,14 +33,14 @@ function FCT.Options()
 			name = {
 				order = 1,
 				type = "header",
-				name = title.." "..ver.." "..by,
+				name = title.." "..version.." "..by,
 			},
 			nameplates = {
 				order = 2,
 				type = "group",
 				name = L["NamePlates"],
-				get = function(info) return ElvFCT.np[ info[#info] ] end,
-				set = function(info, value) ElvFCT.np[ info[#info] ] = value end,
+				get = function(info) return FCT.db.nameplates[ info[#info] ] end,
+				set = function(info, value) FCT.db.nameplates[ info[#info] ] = value end,
 				args = {
 					enable = {
 						order = 1,
@@ -49,8 +53,8 @@ function FCT.Options()
 				order = 3,
 				type = "group",
 				name = L["UnitFrames"],
-				get = function(info) return ElvFCT.uf[ info[#info] ] end,
-				set = function(info, value) ElvFCT.uf[ info[#info] ] = value end,
+				get = function(info) return FCT.db.unitframes[ info[#info] ] end,
+				set = function(info, value) FCT.db.unitframes[ info[#info] ] = value end,
 				args = {
 					enable = {
 						order = 1,
@@ -70,7 +74,60 @@ function FCT.Options()
 	end
 end
 
+-- Shamelessy taken from AceDB-3.0
+local function removeDefaults(db, defaults, blocker)
+	-- remove all metatables from the db, so we don't accidentally create new sub-tables through them
+	setmetatable(db, nil)
+	-- loop through the defaults and remove their content
+	for k,v in pairs(defaults) do
+		if k == "*" or k == "**" then
+			if type(v) == "table" then
+				-- Loop through all the actual k,v pairs and remove
+				for key, value in pairs(db) do
+					if type(value) == "table" then
+						-- if the key was not explicitly specified in the defaults table, just strip everything from * and ** tables
+						if defaults[key] == nil and (not blocker or blocker[key] == nil) then
+							removeDefaults(value, v)
+							-- if the table is empty afterwards, remove it
+							if next(value) == nil then
+								db[key] = nil
+							end
+						-- if it was specified, only strip ** content, but block values which were set in the key table
+						elseif k == "**" then
+							removeDefaults(value, v, defaults[key])
+						end
+					end
+				end
+			elseif k == "*" then
+				-- check for non-table default
+				for key, value in pairs(db) do
+					if defaults[key] == nil and v == value then
+						db[key] = nil
+					end
+				end
+			end
+		elseif type(v) == "table" and type(db[k]) == "table" then
+			-- if a blocker was set, dive into it, to allow multi-level defaults
+			removeDefaults(db[k], v, blocker and blocker[k])
+			if next(db[k]) == nil then
+				db[k] = nil
+			end
+		else
+			-- check if the current value matches the default, and that its not blocked by another defaults table
+			if db[k] == defaults[k] and (not blocker or blocker[k] == nil) then
+				db[k] = nil
+			end
+		end
+	end
+end
+
+function FCT:PLAYER_LOGOUT()
+	removeDefaults(_G.ElvFCT, ns.defaults)
+end
+
 function FCT:Initialize()
+	_G.ElvUI_FCT = FCT
+
 	FCT.OptionsTable = {
 		-- Nameplates
 		Player = {1, "Player"},
@@ -95,6 +152,12 @@ function FCT:Initialize()
 		Assist = {15, "Assist"},
 		Tank = {16, "Tank"},
 	}
+
+	-- Database
+	FCT.db = E:CopyTable({}, ns.defaults)
+	_G.ElvFCT = E:CopyTable(FCT.db, _G.ElvFCT)
+
+	FCT:RegisterEvent("PLAYER_LOGOUT")
 
 	E.Libs.EP:RegisterPlugin(addon, FCT.Options)
 end
