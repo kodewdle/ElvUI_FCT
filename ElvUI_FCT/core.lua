@@ -226,13 +226,13 @@ end end
 
 function FCT:EnableMode(fb, mode)
 	if mode == 'Simpy' then
-		fb.Frame = cf('Frame', fb.__owner:GetDebugName()..'Feedback', fb.__owner)
+		fb.Frame = cf('Frame', fb.parent:GetDebugName()..'Feedback', fb.parent)
 		local frameName = fb.Frame:GetDebugName()
 		fb.Frame.owner = fb.owner
 
 		fb.Text = fb.Frame:CreateFontString(frameName..'Text', 'OVERLAY')
 		fb.Text:FontTemplate(fb.font, fb.fontSize, fb.fontOutline)
-		fb.Text:Point('CENTER', fb.__owner.Health)
+		fb.Text:Point('CENTER', fb.parent.Health)
 		fb.Text.Icon = fb.Frame:CreateTexture(frameName..'Icon')
 		fb.Text.Icon:Point('RIGHT', fb.Text, 'LEFT', -10, 0)
 		fb.Text.Icon:Size(16, 16)
@@ -246,7 +246,7 @@ function FCT:EnableMode(fb, mode)
 		fb.objs, fb.texts = {}, {}
 
 		for i=1, fb.numTexts do
-			local frame = cf('Frame', fb.__owner:GetDebugName()..'Feedback'..i, fb.__owner)
+			local frame = cf('Frame', fb.parent:GetDebugName()..'Feedback'..i, fb.parent)
 			local frameName = frame:GetDebugName()
 			local text = frame:CreateFontString(frameName..'Text', 'OVERLAY')
 			text:FontTemplate(fb.font, fb.fontSize, fb.fontOutline)
@@ -322,7 +322,7 @@ end
 local function Enable(self)
 	local fb = self.ElvFCT
 	if fb then
-		fb.__owner = self
+		fb.parent = self
 
 		-- FCT:SetOptions(fb, fb.db)
 		-- FCT:EnableMode(fb, fb.db.mode)
