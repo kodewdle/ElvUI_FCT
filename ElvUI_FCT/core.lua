@@ -260,13 +260,13 @@ function FCT:EnableMode(fb, parent, mode)
 			text.Spell:FontTemplate(fb.font, fb.fontSize, fb.fontOutline)
 			text.Spell:Point('BOTTOM', text, 'TOP', 0, 5)
 
-			if fb.radius     ~= nil then text.radius     = fb.radius     else text.radius     = 64                end
-			if fb.ScrollTime ~= nil then text.scrollTime = fb.ScrollTime else text.scrollTime = 1.5               end
-			if fb.FadeTime   ~= nil then text.fadeTime   = fb.FadeTime   else text.fadeTime = text.scrollTime / 3 end
-			if fb.DirectionX ~= nil then text.xDirection = fb.DirectionX else text.xDirection = 1                 end
-			if fb.DirectionY ~= nil then text.yDirection = fb.DirectionY else text.yDirection = 1                 end
-			if fb.AlternateX ~= nil then text.alternateX = fb.AlternateX else text.alternateX = true              end
-			if fb.AlternateY ~= nil then text.alternateY = fb.AlternateY else text.alternateY = false             end
+			text.radius     = fb.radius
+			text.scrollTime = fb.ScrollTime
+			text.fadeTime   = fb.FadeTime
+			text.xDirection = fb.DirectionX
+			text.yDirection = fb.DirectionY
+			text.alternateX = fb.AlternateX
+			text.alternateY = fb.AlternateY
 
 			text.x = text.xDirection * ns.LS.xOffsets[fb.anim]
 			text.y = text.yDirection * ns.LS.yOffsets[fb.anim]
@@ -280,6 +280,37 @@ function FCT:EnableMode(fb, parent, mode)
 		fb.owner:HookScript("OnShow", ns.LS.onShowHide)
 		fb.owner:HookScript("OnUpdate", ns.LS.onUpdate)
 	end
+end
+
+function FCT:SetOptions(fb, db)
+	fb.enable = db.enable
+	fb.font = db.font
+	fb.fontSize = db.fontSize
+	fb.fontOutline = db.fontOutline
+	fb.alternateIcon = db.alternateIcon
+	fb.shakeDuration = db.shakeDuration
+	fb.critShake = db.critShake
+	fb.textShake = db.textShake
+	fb.showIcon = fb.showIcon
+	fb.showName = fb.showName
+	fb.showHots = fb.showHots
+	fb.showDots = fb.showDots
+	fb.isTarget = fb.isTarget
+	fb.isPlayer = fb.isPlayer
+	fb.showPet = fb.showPet
+	fb.exclude = fb.exclude
+	fb.mode = db.mode
+
+	-- advanced animation settings
+	fb.anim = db.advanced.anim
+	fb.numTexts = db.advanced.numTexts
+	fb.radius = db.advanced.radius
+	fb.FadeTime = db.advanced.FadeTime
+	fb.ScrollTime = db.advanced.ScrollTime
+	fb.DirectionX = db.advanced.DirectionX
+	fb.DirectionY = db.advanced.DirectionY
+	fb.AlternateY = db.advanced.AlternateY
+	fb.AlternateX = db.advanced.AlternateX
 end
 
 --[[

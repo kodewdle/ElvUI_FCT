@@ -115,14 +115,8 @@ FCT.options = {
 		name = " ",
 		width = "full"
 	},
-	numTexts = {
-		order = 18,
-		name = L["Text Amount"],
-		type = "range",
-		min = 1, max = 30, step = 1,
-	},
 	mode = {
-		order = 19,
+		order = 18,
 		name = L["Mode"],
 		type = "select",
 		values = {
@@ -130,22 +124,76 @@ FCT.options = {
 			['LS'] = 'Animation'
 		},
 	},
-	anim = {
-		order = 20,
-		name = L["Animation"],
-		type = "select",
-		values = {
-			["fountain"] = L["Fountain"],
-			["vertical"] = L["Vertical"],
-			["horizontal"] = L["Horizontal"],
-			["diagonal"] = L["Diagonal"],
-			["static"] = L["Static"],
-			["random"] = L["Random"]
-		},
+	advanced = {
+		order = 19,
+		type = "group",
+		name = L["Advanced"],
+		guiInline = true,
+		args = {
+			numTexts = {
+				order = 1,
+				name = L["Text Amount"],
+				type = "range",
+				min = 1, max = 30, step = 1,
+			},
+			anim = {
+				order = 2,
+				name = L["Animation"],
+				type = "select",
+				values = {
+					["fountain"] = L["Fountain"],
+					["vertical"] = L["Vertical"],
+					["horizontal"] = L["Horizontal"],
+					["diagonal"] = L["Diagonal"],
+					["static"] = L["Static"],
+					["random"] = L["Random"]
+				},
+			},
+			radius = {
+				order = 3,
+				name = L["Radius"],
+				type = "range",
+				min = 0, max = 256, step = 1,
+			},
+			ScrollTime = {
+				order = 3,
+				name = L["Scroll Time"],
+				type = "range",
+				min = 0, max = 5, step = 0.1,
+			},
+			FadeTime = {
+				order = 4,
+				name = L["Fade Time"],
+				type = "range",
+				min = 0, max = 5, step = 0.1,
+			},
+			AlternateX = {
+				order = 1,
+				type = "toggle",
+				name = L["Alternate X"],
+			},
+			AlternateY = {
+				order = 1,
+				type = "toggle",
+				name = L["Alternate Y"],
+			},
+			DirectionX = {
+				order = 5,
+				name = L["Direction X"],
+				type = "range",
+				min = 0, max = 100, step = 1,
+			},
+			DirectionY = {
+				order = 6,
+				name = L["Direction Y"],
+				type = "range",
+				min = 0, max = 100, step = 1,
+			},
+		}
 	},
 }
 
-function FCT:AddOptions(arg1, arg2)
+function FCT:AddOptions(arg1, arg2, arg3)
 	if E.Options.args.ElvFCT.args[arg1].args[arg2] then return end
 
 	if arg1 == 'colors' then
@@ -163,6 +211,11 @@ function FCT:AddOptions(arg1, arg2)
 			set = function(info, value) FCT.db[arg1].frames[arg2][ info[#info] ] = value end,
 			args = FCT.options
 		}
+
+		if arg3 then
+			E.Options.args.ElvFCT.args[arg1].args[arg2].get = function(info) return FCT.db[arg1].frames[arg2][arg3][ info[#info] ] end
+			E.Options.args.ElvFCT.args[arg1].args[arg2].set = function(info, value) FCT.db[arg1].frames[arg2][arg3][ info[#info] ] = value end
+		end
 	end
 end
 
@@ -229,8 +282,12 @@ function FCT:Options()
 	for name in pairs(ns.defaults.nameplates.frames) do
 		FCT:AddOptions('nameplates', name)
 	end
-	for name in pairs(ns.defaults.unitframes.frames) do
-		FCT:AddOptions('unitframes', name)
+	for name, obj in pairs(ns.defaults.unitframes.frames) do
+		if type(obj) == 'table' then
+			FCT:AddOptions('unitframes', name, obj)
+		else
+			FCT:AddOptions('unitframes', name)
+		end
 	end
 	for index in pairs(ns.colors) do
 		FCT:AddOptions('colors', index)

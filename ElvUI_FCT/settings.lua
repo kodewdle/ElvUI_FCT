@@ -44,8 +44,6 @@ ns.frames = {
 	mode = 'Simpy',
 	alternateIcon = false,
 	shakeDuration = 0.25,
-	numTexts = 25,
-	anim = 'fountain',
 	critShake = false,
 	textShake = false,
 	showIcon = false,
@@ -57,6 +55,17 @@ ns.frames = {
 	showPet = true,
 	exclude = {
 		[145109] = true, -- Ysera's Gift (self healing)
+	},
+	advanced = {
+		anim = 'fountain',
+		radius = 64,
+		numTexts = 25,
+		ScrollTime = 1.5,
+		FadeTime = 0.5,
+		DirectionX = 1,
+		DirectionY = 1,
+		AlternateX = true,
+		AlternateY = false,
 	}
 }
 
