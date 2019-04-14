@@ -32,3 +32,25 @@ ns.defaults = {
 		}
 	}
 }
+
+ns.frameDefaults = {
+	enable = false,
+	font = 'Expressway',
+	fontSize = 14,
+	fontOutline = 'OUTLINE',
+	mode = 'Simpy',
+	alternateIcon = false,
+	shakeDuration = 0.25,
+	critShake = false,
+	textShake = false,
+	showIcon = false,
+	showName = false,
+	showHots = false,
+	showDots = false,
+	isTarget = false,
+	isPlayer = true,
+	showPet = true,
+	exclude = {
+		[145109] = true, -- Ysera's Gift (self healing)
+	}
+}

@@ -1,4 +1,6 @@
-local E, L, V, P, G = unpack(ElvUI); --Inport: Engine, Locales, PrivateDB, ProfileDB, GlobalDB, Localize Underscore
+local addon, ns = ...
+
+local E, L, V, P, G = unpack(ElvUI)
 local S = E:GetModule('Skins')
 
 local oUF = E.oUF or oUF
@@ -11,7 +13,7 @@ local band, guid, uisu, gsi, cf = bit.band, UnitGUID, UnitIsUnit, GetSpellInfo, 
 local info = CombatLogGetCurrentEventInfo
 
 local spells, exclude = {}, {}
-local CT, SC = CombatFeedbackText, {
+local CT, SC = E:CopyTable({}, CombatFeedbackText), {
 	[-3] = {050/255, 255/255, 050/255}, -- [32FF32] Heal
 	[-2] = {102/255, 102/255, 102/255}, -- [666666] Ranged
 	[-1] = {153/255, 102/255, 051/255}, -- [996633] Physical
@@ -23,7 +25,7 @@ local CT, SC = CombatFeedbackText, {
 	[16] = {075/255, 255/255, 255/255}, -- [4BFFFF] Frost
 	[32] = {175/255, 075/255, 255/255}, -- [AF4BFF] Shadow
 	[64] = {255/255, 075/255, 175/255}} -- [FF4BAF] Arcane
-CT.MISFIRE = COMBAT_TEXT_MISFIRE
+CT.MISFIRE = _G.COMBAT_TEXT_MISFIRE
 
 local HS
 local harlemShake = {
@@ -244,7 +246,6 @@ local function hook(x)
 	if fb.fontSize		== nil then fb.fontSize		= 14			end
 	if fb.fontOutline	== nil then fb.fontOutline	= 'OUTLINE'		end
 	if fb.mode			== nil then fb.mode			= 'Simpy'		end
-	if fb.font == 'Expressway' then fb.font = E.Libs.LSM:Fetch('font', fb.font) end
 	if fb.alternateIcon == nil then fb.alternateIcon = false end
 	if fb.shakeDuration == nil then fb.shakeDuration = 0.25 end
 	if fb.critShake == nil then fb.critShake = false end
@@ -256,6 +257,8 @@ local function hook(x)
 	if fb.isTarget == nil then fb.isTarget = false end
 	if fb.isPlayer == nil then fb.isPlayer = true  end
 	if fb.showPet  == nil then fb.showPet  = true  end
+
+	if fb.font then fb.font = E.Libs.LSM:Fetch('font', fb.font) end
 
 	if fb.exclude == nil then
 		exclude[145109] = true -- Ysera's Gift (self healing)
