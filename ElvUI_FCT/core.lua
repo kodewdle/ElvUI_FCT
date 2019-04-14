@@ -1,9 +1,9 @@
 local E, L, V, P, G = unpack(ElvUI)
-local _, ns = ...
 
 local oUF = E.oUF or oUF
 if not oUF then return end
 
+local _, ns = ...
 local FCT = ns[2]
 local S = E:GetModule('Skins')
 

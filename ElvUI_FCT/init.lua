@@ -1,8 +1,7 @@
-local addon, ns = ...
-
 local E, L, V, P, G = unpack(ElvUI)
 local NP = E:GetModule('NamePlates')
 local UF = E:GetModule('UnitFrames')
+local addon, ns = ...
 
 local FCT = E.Libs.AceAddon:NewAddon(addon, 'AceEvent-3.0')
 ns[1] = addon
@@ -21,37 +20,59 @@ local by = 'by |cFF8866ccSimpy|r and |cFF34dd61Lightspark|r (ls-)'
 
 FCT.options = {
 	enable = { order = 1, type = "toggle", name = L["Enable"] },
-	showIcon = { order = 2, type = "toggle", name = L["Show Icon"] },
-	alternateIcon = { order = 3, type = "toggle", name = L["Alternate Icon"] },
-	showName = { order = 4, type = "toggle", name = L["Show Name"] },
-	showHots = { order = 5, type = "toggle", name = L["Show Hots"] },
-	showDots = { order = 6, type = "toggle", name = L["Show Dots"] },
-	isTarget = { order = 7, type = "toggle", name = L["Is Target"] },
-	isPlayer = { order = 8, type = "toggle", name = L["From Player"] },
-	showPet = { order = 9, type = "toggle", name = L["Show Pet"] },
-	critShake = { order = 10, type = "toggle", name = L["Crit Shake"] },
-	textShake = { order = 11, type = "toggle", name = L["Text Shake"] },
-	shakeDuration = { order = 12, name = L["Shake Duration"], type = "range", min = 0, max = 1, step = 0.1 },
-	spacer1 = { order = 13, type = "description", name = " ", width = "full" },
-	font = { type = "select", dialogControl = 'LSM30_Font', order = 14, name = L["Font"] },
-	fontOutline = { order = 15, name = L["Font Outline"], desc = L["Set the font outline."], type = "select",
-		values = {
-			['NONE'] = _G.NONE,
-			['OUTLINE'] = 'OUTLINE',
-			['MONOCHROMEOUTLINE'] = 'MONOCROMEOUTLINE',
-			['THICKOUTLINE'] = 'THICKOUTLINE',
-		},
-	},
-	fontSize = { order = 16, name = _G.FONT_SIZE, type = "range", min = 4, max = 60, step = 1 },
-	spacer2 = { order = 17, type = "description", name = " ", width = "full" },
-	mode = { order = 18, name = L["Mode"], type = "select",
-		values = { ['Simpy'] = L["Fade"], ['LS'] = L["Animation"] },
-	},
-	iconSize = { order = 19, name = L["Icon Size"], type = "range", min = 10, max = 30, step = 1 },
-	offsets = {
-		order = 20,
+	toggles = {
+		order = 2,
 		type = "group",
-		name = L["Offsets"],
+		name = "",
+		guiInline = true,
+		args = {
+			showIcon = { order = 1, type = "toggle", name = L["Show Icon"] },
+			alternateIcon = { order = 2, type = "toggle", name = L["Alternate Icon"] },
+			showName = { order = 3, type = "toggle", name = L["Show Name"] },
+			showHots = { order = 4, type = "toggle", name = L["Show Hots"] },
+			showDots = { order = 5, type = "toggle", name = L["Show Dots"] },
+			isTarget = { order = 6, type = "toggle", name = L["Is Target"] },
+			isPlayer = { order = 7, type = "toggle", name = L["From Player"] },
+			showPet = { order = 8, type = "toggle", name = L["Show Pet"] },
+			critShake = { order = 9, type = "toggle", name = L["Crit Shake"] },
+			textShake = { order = 10, type = "toggle", name = L["Text Shake"] },
+		}
+	},
+	settings = {
+		order = 3,
+		type = "group",
+		name = "",
+		guiInline = true,
+		args = {
+			mode = { order = 1, name = L["Mode"], type = "select",
+				values = { ['Simpy'] = L["Fade"], ['LS'] = L["Animation"] },
+			},
+			iconSize = { order = 2, name = L["Icon Size"], type = "range", min = 10, max = 30, step = 1 },
+			shakeDuration = { order = 3, name = L["Shake Duration"], type = "range", min = 0, max = 1, step = 0.1 },
+		}
+	},
+	fonts = {
+		order = 4,
+		type = "group",
+		name = "",
+		guiInline = true,
+		args = {
+			font = { type = "select", dialogControl = 'LSM30_Font', order = 1, name = L["Font"] },
+			fontOutline = { order = 2, name = L["Font Outline"], desc = L["Set the font outline."], type = "select",
+				values = {
+					['NONE'] = _G.NONE,
+					['OUTLINE'] = 'OUTLINE',
+					['MONOCHROMEOUTLINE'] = 'MONOCROMEOUTLINE',
+					['THICKOUTLINE'] = 'THICKOUTLINE',
+				},
+			},
+			fontSize = { order = 3, name = _G.FONT_SIZE, type = "range", min = 4, max = 60, step = 1 },
+		}
+	},
+	offsets = {
+		order = 5,
+		type = "group",
+		name = "",
 		guiInline = true,
 		args = {
 			textY = { order = 1, name = L["Text Y"], desc = L["Only applies to Fade mode."], type = "range", min = -100, max = 100, step = 1 },
@@ -63,9 +84,9 @@ FCT.options = {
 		}
 	},
 	advanced = {
-		order = 21,
+		order = 6,
 		type = "group",
-		name = L["Animation Settings"],
+		name = "",
 		guiInline = true,
 		args = {
 			numTexts = { order = 1, name = L["Text Amount"], type = "range", min = 1, max = 30, step = 1 },
@@ -130,7 +151,7 @@ function FCT:AddOptions(arg1, arg2)
 end
 
 function FCT:Options()
-	FCT.options.font.values = _G.AceGUIWidgetLSMlists.font
+	FCT.options.fonts.args.font.values = _G.AceGUIWidgetLSMlists.font
 
 	E.Options.args.ElvFCT = {
 		order = 1337,
