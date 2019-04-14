@@ -120,8 +120,8 @@ FCT.options = {
 			radius = { order = 6, name = L["Radius"], type = "range", min = 0, max = 256, step = 1 },
 			ScrollTime = { order = 7, name = L["Scroll Time"], type = "range", min = 0, max = 5, step = 0.1 },
 			FadeTime = { order = 8, name = L["Fade Time"], type = "range", min = 0, max = 5, step = 0.1 },
-			DirectionX = { order = 9, name = L["Direction X"], type = "range", min = 0, max = 100, step = 1 },
-			DirectionY = { order = 10, name = L["Direction Y"], type = "range", min = 0, max = 100, step = 1 },
+			DirectionX = { order = 9, name = L["Direction X"], type = "range", min = -1, max = 1, step = 2 },
+			DirectionY = { order = 10, name = L["Direction Y"], type = "range", min = -1, max = 1, step = 2 },
 		}
 	},
 }
