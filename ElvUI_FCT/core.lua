@@ -236,15 +236,16 @@ function FCT:EnableMode(fb, mode)
 
 			fb.Text = fb.Frame:CreateFontString(frameName..'Text', 'OVERLAY')
 			fb.Text:FontTemplate(fb.font, fb.fontSize, fb.fontOutline)
-			fb.Text:Point('CENTER', fb.owner.Health)
 			fb.Text.Icon = fb.Frame:CreateTexture(frameName..'Icon')
-			fb.Text.Icon:Point('RIGHT', fb.Text, 'LEFT', -10, 0)
 			fb.Text.Icon:Size(16, 16)
 			S:HandleIcon(fb.Text.Icon, true)
 			fb.Text.Spell = fb.Frame:CreateFontString(frameName..'Spell', 'OVERLAY')
 			fb.Text.Spell:FontTemplate(fb.font, fb.fontSize, fb.fontOutline)
-			fb.Text.Spell:Point('BOTTOM', fb.Text, 'TOP', 5, 0)
 		end
+
+		fb.Text:Point('CENTER', fb.owner.Health, 'CENTER', fb.textX, fb.textY)
+		fb.Text.Icon:Point('RIGHT', fb.Text, 'LEFT', fb.iconX, fb.iconY)
+		fb.Text.Spell:Point('BOTTOM', fb.Text, 'TOP', fb.spellX, fb.spellY)
 
 		fb.Text.fadeTime   = fb.FadeTime
 		fb.Text.xDirection = fb.DirectionX
@@ -265,15 +266,16 @@ function FCT:EnableMode(fb, mode)
 				local text = frame:CreateFontString(frameName..'Text', 'OVERLAY')
 				text:FontTemplate(fb.font, fb.fontSize, fb.fontOutline)
 				text.Icon = frame:CreateTexture(frameName..'Icon')
-				text.Icon:Point('RIGHT', text, 'LEFT', -5, 0)
 				text.Icon:Size(16, 16)
 				S:HandleIcon(text.Icon, true)
 				text.Spell = frame:CreateFontString(frameName..'Spell', 'OVERLAY')
-				text.Spell:FontTemplate(fb.font, fb.fontSize, fb.fontOutline)
-				text.Spell:Point('BOTTOM', text, 'TOP', 0, 5)
+				text.Spell:Point('BOTTOM', text, 'TOP', fb.spellX, fb.spellY)
 				text.frame = frame
 				fb.texts[i] = text
 			end
+
+			fb.texts[i].Icon:Point('RIGHT', fb.texts[i], 'LEFT', fb.iconX, fb.iconY)
+			fb.texts[i].Spell:FontTemplate(fb.font, fb.fontSize, fb.fontOutline)
 
 			fb.texts[i].fadeTime   = fb.FadeTime
 			fb.texts[i].xDirection = fb.DirectionX
@@ -322,6 +324,14 @@ function FCT:SetOptions(fb, db)
 	fb.exclude = db.exclude
 	fb.mode = db.mode
 
+	-- offsets
+	fb.textX = db.textX
+	fb.textY = db.textY
+	fb.iconX = db.iconX
+	fb.iconY = db.iconY
+	fb.spellX = db.spellX
+	fb.spellY = db.spellY
+
 	-- advanced animation settings
 	fb.anim = db.advanced.anim
 	fb.numTexts = db.advanced.numTexts
@@ -340,10 +350,10 @@ function FCT:COMBAT_LOG_EVENT_UNFILTERED()
 	end
 end
 
-function FCT:Toggle(frame, db)
+function FCT:Toggle(frame, module, db)
 	local fb = frame.ElvFCT
 	if fb and db then
-		if db.enable then
+		if db.enable and FCT.db[module].enable then
 			FCT:Enable(frame, db)
 		else
 			FCT:Disable(frame, db)

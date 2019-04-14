@@ -126,14 +126,60 @@ FCT.options = {
 		name = L["Mode"],
 		type = "select",
 		values = {
-			['Simpy'] = 'Static',
-			['LS'] = 'Animation'
+			['Simpy'] = L["Fade"],
+			['LS'] = L["Animation"]
 		},
 	},
-	advanced = {
+	offsets = {
 		order = 19,
 		type = "group",
-		name = L["Advanced"],
+		name = L["Offsets"],
+		guiInline = true,
+		args = {
+			textY = {
+				order = 1,
+				name = L["Text Y"],
+				desc = L["Only applies to Fade mode."],
+				type = "range",
+				min = -100, max = 100, step = 1,
+			},
+			textX = {
+				order = 2,
+				name = L["Text X"],
+				desc = L["Only applies to Fade mode."],
+				type = "range",
+				min = -100, max = 100, step = 1,
+			},
+			iconY = {
+				order = 3,
+				name = L["Icon Y"],
+				type = "range",
+				min = -100, max = 100, step = 1,
+			},
+			iconX = {
+				order = 4,
+				name = L["Icon X"],
+				type = "range",
+				min = -100, max = 100, step = 1,
+			},
+			spellY = {
+				order = 5,
+				name = L["Spell Y"],
+				type = "range",
+				min = -100, max = 100, step = 1,
+			},
+			spellX = {
+				order = 6,
+				name = L["Spell X"],
+				type = "range",
+				min = -100, max = 100, step = 1,
+			},
+		}
+	},
+	advanced = {
+		order = 20,
+		type = "group",
+		name = L["Animation Settings"],
 		guiInline = true,
 		args = {
 			numTexts = {
@@ -226,6 +272,7 @@ function FCT:AddOptions(arg1, arg2)
 				else
 					FCT.db[arg1].frames[arg2][ info[#info] ] = value
 				end
+
 				if arg1 == 'unitframes' then
 					UF:Update_AllFrames()
 				else
@@ -256,7 +303,7 @@ function FCT:Options()
 				type = "group",
 				name = L["NamePlates"],
 				get = function(info) return FCT.db.nameplates[ info[#info] ] end,
-				set = function(info, value) FCT.db.nameplates[ info[#info] ] = value end,
+				set = function(info, value) FCT.db.nameplates[ info[#info] ] = value; NP:ConfigureAll() end,
 				args = {
 					enable = {
 						order = 1,
@@ -270,7 +317,7 @@ function FCT:Options()
 				type = "group",
 				name = L["UnitFrames"],
 				get = function(info) return FCT.db.unitframes[ info[#info] ] end,
-				set = function(info, value) FCT.db.unitframes[ info[#info] ] = value end,
+				set = function(info, value) FCT.db.unitframes[ info[#info] ] = value; UF:Update_AllFrames() end,
 				args = {
 					enable = {
 						order = 1,
@@ -310,6 +357,51 @@ function FCT:Options()
 end
 
 -- Shamelessy taken from AceDB-3.0
+local function copyDefaults(dest, src)
+	-- this happens if some value in the SV overwrites our default value with a non-table
+	--if type(dest) ~= "table" then return end
+	for k, v in pairs(src) do
+		if k == "*" or k == "**" then
+			if type(v) == "table" then
+				-- This is a metatable used for table defaults
+				local mt = {
+					-- This handles the lookup and creation of new subtables
+					__index = function(t,k)
+							if k == nil then return nil end
+							local tbl = {}
+							copyDefaults(tbl, v)
+							rawset(t, k, tbl)
+							return tbl
+						end,
+				}
+				setmetatable(dest, mt)
+				-- handle already existing tables in the SV
+				for dk, dv in pairs(dest) do
+					if not rawget(src, dk) and type(dv) == "table" then
+						copyDefaults(dv, v)
+					end
+				end
+			else
+				-- Values are not tables, so this is just a simple return
+				local mt = {__index = function(_,k) return k~=nil and v or nil end}
+				setmetatable(dest, mt)
+			end
+		elseif type(v) == "table" then
+			if not rawget(dest, k) then rawset(dest, k, {}) end
+			if type(dest[k]) == "table" then
+				copyDefaults(dest[k], v)
+				if src['**'] then
+					copyDefaults(dest[k], src['**'])
+				end
+			end
+		else
+			if rawget(dest, k) == nil then
+				rawset(dest, k, v)
+			end
+		end
+	end
+end
+
 local function removeDefaults(db, defaults, blocker)
 	-- remove all metatables from the db, so we don't accidentally create new sub-tables through them
 	setmetatable(db, nil)
@@ -366,9 +458,9 @@ end
 
 function FCT:ToggleFrame(frame)
 	if frame.unitframeType then
-		FCT:Toggle(frame, FCT:FetchDB('unitframes', frame.unitframeType))
+		FCT:Toggle(frame, 'unitframes', FCT:FetchDB('unitframes', frame.unitframeType))
 	elseif frame.frameType then
-		FCT:Toggle(frame, FCT:FetchDB('nameplates', frame.frameType))
+		FCT:Toggle(frame, 'nameplates', FCT:FetchDB('nameplates', frame.frameType))
 	end
 end
 
@@ -439,12 +531,12 @@ function FCT:Initialize()
 	}
 
 	-- Database
-	FCT.data = E:CopyTable({}, ns.defaults)
-	FCT.data.colors = E:CopyTable({}, ns.colors)
-	for name in pairs(ns.defaults.nameplates.frames) do E:CopyTable(FCT.data.nameplates.frames[name], ns.frames) end
-	for name in pairs(ns.defaults.unitframes.frames) do E:CopyTable(FCT.data.unitframes.frames[name], ns.frames) end
+	FCT.data = {}; copyDefaults(FCT.data, ns.defaults)
+	FCT.data.colors = {}; copyDefaults(FCT.data.colors, ns.colors)
+	for name in pairs(ns.defaults.nameplates.frames) do copyDefaults(FCT.data.nameplates.frames[name], ns.frames) end
+	for name in pairs(ns.defaults.unitframes.frames) do copyDefaults(FCT.data.unitframes.frames[name], ns.frames) end
+	FCT.db = {}; copyDefaults(FCT.db, FCT.data)
 
-	FCT.db = E:CopyTable({}, FCT.data)
 	_G.ElvFCT = E:CopyTable(FCT.db, _G.ElvFCT)
 
 	FCT:UpdateColors()

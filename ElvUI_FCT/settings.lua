@@ -3,28 +3,67 @@ local _, ns = ...
 ns.defaults = {
 	colors = {},
 	nameplates = {
-		enable = false,
+		enable = true,
 		frames = {
 			Player = {},
-			FriendlyPlayer = {},
-			FriendlyNPC = {},
-			EnemyPlayer = {},
-			EnemyNPC = {},
+			FriendlyPlayer = {
+				enable = true,
+				mode = 'LS',
+				alternateIcon = true,
+				isTarget = true,
+				showIcon = true,
+			},
+			FriendlyNPC = {
+				enable = true,
+				mode = 'LS',
+				alternateIcon = true,
+				isTarget = true,
+				showIcon = true,
+			},
+			EnemyPlayer = {
+				enable = true,
+				mode = 'LS',
+				alternateIcon = true,
+				isTarget = true,
+				showIcon = true,
+			},
+			EnemyNPC = {
+				enable = true,
+				mode = 'LS',
+				alternateIcon = true,
+				isTarget = true,
+				showIcon = true,
+			},
 		}
 	},
 	unitframes = {
-		enable = false,
+		enable = true,
 		frames = {
-			Player = {},
-			Target = {},
+			Player = {
+				enable = true,
+				showName = true
+			},
+			Target = {
+				enable = true,
+				showName = true
+			},
 			TargetTarget = {},
 			TargetTargetTarget = {},
-			Focus = {},
-			FocusTarget = {},
+			Focus = {
+				enable = true,
+				showIcon = true
+			},
+			FocusTarget = {
+				enable = true,
+				showIcon = true
+			},
 			Pet = {},
 			PetTarget = {},
 			Arena = {},
-			Boss = {},
+			Boss = {
+				enable = true,
+				showIcon = true
+			},
 			Party = {},
 			Raid = {},
 			Raid40 = {},
@@ -52,6 +91,12 @@ ns.frames = {
 	isTarget = false,
 	isPlayer = true,
 	showPet = true,
+	textY = 0,
+	textX = 0,
+	iconY = 0,
+	iconX = 0,
+	spellY = 0,
+	spellX = 0,
 	exclude = {
 		[145109] = true, -- Ysera's Gift (self healing)
 	},
