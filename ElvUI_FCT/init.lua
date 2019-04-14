@@ -89,8 +89,7 @@ FCT.options = {
 		name = "",
 		guiInline = true,
 		args = {
-			numTexts = { order = 1, name = L["Text Amount"], type = "range", min = 1, max = 30, step = 1 },
-			anim = { order = 2, name = L["Animation"], type = "select",
+			anim = { order = 1, name = L["Animation"], type = "select",
 				values = {
 					["fountain"] = L["Fountain"],
 					["vertical"] = L["Vertical"],
@@ -100,13 +99,15 @@ FCT.options = {
 					["random"] = L["Random"]
 				},
 			},
-			radius = { order = 3, name = L["Radius"], type = "range", min = 0, max = 256, step = 1 },
-			ScrollTime = { order = 3, name = L["Scroll Time"], type = "range", min = 0, max = 5, step = 0.1 },
-			FadeTime = { order = 4, name = L["Fade Time"], type = "range", min = 0, max = 5, step = 0.1 },
-			AlternateX = { order = 1, type = "toggle", name = L["Alternate X"] },
-			AlternateY = { order = 1, type = "toggle", name = L["Alternate Y"] },
-			DirectionX = { order = 5, name = L["Direction X"], type = "range", min = 0, max = 100, step = 1 },
-			DirectionY = { order = 6, name = L["Direction Y"], type = "range", min = 0, max = 100, step = 1 },
+			AlternateX = { order = 2, type = "toggle", name = L["Alternate X"] },
+			AlternateY = { order = 3, type = "toggle", name = L["Alternate Y"] },
+			spacer1 = { order = 4, type = "description", name = " ", width = "full" },
+			numTexts = { order = 5, name = L["Text Amount"], type = "range", min = 1, max = 30, step = 1 },
+			radius = { order = 6, name = L["Radius"], type = "range", min = 0, max = 256, step = 1 },
+			ScrollTime = { order = 7, name = L["Scroll Time"], type = "range", min = 0, max = 5, step = 0.1 },
+			FadeTime = { order = 8, name = L["Fade Time"], type = "range", min = 0, max = 5, step = 0.1 },
+			DirectionX = { order = 9, name = L["Direction X"], type = "range", min = 0, max = 100, step = 1 },
+			DirectionY = { order = 10, name = L["Direction Y"], type = "range", min = 0, max = 100, step = 1 },
 		}
 	},
 }
