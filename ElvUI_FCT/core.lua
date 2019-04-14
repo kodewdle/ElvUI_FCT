@@ -14,7 +14,7 @@ local band, guid, uisu, gsi, cf = bit.band, UnitGUID, UnitIsUnit, GetSpellInfo, 
 local info = CombatLogGetCurrentEventInfo
 
 ns.objects, ns.spells = {}, {}
-ns.CT, ns.SC = E:CopyTable({}, CombatFeedbackText), ns.colors
+ns.CT = E:CopyTable({}, CombatFeedbackText)
 ns.CT.MISFIRE = _G.COMBAT_TEXT_MISFIRE
 
 local harlemShake = {
@@ -113,7 +113,7 @@ local Simpy = {
 ns.SI = Simpy
 
 function FCT:GP(a)
-	for x, z in next, ns.SC do
+	for x, z in next, FCT.db.colors do
 		if x > 1 and band(x,a) > 0 then
 			return z
 		end
@@ -143,11 +143,11 @@ function FCT:Update(frame, fb)
 	if tb or pb then return end
 
 	if e == 'SPELL_HEAL' or (fb.showHots and e == 'SPELL_PERIODIC_HEAL') then
-		if not fb.exclude[h] then a, b, d = j, k, ns.SC[-3] end
+		if not fb.exclude[h] then a, b, d = j, k, FCT.db.colors[-3] end
 	elseif e == 'RANGE_DAMAGE' then
-		a, b, d = j, l, ns.SC[-2]
+		a, b, d = j, l, FCT.db.colors[-2]
 	elseif e == 'SWING_DAMAGE' then
-		a, b, d = h, k, ns.SC[-1]
+		a, b, d = h, k, FCT.db.colors[-1]
 	elseif e == 'SPELL_DAMAGE' or (fb.showDots and e == 'SPELL_PERIODIC_DAMAGE') then
 		a, b, c = j, l, i
 	elseif e == 'SPELL_MISSED' or e == 'RANGE_MISSED' then
@@ -210,7 +210,7 @@ function FCT:Update(frame, fb)
 		end
 
 		text:FontTemplate(fb.font, fb.fontSize + (b and 4 or 0), fb.fontOutline)
-		text:SetTextColor(unpack(d or (ns.CT[a] and ns.SC[00]) or GP(c) or ns.SC[01]))
+		text:SetTextColor(unpack(d or (ns.CT[a] and FCT.db.colors[00]) or ns:GP(c) or FCT.db.colors[01]))
 		text:SetText(ns.CT[a] or a)
 
 		if fb.mode == 'Simpy' then
@@ -224,15 +224,15 @@ function FCT:Update(frame, fb)
 		end
 end end
 
-function FCT:EnableMode(fb, parent, mode)
+function FCT:EnableMode(fb, mode)
 	if mode == 'Simpy' then
-		fb.Frame = cf('Frame', parent:GetDebugName()..'Feedback', parent)
+		fb.Frame = cf('Frame', fb.__owner:GetDebugName()..'Feedback', fb.__owner)
 		local frameName = fb.Frame:GetDebugName()
 		fb.Frame.owner = fb.owner
 
 		fb.Text = fb.Frame:CreateFontString(frameName..'Text', 'OVERLAY')
 		fb.Text:FontTemplate(fb.font, fb.fontSize, fb.fontOutline)
-		fb.Text:Point('CENTER', x.Health)
+		fb.Text:Point('CENTER', fb.__owner.Health)
 		fb.Text.Icon = fb.Frame:CreateTexture(frameName..'Icon')
 		fb.Text.Icon:Point('RIGHT', fb.Text, 'LEFT', -10, 0)
 		fb.Text.Icon:Size(16, 16)
@@ -246,7 +246,7 @@ function FCT:EnableMode(fb, parent, mode)
 		fb.objs, fb.texts = {}, {}
 
 		for i=1, fb.numTexts do
-			local frame = cf('Frame', parent:GetDebugName()..'Feedback'..i, parent)
+			local frame = cf('Frame', fb.__owner:GetDebugName()..'Feedback'..i, fb.__owner)
 			local frameName = frame:GetDebugName()
 			local text = frame:CreateFontString(frameName..'Text', 'OVERLAY')
 			text:FontTemplate(fb.font, fb.fontSize, fb.fontOutline)
@@ -313,22 +313,31 @@ function FCT:SetOptions(fb, db)
 	fb.AlternateX = db.advanced.AlternateX
 end
 
---[[
-	function FCT:Hook(x)
-		local fb = x and x.Feedback
-		if not (fb and fb.owner) or ns.objects[fb.owner] then return end
-
-		ns.objects[fb.owner] = fb
-
-		local parent = fb.parent or x
-		if fb.mode == 'Simpy' then
-		elseif fb.mode == 'LS' then
-		end
-	end
-]]
-
 function FCT:COMBAT_LOG_EVENT_UNFILTERED()
 	for object, texts in next, ns.objects do
 		ns:Update(object, texts)
 	end
 end
+
+local function Enable(self)
+	local fb = self.ElvFCT
+	if fb then
+		fb.__owner = self
+
+		-- FCT:SetOptions(fb, fb.db)
+		-- FCT:EnableMode(fb, fb.db.mode)
+
+		ns.objects[self] = fb
+
+		return true
+	end
+end
+
+local function Disable(self)
+	local fb = self.ElvFCT
+	if fb then
+		ns.objects[self] = nil
+	end
+end
+
+oUF:AddElement('ElvFCT', nil, Enable, Disable)
