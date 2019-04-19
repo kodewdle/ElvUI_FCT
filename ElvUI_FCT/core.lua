@@ -115,16 +115,58 @@ local Simpy = {
 	end}
 ns.SI = Simpy
 
-function FCT:GP(a)
-	if not a then return end
-	for x, z in next, ns.color do
-		if x > 1 and band(x,a) > 0 then
-			return z
+function FCT:RecolorText(t)
+	if not (t.types and t.types[1] and t.typeTime) then return end
+
+	t:SetTextColor(unpack(t.types[1]))
+	tremove(t.types, 1)
+
+	if #t.types >= 1 then
+		E:Delay(t.typeTime, FCT.RecolorText, FCT, t)
+	end
+end
+
+function FCT:GP(t, fb, b, a)
+	if not a then
+		return ns.color[01]
+	end
+
+	if fb.cycleColors then
+		if not t.types then
+			t.types = {}
+		else
+			wipe(t.types)
+		end
+
+		for x, z in next, ns.color do
+			if x > 1 and band(x, a) > 0 then
+				tinsert(t.types, z)
+			end
+		end
+
+		if next(t.types) then
+			local c = t.types[1]
+			tremove(t.types, 1)
+
+			if #t.types >= 1 then
+				t.typeTime = (t.fadeTime + ((fb.mode == 'Simpy' and b and 0.3) or 0)) / #t.types
+				E:Delay(t.typeTime, FCT.RecolorText, FCT, t)
+			end
+
+			return c
+		else
+			return ns.color[01]
+		end
+	else
+		for x, z in next, ns.color do
+			if x > 1 and band(x, a) > 0 then
+				return z
+			end
 		end
 	end
 end
 
-function FCT:Prefix(style, number)
+function FCT:StyleNumber(style, number)
 	if style == 'BLIZZARD' then
 		return buln(number)
 	elseif style == 'SHORT' then
@@ -219,8 +261,8 @@ function FCT:Update(frame, fb)
 		end
 
 		text:FontTemplate(fb.font, fb.fontSize + (b and 4 or 0), fb.fontOutline)
-		text:SetTextColor(unpack(d or (ns.CT[a] and ns.color[00]) or FCT:GP(c) or ns.color[01]))
-		text:SetText(ns.CT[a] or FCT:Prefix(fb.numberStyle, a))
+		text:SetTextColor(unpack(d or (ns.CT[a] and ns.color[00]) or FCT:GP(text, fb, b, c)))
+		text:SetText(ns.CT[a] or FCT:StyleNumber(fb.numberStyle, a))
 		text:Show()
 
 		if b then
@@ -336,6 +378,7 @@ function FCT:SetOptions(fb, db)
 	fb.fontOutline = db.fontOutline
 	fb.alternateIcon = db.alternateIcon
 	fb.shakeDuration = db.shakeDuration
+	fb.cycleColors = db.cycleColors
 	fb.numberStyle = db.numberStyle
 	fb.critShake = db.critShake
 	fb.textShake = db.textShake

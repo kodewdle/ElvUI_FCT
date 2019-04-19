@@ -110,6 +110,7 @@ ns.frames = {
 	isPlayer = true,
 	showPet = true,
 	iconSize = 16,
+	cycleColors = true,
 	numberStyle = 'SHORT',
 	textY = 0,
 	textX = 0,

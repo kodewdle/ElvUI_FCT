@@ -46,6 +46,7 @@ FCT.options = {
 			isPlayer = { order = 8, type = "toggle", name = L["From Player"] },
 			critShake = { order = 9, type = "toggle", name = L["Critical Frame Shake"] },
 			textShake = { order = 10, type = "toggle", name = L["Critical Text Shake"] },
+			cycleColors = { order = 11, type = "toggle", name = L["Cycle Spell Colors"] },
 		}
 	},
 	fonts = {
