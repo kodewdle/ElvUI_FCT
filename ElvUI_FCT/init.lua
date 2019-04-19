@@ -128,6 +128,52 @@ FCT.options = {
 	},
 }
 
+function FCT:UpdateNamePlates()
+	if NP.Plates then
+		for nameplate in pairs(NP.Plates) do
+			FCT:ToggleFrame(nameplate)
+		end
+	end
+end
+
+function FCT:UpdateUnitFrames()
+	-- focus, focustarget, pet, pettarget, player, target, targettarget, targettargettarget
+	if UF.units then
+		for unit in pairs(UF.units) do
+			FCT:ToggleFrame(UF[unit])
+		end
+	end
+
+	-- arena{1-5}, boss{1-5}
+	if UF.groupunits then
+		for unit in pairs(UF.groupunits) do
+			FCT:ToggleFrame(UF[unit])
+		end
+	end
+
+	-- assist, tank, party, raid, raid40, raidpet
+	if UF.headers then
+		for groupName in pairs(UF.headers) do
+			local group = UF[groupName]
+			if group and group.GetNumChildren then
+				for i=1, group:GetNumChildren() do
+					local frame = select(i, group:GetChildren())
+					if frame and frame.Health then
+						FCT:ToggleFrame(frame)
+					elseif frame then
+						for n = 1, frame:GetNumChildren() do
+							local child = select(n, frame:GetChildren())
+							if child and child.Health then
+								FCT:ToggleFrame(child)
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
 function FCT:AddOptions(arg1, arg2)
 	if E.Options.args.ElvFCT.args[arg1].args[arg2] then return end
 
@@ -157,9 +203,9 @@ function FCT:AddOptions(arg1, arg2)
 				end
 
 				if arg1 == 'unitframes' then
-					UF:Update_AllFrames()
+					FCT:UpdateUnitFrames()
 				else
-					NP:ConfigureAll()
+					FCT:UpdateNamePlates()
 				end
 			end,
 			args = FCT.options
@@ -186,7 +232,7 @@ function FCT:Options()
 				type = "group",
 				name = L["NamePlates"],
 				get = function(info) return FCT.db.nameplates[ info[#info] ] end,
-				set = function(info, value) FCT.db.nameplates[ info[#info] ] = value; NP:ConfigureAll() end,
+				set = function(info, value) FCT.db.nameplates[ info[#info] ] = value; FCT:UpdateNamePlates() end,
 				args = { enable = { order = 1, type = "toggle", name = L["Enable"] } }
 			},
 			unitframes = {
@@ -194,7 +240,7 @@ function FCT:Options()
 				type = "group",
 				name = L["UnitFrames"],
 				get = function(info) return FCT.db.unitframes[ info[#info] ] end,
-				set = function(info, value) FCT.db.unitframes[ info[#info] ] = value; UF:Update_AllFrames() end,
+				set = function(info, value) FCT.db.unitframes[ info[#info] ] = value; FCT:UpdateUnitFrames() end,
 				args = { enable = { order = 1, type = "toggle", name = L["Enable"] } }
 			},
 			colors = {
