@@ -127,6 +127,8 @@ ns.frames = {
 		FadeTime = 0.5,
 		DirectionX = 1,
 		DirectionY = 1,
+		OffsetX = 24,
+		OffsetY = 8,
 		AlternateX = true,
 		AlternateY = false,
 	}

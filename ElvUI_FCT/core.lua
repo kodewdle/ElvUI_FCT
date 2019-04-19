@@ -40,8 +40,6 @@ local lightspark = {
 		diagonal = function(s) return s.x + s.xDirection * s.radius * s.progress, s.y + s.yDirection * s.radius * s.progress end,
 		static = function(s) return s.x, s.y end,
 		random = function(s) if s.elapsed == 0 then s.x, s.y = rand(-s.radius * 0.66, s.radius * 0.66), rand(-s.radius * 0.66, s.radius * 0.66) end return s.x, s.y end},
-	xOffsets = {diagonal = 24, fountain = 24, horizontal = 8, random = 0, static = 0, vertical = 8},
-	yOffsets = {diagonal = 8, fountain = 8, horizontal = 8, random = 0, static = 0, vertical = 8},
 	clamp = function(v) if v > 1 then return 1 elseif v < 0 then return 0 end return v end,
 	removeText = function(fb, i, text)
 		tremove(fb.objs, i)
@@ -301,8 +299,8 @@ function FCT:EnableMode(fb, mode)
 			fb.texts[i].alternateX = fb.AlternateX
 			fb.texts[i].alternateY = fb.AlternateY
 
-			fb.texts[i].x = fb.texts[i].xDirection * ns.LS.xOffsets[fb.anim]
-			fb.texts[i].y = fb.texts[i].yDirection * ns.LS.yOffsets[fb.anim]
+			fb.texts[i].x = fb.texts[i].xDirection * fb.OffsetX
+			fb.texts[i].y = fb.texts[i].yDirection * fb.OffsetY
 			fb.texts[i].GetXY = ns.LS.animations[fb.anim]
 			fb.texts[i].elapsed = 0
 
@@ -356,8 +354,10 @@ function FCT:SetOptions(fb, db)
 	fb.ScrollTime = db.advanced.ScrollTime
 	fb.DirectionX = db.advanced.DirectionX
 	fb.DirectionY = db.advanced.DirectionY
-	fb.AlternateY = db.advanced.AlternateY
 	fb.AlternateX = db.advanced.AlternateX
+	fb.AlternateY = db.advanced.AlternateY
+	fb.OffsetX = db.advanced.OffsetX
+	fb.OffsetY = db.advanced.OffsetY
 end
 
 function FCT:COMBAT_LOG_EVENT_UNFILTERED()
