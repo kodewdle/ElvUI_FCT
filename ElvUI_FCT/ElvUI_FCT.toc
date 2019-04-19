@@ -1,7 +1,7 @@
 ## Interface: 80100
 ## Author: Simpy and Lightspark
-## Version: 1.0
-## Title: |cfffe7b2cElvUI|r: |cFFF76ADBFloating Combat Text|r
+## Version: 1.0.1
+## Title: |cfffe7b2cElvUI|r: |cFFdd2244Floating Combat Text|r
 ## SavedVariables: ElvFCT
 ## RequiredDeps: ElvUI
 
