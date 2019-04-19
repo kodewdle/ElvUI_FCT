@@ -12,6 +12,7 @@ local bit, type, unpack, next = bit, type, unpack, next
 local sin, cos, pi, rand = math.sin, math.cos, math.pi, math.random
 local band, guid, uisu, gsi, cf = bit.band, UnitGUID, UnitIsUnit, GetSpellInfo, CreateFrame
 local info = CombatLogGetCurrentEventInfo
+local buln = BreakUpLargeNumbers
 
 ns.objects, ns.spells, ns.color = {}, {}, {}
 ns.CT = E:CopyTable({}, _G.CombatFeedbackText)
@@ -123,6 +124,16 @@ function FCT:GP(a)
 	end
 end
 
+function FCT:Prefix(style, number)
+	if style == 'BLIZZARD' then
+		return buln(number)
+	elseif style == 'SHORT' then
+		return E:ShortValue(number)
+	else
+		return number
+	end
+end
+
 function FCT:Update(frame, fb)
 	local a, b, c, d -- amount, critical, spellSchool, dmgColor
 	local _, e, _, f, _, _, _, g, _, _, _, h, _, i, j, _, _, k, _, _, l = info()
@@ -209,7 +220,7 @@ function FCT:Update(frame, fb)
 
 		text:FontTemplate(fb.font, fb.fontSize + (b and 4 or 0), fb.fontOutline)
 		text:SetTextColor(unpack(d or (ns.CT[a] and ns.color[00]) or FCT:GP(c) or ns.color[01]))
-		text:SetText(ns.CT[a] or a)
+		text:SetText(ns.CT[a] or FCT:Prefix(fb.numberStyle, a))
 		text:Show()
 
 		if b then
@@ -325,6 +336,7 @@ function FCT:SetOptions(fb, db)
 	fb.fontOutline = db.fontOutline
 	fb.alternateIcon = db.alternateIcon
 	fb.shakeDuration = db.shakeDuration
+	fb.numberStyle = db.numberStyle
 	fb.critShake = db.critShake
 	fb.textShake = db.textShake
 	fb.showIcon = db.showIcon

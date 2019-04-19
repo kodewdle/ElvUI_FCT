@@ -77,8 +77,15 @@ FCT.options = {
 			mode = { order = 1, name = L["Mode"], type = "select",
 				values = { ['Simpy'] = L["Fade"], ['LS'] = L["Animation"] },
 			},
-			iconSize = { order = 2, name = L["Icon Size"], type = "range", min = 10, max = 30, step = 1 },
-			shakeDuration = { order = 3, name = L["Shake Duration"], type = "range", min = 0, max = 1, step = 0.1 },
+			numberStyle = { order = 2, name = L["Number Style"], type = "select",
+				values = {
+					['NONE'] = _G.NONE,
+					['SHORT'] = L["Short"],
+					['BLIZZARD'] = L["Blizzard"],
+				},
+			},
+			iconSize = { order = 3, name = L["Icon Size"], type = "range", min = 10, max = 30, step = 1 },
+			shakeDuration = { order = 4, name = L["Shake Duration"], type = "range", min = 0, max = 1, step = 0.1 },
 		}
 	},
 	offsets = {
