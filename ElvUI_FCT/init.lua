@@ -8,6 +8,7 @@ ns[1] = addon
 ns[2] = FCT
 
 local _G = _G
+local select = select
 local next, type, pairs, format, tonumber = next, type, pairs, format, tonumber
 local rawget, rawset, setmetatable = rawget, rawset, setmetatable
 local hooksecurefunc = hooksecurefunc
@@ -15,8 +16,7 @@ local CreateFrame = CreateFrame
 
 local Version = GetAddOnMetadata(addon, "Version")
 local version = format("[|cFF508cf7v%s|r]", Version)
-local title = '|cfffe7b2cElvUI|r: |cFFF76ADBFCT|r'
-local titleLong = '|cfffe7b2cElvUI|r: |cFFF76ADBFloating Combat Text|r'
+local title = '|cFFdd2244Floating Combat Text|r'
 local by = 'by |cFF8866ccSimpy|r and |cFF34dd61Lightspark|r (ls-)'
 
 function FCT:ColorOption(name, desc)
@@ -225,7 +225,7 @@ function FCT:Options()
 			name = {
 				order = 1,
 				type = "header",
-				name = titleLong.." "..version.." "..by,
+				name = title.." "..version.." "..by,
 			},
 			nameplates = {
 				order = 2,
