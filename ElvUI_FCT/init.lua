@@ -21,9 +21,9 @@ local by = 'by |cFF8866ccSimpy|r and |cFF34dd61Lightspark|r (ls-)'
 
 function FCT:ColorOption(name, desc)
 	if desc then
-		return format("|cFFF76ADB%s:|r |cFFffffff%s|r", name, desc)
+		return format("|cFF508cf7%s:|r |cFFffffff%s|r", name, desc)
 	else
-		return format("|cFFF76ADB%s|r", name)
+		return format("|cFF508cf7%s|r", name)
 	end
 end
 
