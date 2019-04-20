@@ -395,6 +395,14 @@ function FCT:ToggleFrame(frame)
 	end
 end
 
+function FCT:Build(frame, RaisedElement)
+	local raised = CreateFrame('Frame', frame:GetDebugName()..'RaisedElvFCT', frame)
+	raised:SetFrameLevel(RaisedElement:GetFrameLevel() + 50)
+	raised:SetAllPoints()
+
+	return { owner = frame, parent = raised }
+end
+
 function FCT:UpdateColors()
 	for k, v in pairs(FCT.db.colors) do
 		k = tonumber(k)
@@ -478,14 +486,6 @@ function FCT:Initialize()
 	FCT:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 
 	E.Libs.EP:RegisterPlugin(addon, FCT.Options)
-end
-
-function FCT:Build(frame, RaisedElement)
-	local raised = CreateFrame('Frame', frame:GetDebugName()..'RaisedElvFCT', frame)
-	raised:SetFrameLevel(RaisedElement:GetFrameLevel() + 50)
-	raised:SetAllPoints()
-
-	return { owner = frame, parent = raised }
 end
 
 hooksecurefunc(E, 'Initialize', FCT.Initialize)
