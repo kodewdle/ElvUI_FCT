@@ -382,6 +382,8 @@ function FCT:FetchDB(Module, Type)
 end
 
 function FCT:ToggleFrame(frame)
+	if not FCT.db then return end
+
 	if frame.unitframeType then
 		FCT:Toggle(frame, 'unitframes', FCT:FetchDB('unitframes', frame.unitframeType))
 	elseif frame.frameType then
@@ -484,8 +486,6 @@ end
 
 hooksecurefunc(E, 'Initialize', FCT.Initialize)
 hooksecurefunc(NP, 'Update_Health', function(_, nameplate)
-	if not FCT.db then return end
-
 	if not nameplate.ElvFCT then
 		nameplate.ElvFCT = FCT:Build(nameplate, nameplate.RaisedElement)
 	end
@@ -493,8 +493,6 @@ hooksecurefunc(NP, 'Update_Health', function(_, nameplate)
 	FCT:ToggleFrame(nameplate)
 end)
 hooksecurefunc(UF, 'Configure_HealthBar', function(_, frame)
-	if not FCT.db then return end
-
 	if not frame.ElvFCT then
 		frame.ElvFCT = FCT:Build(frame, frame.RaisedElementParent)
 	end
