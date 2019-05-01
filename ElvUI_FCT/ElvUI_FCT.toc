@@ -5,6 +5,7 @@
 ## SavedVariables: ElvFCT
 ## RequiredDeps: ElvUI
 
+locales\load_locales.xml
 settings.lua
 init.lua
 core.lua

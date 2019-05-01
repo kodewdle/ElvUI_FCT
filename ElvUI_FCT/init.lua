@@ -1,4 +1,4 @@
-local E, L, V, P, G = unpack(ElvUI)
+local E, _, V, P, G = unpack(ElvUI)
 local NP = E:GetModule('NamePlates')
 local UF = E:GetModule('UnitFrames')
 local addon, ns = ...
@@ -26,115 +26,6 @@ function FCT:ColorOption(name, desc)
 		return format("|cFF508cf7%s|r", name)
 	end
 end
-
-FCT.options = {
-	enable = { order = 1, type = "toggle", name = L["Enable"] },
-	toggles = {
-		order = 2,
-		type = "group",
-		name = "",
-		guiInline = true,
-		args = {
-			header = { order = 0, name = FCT:ColorOption(L["Toggles"]), type = "header" },
-			alternateIcon = { order = 1, type = "toggle", name = L["Alternate Icon"] },
-			showIcon = { order = 2, type = "toggle", name = L["Show Icon"] },
-			showName = { order = 3, type = "toggle", name = L["Show Name"] },
-			showPet = { order = 4, type = "toggle", name = L["Show Pet"] },
-			showHots = { order = 5, type = "toggle", name = L["Show Hots"] },
-			showDots = { order = 6, type = "toggle", name = L["Show Dots"] },
-			isTarget = { order = 7, type = "toggle", name = L["Is Target"] },
-			isPlayer = { order = 8, type = "toggle", name = L["From Player"] },
-			critShake = { order = 9, type = "toggle", name = L["Critical Frame Shake"] },
-			textShake = { order = 10, type = "toggle", name = L["Critical Text Shake"] },
-			cycleColors = { order = 11, type = "toggle", name = L["Cycle Spell Colors"] },
-		}
-	},
-	fonts = {
-		order = 3,
-		type = "group",
-		name = "",
-		guiInline = true,
-		args = {
-			header = { order = 0, name = FCT:ColorOption(L["Fonts"]), type = "header" },
-			font = { type = "select", dialogControl = 'LSM30_Font', order = 1, name = L["Font"] },
-			fontOutline = { order = 2, name = L["Font Outline"], desc = L["Set the font outline."], type = "select",
-				values = {
-					['NONE'] = _G.NONE,
-					['OUTLINE'] = 'OUTLINE',
-					['MONOCHROMEOUTLINE'] = 'MONOCROMEOUTLINE',
-					['THICKOUTLINE'] = 'THICKOUTLINE',
-				},
-			},
-			fontSize = { order = 3, name = _G.FONT_SIZE, type = "range", min = 4, max = 60, step = 1 },
-		}
-	},
-	settings = {
-		order = 4,
-		type = "group",
-		name = "",
-		guiInline = true,
-		args = {
-			header = { order = 0, name =  FCT:ColorOption(L["Settings"]), type = "header" },
-			mode = { order = 1, name = L["Mode"], type = "select",
-				values = { ['Simpy'] = L["Fade"], ['LS'] = L["Animation"] },
-			},
-			numberStyle = { order = 2, name = L["Number Style"], type = "select",
-				values = {
-					['NONE'] = _G.NONE,
-					['SHORT'] = L["Short"],
-					['BLIZZARD'] = L["Blizzard"],
-				},
-			},
-			iconSize = { order = 3, name = L["Icon Size"], type = "range", min = 10, max = 30, step = 1 },
-			shakeDuration = { order = 4, name = L["Shake Duration"], type = "range", min = 0, max = 1, step = 0.1 },
-		}
-	},
-	offsets = {
-		order = 5,
-		type = "group",
-		name = "",
-		guiInline = true,
-		args = {
-			header = { order = 0, name =  FCT:ColorOption(L["Offsets"]), type = "header" },
-			textY = { order = 1, name = L["Text Y"], desc = L["Only applies to Fade mode."], type = "range", min = -100, max = 100, step = 1 },
-			textX = { order = 2, name = L["Text X"], desc = L["Only applies to Fade mode."], type = "range", min = -100, max = 100, step = 1 },
-			iconY = { order = 3, name = L["Icon Y"], type = "range", min = -100, max = 100, step = 1 },
-			iconX = { order = 4, name = L["Icon X"], type = "range", min = -100, max = 100, step = 1 },
-			spellY = { order = 5, name = L["Spell Y"], type = "range", min = -100, max = 100, step = 1 },
-			spellX = { order = 6, name = L["Spell X"], type = "range", min = -100, max = 100, step = 1 },
-		}
-	},
-	advanced = {
-		order = 6,
-		type = "group",
-		name = "",
-		guiInline = true,
-		args = {
-			header = { order = 0, name =  FCT:ColorOption(L["Animations"], L["Only applies on Animation mode."]), type = "header" },
-			anim = { order = 1, name = L["Animation"], type = "select",
-				values = {
-					["fountain"] = L["Fountain"],
-					["vertical"] = L["Vertical"],
-					["horizontal"] = L["Horizontal"],
-					["diagonal"] = L["Diagonal"],
-					["static"] = L["Static"],
-					["random"] = L["Random"]
-				},
-			},
-			AlternateX = { order = 2, type = "toggle", name = L["Alternate X"] },
-			AlternateY = { order = 3, type = "toggle", name = L["Alternate Y"] },
-			spacer1 = { order = 4, type = "description", name = " ", width = "full" },
-			numTexts = { order = 5, name = L["Text Amount"], type = "range", min = 1, max = 30, step = 1 },
-			radius = { order = 6, name = L["Radius"], type = "range", min = 0, max = 256, step = 1 },
-			ScrollTime = { order = 7, name = L["Scroll Time"], type = "range", min = 0, max = 5, step = 0.1 },
-			FadeTime = { order = 8, name = L["Fade Time"], type = "range", min = 0, max = 5, step = 0.1 },
-			DirectionX = { order = 9, name = L["Direction X"], type = "range", min = -100, max = 100, step = 1 },
-			DirectionY = { order = 10, name = L["Direction Y"], type = "range", min = -100, max = 100, step = 1 },
-			OffsetX = { order = 11, name = L["Offset X"], type = "range", min = -100, max = 100, step = 1 },
-			OffsetY = { order = 12, name = L["Offset Y"], type = "range", min = -100, max = 100, step = 1 },
-		}
-	},
-}
 
 function FCT:UpdateNamePlates()
 	if NP.Plates then
@@ -188,13 +79,13 @@ function FCT:AddOptions(arg1, arg2)
 	if arg1 == 'colors' then
 		E.Options.args.ElvFCT.args[arg1].args[arg2] = {
 			order = FCT.orders[arg2],
-			name = L[ns.colors[arg2].n],
+			name = FCT.L[ns.colors[arg2].n],
 			type = 'color',
 		}
 	else
 		E.Options.args.ElvFCT.args[arg1].args[arg2] = {
 			order = FCT.orders[arg2][1],
-			name = L[FCT.orders[arg2][2]],
+			name = FCT.L[FCT.orders[arg2][2]],
 			type = "group",
 			get = function(info)
 				if info[4] == 'advanced' or info[4] == 'exclude' then
@@ -222,53 +113,113 @@ function FCT:AddOptions(arg1, arg2)
 end
 
 function FCT:Options()
-	FCT.options.fonts.args.font.values = _G.AceGUIWidgetLSMlists.font
+	FCT.L = E.Libs.ACL:GetLocale('ElvUI', E.global.general.locale or 'enUS')
+	local L = FCT.L
 
-	E.Options.args.ElvFCT = {
-		order = 1337,
-		type = 'group',
-		name = title,
-		childGroups = "tab",
-		args = {
-			name = {
-				order = 1,
-				type = "header",
-				name = title.." "..version.." "..by,
-			},
-			nameplates = {
-				order = 2,
-				type = "group",
-				name = L["NamePlates"],
-				get = function(info) return FCT.db.nameplates[ info[#info] ] end,
-				set = function(info, value) FCT.db.nameplates[ info[#info] ] = value; FCT:UpdateNamePlates() end,
-				args = { enable = { order = 1, type = "toggle", name = L["Enable"] } }
-			},
-			unitframes = {
-				order = 3,
-				type = "group",
-				name = L["UnitFrames"],
-				get = function(info) return FCT.db.unitframes[ info[#info] ] end,
-				set = function(info, value) FCT.db.unitframes[ info[#info] ] = value; FCT:UpdateUnitFrames() end,
-				args = { enable = { order = 1, type = "toggle", name = L["Enable"] } }
-			},
-			colors = {
-				order = 4,
-				type = "group",
-				name = L["Colors"],
-				get = function(info)
-					local t = FCT.db.colors[ info[#info] ]
-					local d = ns.colors[ info[#info] ]
-					return t.r, t.g, t.b, t.a, d.r, d.g, d.b, d.a
-				end,
-				set = function(info, r, g, b)
-					local t = FCT.db.colors[ info[#info] ]
-					t.r, t.g, t.b = r, g, b
-					FCT:UpdateColors();
-				end,
-				args = {}
-			}
-		},
+	FCT.options = {
+		enable = { order = 1, type = "toggle", name = L["Enable"] },
+		toggles = { order = 2, type = "group", name = "", guiInline = true, args = {
+			header = { order = 0, name = FCT:ColorOption(L["Toggles"]), type = "header" },
+			alternateIcon = { order = 1, type = "toggle", name = L["Alternate Icon"] },
+			showIcon = { order = 2, type = "toggle", name = L["Show Icon"] },
+			showName = { order = 3, type = "toggle", name = L["Show Name"] },
+			showPet = { order = 4, type = "toggle", name = L["Show Pet"] },
+			showHots = { order = 5, type = "toggle", name = L["Show Hots"] },
+			showDots = { order = 6, type = "toggle", name = L["Show Dots"] },
+			isTarget = { order = 7, type = "toggle", name = L["Is Target"] },
+			isPlayer = { order = 8, type = "toggle", name = L["From Player"] },
+			critShake = { order = 9, type = "toggle", name = L["Critical Frame Shake"] },
+			textShake = { order = 10, type = "toggle", name = L["Critical Text Shake"] },
+			cycleColors = { order = 11, type = "toggle", name = L["Cycle Spell Colors"] }
+		}},
+		fonts = { order = 3, type = "group", name = "", guiInline = true, args = {
+			header = { order = 0, name = FCT:ColorOption(L["Fonts"]), type = "header" },
+			fontSize = { order = 3, name = _G.FONT_SIZE, type = "range", min = 4, max = 60, step = 1 },
+			font = { type = "select", dialogControl = 'LSM30_Font', order = 1, name = L["Font"], values = _G.AceGUIWidgetLSMlists.font },
+			fontOutline = { order = 2, name = L["Font Outline"], desc = L["Set the font outline."], type = "select", values = {
+				['NONE'] = _G.NONE,
+				['OUTLINE'] = 'OUTLINE',
+				['MONOCHROMEOUTLINE'] = 'MONOCROMEOUTLINE',
+				['THICKOUTLINE'] = 'THICKOUTLINE'
+		}}	}},
+		settings = { order = 4, type = "group", name = "", guiInline = true, args = {
+			header = { order = 0, name =  FCT:ColorOption(L["Settings"]), type = "header" },
+			mode = { order = 1, name = L["Mode"], type = "select", values = { ['Simpy'] = L["Fade"], ['LS'] = L["Animation"] } },
+			numberStyle = { order = 2, name = L["Number Style"], type = "select", values = { ['NONE'] = _G.NONE, ['SHORT'] = L["Short"], ['BLIZZARD'] = L["Blizzard"] }},
+			iconSize = { order = 3, name = L["Icon Size"], type = "range", min = 10, max = 30, step = 1 },
+			shakeDuration = { order = 4, name = L["Shake Duration"], type = "range", min = 0, max = 1, step = 0.1 }
+		}},
+		offsets = { order = 5, type = "group", name = "", guiInline = true, args = {
+			header = { order = 0, name =  FCT:ColorOption(L["Offsets"]), type = "header" },
+			textY = { order = 1, name = L["Text Y"], desc = L["Only applies to Fade mode."], type = "range", min = -100, max = 100, step = 1 },
+			textX = { order = 2, name = L["Text X"], desc = L["Only applies to Fade mode."], type = "range", min = -100, max = 100, step = 1 },
+			iconY = { order = 3, name = L["Icon Y"], type = "range", min = -100, max = 100, step = 1 },
+			iconX = { order = 4, name = L["Icon X"], type = "range", min = -100, max = 100, step = 1 },
+			spellY = { order = 5, name = L["Spell Y"], type = "range", min = -100, max = 100, step = 1 },
+			spellX = { order = 6, name = L["Spell X"], type = "range", min = -100, max = 100, step = 1 },
+		}},
+		advanced = { order = 6, type = "group", name = "", guiInline = true, args = {
+			header = { order = 0, name =  FCT:ColorOption(L["Animations"], L["Only applies on Animation mode."]), type = "header" },
+			anim = { order = 1, name = L["Animation"], type = "select", values = {
+				["fountain"] = L["Fountain"],
+				["vertical"] = L["Vertical"],
+				["horizontal"] = L["Horizontal"],
+				["diagonal"] = L["Diagonal"],
+				["static"] = L["Static"],
+				["random"] = L["Random"]
+			}},
+			AlternateX = { order = 2, type = "toggle", name = L["Alternate X"] },
+			AlternateY = { order = 3, type = "toggle", name = L["Alternate Y"] },
+			spacer1 = { order = 4, type = "description", name = " ", width = "full" },
+			numTexts = { order = 5, name = L["Text Amount"], type = "range", min = 1, max = 30, step = 1 },
+			radius = { order = 6, name = L["Radius"], type = "range", min = 0, max = 256, step = 1 },
+			ScrollTime = { order = 7, name = L["Scroll Time"], type = "range", min = 0, max = 5, step = 0.1 },
+			FadeTime = { order = 8, name = L["Fade Time"], type = "range", min = 0, max = 5, step = 0.1 },
+			DirectionX = { order = 9, name = L["Direction X"], type = "range", min = -100, max = 100, step = 1 },
+			DirectionY = { order = 10, name = L["Direction Y"], type = "range", min = -100, max = 100, step = 1 },
+			OffsetX = { order = 11, name = L["Offset X"], type = "range", min = -100, max = 100, step = 1 },
+			OffsetY = { order = 12, name = L["Offset Y"], type = "range", min = -100, max = 100, step = 1 },
+		}}
 	}
+
+	E.Options.args.ElvFCT = { order = 1337, type = 'group', name = title, childGroups = "tab", args = {
+		name = {
+			order = 1,
+			type = "header",
+			name = title.." "..version.." "..by,
+		},
+		nameplates = {
+			order = 2,
+			type = "group",
+			name = L["NamePlates"],
+			get = function(info) return FCT.db.nameplates[ info[#info] ] end,
+			set = function(info, value) FCT.db.nameplates[ info[#info] ] = value; FCT:UpdateNamePlates() end,
+			args = { enable = { order = 1, type = "toggle", name = L["Enable"] } }
+		},
+		unitframes = {
+			order = 3,
+			type = "group",
+			name = L["UnitFrames"],
+			get = function(info) return FCT.db.unitframes[ info[#info] ] end,
+			set = function(info, value) FCT.db.unitframes[ info[#info] ] = value; FCT:UpdateUnitFrames() end,
+			args = { enable = { order = 1, type = "toggle", name = L["Enable"] } }
+		},
+		colors = {
+			order = 4,
+			type = "group",
+			name = L["Colors"],
+			get = function(info)
+				local t = FCT.db.colors[ info[#info] ]
+				local d = ns.colors[ info[#info] ]
+				return t.r, t.g, t.b, t.a, d.r, d.g, d.b, d.a
+			end,
+			set = function(info, r, g, b)
+				local t = FCT.db.colors[ info[#info] ]
+				t.r, t.g, t.b = r, g, b
+				FCT:UpdateColors();
+			end,
+			args = {}
+	}	}}
 
 	for name in pairs(ns.defaults.nameplates.frames) do
 		FCT:AddOptions('nameplates', name)
