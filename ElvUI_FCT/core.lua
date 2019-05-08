@@ -223,8 +223,8 @@ function FCT:Update(frame, fb)
 			text = ns.LS.getText(fb)
 			if not text then return end
 
-			if text.alternateX then text.xDirection = text.xDirection * -1 end
-			if text.alternateY then text.yDirection = text.yDirection * -1 end
+			if text.alternateX then text.xDirection = -text.xDirection end
+			if text.alternateY then text.yDirection = -text.yDirection end
 			text.elapsed = 0
 		end
 
@@ -242,7 +242,7 @@ function FCT:Update(frame, fb)
 							if text.xDirection < 0 then
 								text.Icon:Point('RIGHT', text, 'LEFT', fb.iconX, fb.iconY)
 							else
-								text.Icon:Point('LEFT', text, 'RIGHT', fb.iconX * -1, fb.iconY)
+								text.Icon:Point('LEFT', text, 'RIGHT', -fb.iconX, fb.iconY)
 							end
 						end
 					else
