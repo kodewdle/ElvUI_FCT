@@ -14,7 +14,7 @@ local band, guid, uisu, gsi, cf = bit.band, UnitGUID, UnitIsUnit, GetSpellInfo, 
 local info = CombatLogGetCurrentEventInfo
 local buln = BreakUpLargeNumbers
 
-ns.objects, ns.spells, ns.color = {}, {}, {}
+ns.objects, ns.spells, ns.color, ns.fallback = {}, {}, {}, {1,1,1}
 ns.CT = E:CopyTable({}, _G.CombatFeedbackText)
 ns.CT.MISFIRE = _G.COMBAT_TEXT_MISFIRE
 
@@ -128,7 +128,7 @@ end
 
 function FCT:GP(t, fb, b, a)
 	if not a then
-		return ns.color[01]
+		return ns.color[01] or ns.fallback
 	end
 
 	if fb.cycleColors then
@@ -155,7 +155,7 @@ function FCT:GP(t, fb, b, a)
 
 			return c
 		else
-			return ns.color[01]
+			return ns.color[01] or ns.fallback
 		end
 	else
 		for x, z in next, ns.color do
@@ -163,6 +163,8 @@ function FCT:GP(t, fb, b, a)
 				return z
 			end
 		end
+
+		return ns.color[01] or ns.fallback
 	end
 end
 
