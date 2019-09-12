@@ -13,6 +13,7 @@ local next, type, pairs, format, tonumber = next, type, pairs, format, tonumber
 local rawget, rawset, setmetatable = rawget, rawset, setmetatable
 local hooksecurefunc = hooksecurefunc
 local CreateFrame = CreateFrame
+local SetCVar = SetCVar
 
 local Version = GetAddOnMetadata(addon, "Version")
 local version = format("[|cFF508cf7v%s|r]", Version)
@@ -364,6 +365,10 @@ function FCT:Initialize()
 	_G.ElvFCT = E:CopyTable(FCT.db, _G.ElvFCT)
 
 	FCT:UpdateColors()
+
+	-- Disable blizzards floating combat text
+	SetCVar("floatingCombatTextCombatDamage", 0)
+	SetCVar("floatingCombatTextCombatLogPeriodicSpells", 0)
 
 	-- Events
 	FCT:RegisterEvent("PLAYER_LOGOUT")
