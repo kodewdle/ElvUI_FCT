@@ -131,7 +131,8 @@ function FCT:Options()
 			isPlayer = { order = 8, type = "toggle", name = L["From Player"] },
 			critShake = { order = 9, type = "toggle", name = L["Critical Frame Shake"] },
 			textShake = { order = 10, type = "toggle", name = L["Critical Text Shake"] },
-			cycleColors = { order = 11, type = "toggle", name = L["Cycle Spell Colors"] }
+			cycleColors = { order = 11, type = "toggle", name = L["Cycle Spell Colors"] },
+			prefix = { order = 12, type = "input", width = "half", name = L["Critical Text Prefix"] }
 		}},
 		fonts = { order = 3, type = "group", name = "", guiInline = true, args = {
 			header = { order = 0, name = FCT:ColorOption(L["Fonts"]), type = "header" },

@@ -112,6 +112,7 @@ ns.frames = {
 	iconSize = 16,
 	cycleColors = true,
 	numberStyle = 'SHORT',
+	prefix = '*',
 	textY = 0,
 	textX = 0,
 	iconY = 0,

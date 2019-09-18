@@ -8,6 +8,7 @@ local FCT = ns[2]
 local S = E:GetModule('Skins')
 
 local wipe, tinsert, tremove = wipe, tinsert, tremove
+local format = string.format
 local bit, type, unpack, next = bit, type, unpack, next
 local sin, cos, pi, rand = math.sin, math.cos, math.pi, math.random
 local band, guid, uisu, gsi, cf = bit.band, UnitGUID, UnitIsUnit, GetSpellInfo, CreateFrame
@@ -264,7 +265,7 @@ function FCT:Update(frame, fb)
 
 		text:FontTemplate(fb.font, fb.fontSize + (b and 4 or 0), fb.fontOutline)
 		text:SetTextColor(unpack(d or (ns.CT[a] and ns.color[00]) or FCT:GP(text, fb, b, c)))
-		text:SetText(ns.CT[a] or FCT:StyleNumber(fb.numberStyle, a))
+		text:SetText(format("|cffff0000%s|r%s|cffff0000%s|r", b and fb.prefix or '', ns.CT[a] or FCT:StyleNumber(fb.numberStyle, a), b and fb.prefix or ''))
 		text:Show()
 
 		if b then
@@ -384,6 +385,7 @@ function FCT:SetOptions(fb, db)
 	fb.numberStyle = db.numberStyle
 	fb.critShake = db.critShake
 	fb.textShake = db.textShake
+	fb.prefix = db.prefix
 	fb.showIcon = db.showIcon
 	fb.showName = db.showName
 	fb.showHots = db.showHots

@@ -45,3 +45,4 @@ L["Text Amount"] = "Text Anzahl"
 L["Text X"] = true -- no need to translate
 L["Text Y"] = true -- no need to translate
 L["Toggles"] = "Umschalten"
+L["Critical Text Prefix"] = "Kritischer Text Prefix"

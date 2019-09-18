@@ -45,3 +45,4 @@ L["Text Amount"] = true
 L["Text X"] = true
 L["Text Y"] = true
 L["Toggles"] = true
+L["Critical Text Prefix"] = true
