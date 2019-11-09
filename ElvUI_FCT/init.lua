@@ -184,7 +184,7 @@ function FCT:Options()
 		}}
 	}
 
-	E.Options.args.ElvFCT = { order = -4, type = 'group', name = title, childGroups = "tab", args = {
+	E.Options.args.ElvFCT = { order = 6, type = 'group', name = title, childGroups = "tab", args = {
 		name = {
 			order = 1,
 			type = "header",
