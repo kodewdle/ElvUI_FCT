@@ -388,7 +388,7 @@ function FCT:Initialize()
 
 	FCT:UpdateColors()
 
-	-- Disable blizzards floating combat text
+	-- Disable Blizzard's Combat Text
 	SetCVar('floatingCombatTextCombatDamage', 0)
 	SetCVar('floatingCombatTextCombatLogPeriodicSpells', 0)
 
