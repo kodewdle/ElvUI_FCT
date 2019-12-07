@@ -87,7 +87,7 @@ function FCT:AddOptions(arg1, arg2)
 
 	if arg1 == 'colors' then
 		E.Options.args.ElvFCT.args[arg1].args[i] = {
-			order = FCT.orders[i],
+			order = FCT.orders.colors[i],
 			name = FCT.L[ns.colors[arg2].n],
 			type = 'color',
 		}
@@ -312,8 +312,20 @@ function FCT:Initialize()
 	_G.ElvUI_FCT = FCT
 
 	FCT.orders = {
-		-- Colors
-		Prefix = -1,
+		colors = {
+			['1'] = 1, -- Damage
+			['2'] = 2, -- Holy
+			['4'] = 3, -- Fire
+			['8'] = 4, -- Nature
+			['16'] = 5, -- Frost
+			['32'] = 6, -- Shadow
+			['64'] = 7, -- Arcane
+			Standard = 8,
+			Physical = 9,
+			Ranged = 10,
+			Heal = 11,
+			Prefix = 12
+		},
 
 		-- Nameplates
 		Player = {1, 'Player'},

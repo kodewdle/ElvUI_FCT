@@ -141,7 +141,7 @@ ns.frames = {
 }
 
 ns.colors = {
-	Prefix   = {r=255/255, g=051/255, b=051/255, n='Critical Prefix'}, --[FF3333]
+	Prefix   = {r=000/255, g=153/255, b=255/255, n='Critical Prefix'}, --[0099FF]
 	Heal     = {r=050/255, g=255/255, b=050/255, n='Heal'},            --[32FF32]
 	Ranged   = {r=102/255, g=102/255, b=102/255, n='Ranged'},          --[666666]
 	Physical = {r=153/255, g=102/255, b=051/255, n='Physical'},        --[996633]
