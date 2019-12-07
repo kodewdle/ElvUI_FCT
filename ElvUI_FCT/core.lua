@@ -8,11 +8,10 @@ local FCT = ns[2]
 local S = E:GetModule('Skins')
 
 local wipe, tinsert, tremove = wipe, tinsert, tremove
-local bit, type, unpack, next = bit, type, unpack, next
+local type, unpack, next, ipairs = type, unpack, next, ipairs
 local sin, cos, pi, rand = math.sin, math.cos, math.pi, math.random
 local band, guid, uisu, gsi, cf = bit.band, UnitGUID, UnitIsUnit, GetSpellInfo, CreateFrame
-local info = CombatLogGetCurrentEventInfo
-local buln = BreakUpLargeNumbers
+local info, buln = CombatLogGetCurrentEventInfo, BreakUpLargeNumbers
 
 ns.objects, ns.spells, ns.color = {}, {}, {}
 ns.colorStep, ns.fallback = {1,2,4,8,16,32,64}, {1,1,1}

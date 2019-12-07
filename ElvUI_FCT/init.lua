@@ -8,7 +8,7 @@ ns[1] = addon
 ns[2] = FCT
 
 local _G = _G
-local select = select
+local select, tostring = select, tostring
 local next, type, pairs, format, tonumber = next, type, pairs, format, tonumber
 local rawget, rawset, setmetatable = rawget, rawset, setmetatable
 local hooksecurefunc = hooksecurefunc
