@@ -8,14 +8,14 @@ local FCT = ns[2]
 local S = E:GetModule('Skins')
 
 local wipe, tinsert, tremove = wipe, tinsert, tremove
-local format = string.format
 local bit, type, unpack, next = bit, type, unpack, next
 local sin, cos, pi, rand = math.sin, math.cos, math.pi, math.random
 local band, guid, uisu, gsi, cf = bit.band, UnitGUID, UnitIsUnit, GetSpellInfo, CreateFrame
 local info = CombatLogGetCurrentEventInfo
 local buln = BreakUpLargeNumbers
 
-ns.objects, ns.spells, ns.color, ns.fallback = {}, {}, {}, {1,1,1}
+ns.objects, ns.spells, ns.color = {}, {}, {}
+ns.colorStep, ns.fallback = {1,2,4,8,16,32,64}, {1,1,1}
 ns.CT = E:CopyTable({}, _G.CombatFeedbackText)
 ns.CT.MISFIRE = _G.COMBAT_TEXT_MISFIRE
 
@@ -71,7 +71,7 @@ local lightspark = {
 				ns.LS.removeText(frame.ElvFCT, index, text)
 			else
 				text.progress = text.elapsed / text.scrollTime
-				text:SetPoint("CENTER", frame, "CENTER", text:GetXY())
+				text:SetPoint('CENTER', frame, 'CENTER', text:GetXY())
 
 				text.elapsed = text.elapsed + elapsed
 				text.frame:SetAlpha(ns.LS.clamp(1 - (text.elapsed - text.fadeTime) / (text.scrollTime - text.fadeTime)))
@@ -139,9 +139,9 @@ function FCT:GP(t, fb, b, a)
 			wipe(t.types)
 		end
 
-		for x, z in next, ns.color do
-			if x > 1 and band(x, a) > 0 then
-				tinsert(t.types, z)
+		for _, x in ipairs(ns.colorStep) do
+			if band(x, a) > 0 then
+				tinsert(t.types, ns.color[x])
 			end
 		end
 
@@ -159,9 +159,9 @@ function FCT:GP(t, fb, b, a)
 			return ns.color[01] or ns.fallback
 		end
 	else
-		for x, z in next, ns.color do
-			if x > 1 and band(x, a) > 0 then
-				return z
+		for _, x in ipairs(ns.colorStep) do
+			if band(x, a) > 0 then
+				return ns.color[x]
 			end
 		end
 
@@ -202,11 +202,11 @@ function FCT:Update(frame, fb)
 	if tb or pb then return end
 
 	if e == 'SPELL_HEAL' or (fb.showHots and e == 'SPELL_PERIODIC_HEAL') then
-		if not fb.exclude[h] then a, b, d = j, k, ns.color[-3] end
+		if not fb.exclude[h] then a, b, d = j, k, ns.color.Heal end
 	elseif e == 'RANGE_DAMAGE' then
-		a, b, d = j, l, ns.color[-2]
+		a, b, d = j, l, ns.color.Ranged
 	elseif e == 'SWING_DAMAGE' then
-		a, b, d = h, k, ns.color[-1]
+		a, b, d = h, k, ns.color.Physical
 	elseif e == 'SPELL_DAMAGE' or (fb.showDots and e == 'SPELL_PERIODIC_DAMAGE') then
 		a, b, c = j, l, i
 	elseif e == 'SPELL_MISSED' or e == 'RANGE_MISSED' then
@@ -263,10 +263,19 @@ function FCT:Update(frame, fb)
 			end
 		end
 
+		local ct = ns.CT[a]
 		text:FontTemplate(fb.font, fb.fontSize + (b and 4 or 0), fb.fontOutline)
-		text:SetTextColor(unpack(d or (ns.CT[a] and ns.color[00]) or FCT:GP(text, fb, b, c)))
-		text:SetText(format("|cffff0000%s|r%s|cffff0000%s|r", b and fb.prefix or '', ns.CT[a] or FCT:StyleNumber(fb.numberStyle, a), b and fb.prefix or ''))
+		text:SetTextColor(unpack(d or (ct and ns.color.Standard) or FCT:GP(text, fb, b, c)))
 		text:Show()
+
+		if ct then
+			text:SetText(ct)
+		elseif b and fb.prefix ~= '' then
+			local red, green, blue = ns.color.Prefix[1] * 255, ns.color.Prefix[2] * 255, ns.color.Prefix[3] * 255
+			text:SetFormattedText('|cff%02x%02x%02x%s|r%s|cff%02x%02x%02x%s|r', red, green, blue, fb.prefix, FCT:StyleNumber(fb.numberStyle, a), red, green, blue, fb.prefix)
+		else
+			text:SetText(FCT:StyleNumber(fb.numberStyle, a))
+		end
 
 		if b then
 			if fb.critShake then
@@ -367,9 +376,9 @@ function FCT:EnableMode(fb, mode)
 		end
 
 		if not fb.owner.ElvFCTHooked then
-			fb.owner:HookScript("OnHide", ns.LS.onShowHide)
-			fb.owner:HookScript("OnShow", ns.LS.onShowHide)
-			fb.owner:HookScript("OnUpdate", ns.LS.onUpdate)
+			fb.owner:HookScript('OnHide', ns.LS.onShowHide)
+			fb.owner:HookScript('OnShow', ns.LS.onShowHide)
+			fb.owner:HookScript('OnUpdate', ns.LS.onUpdate)
 			fb.owner.ElvFCTHooked = true
 		end
 	end
@@ -385,7 +394,6 @@ function FCT:SetOptions(fb, db)
 	fb.numberStyle = db.numberStyle
 	fb.critShake = db.critShake
 	fb.textShake = db.textShake
-	fb.prefix = db.prefix
 	fb.showIcon = db.showIcon
 	fb.showName = db.showName
 	fb.showHots = db.showHots
@@ -395,6 +403,7 @@ function FCT:SetOptions(fb, db)
 	fb.iconSize = db.iconSize
 	fb.showPet = db.showPet
 	fb.exclude = db.exclude
+	fb.prefix = db.prefix
 	fb.mode = db.mode
 
 	-- offsets

@@ -15,16 +15,16 @@ local hooksecurefunc = hooksecurefunc
 local CreateFrame = CreateFrame
 local SetCVar = SetCVar
 
-local Version = GetAddOnMetadata(addon, "Version")
-local version = format("[|cFF508cf7v%s|r]", Version)
+local Version = GetAddOnMetadata(addon, 'Version')
+local version = format('[|cFF508cf7v%s|r]', Version)
 local title = '|cFFdd2244Floating Combat Text|r'
 local by = 'by |cFF8866ccSimpy|r and |cFF34dd61Lightspark|r (ls-)'
 
 function FCT:ColorOption(name, desc)
 	if desc then
-		return format("|cFF508cf7%s:|r |cFFffffff%s|r", name, desc)
+		return format('|cFF508cf7%s:|r |cFFffffff%s|r', name, desc)
 	else
-		return format("|cFF508cf7%s|r", name)
+		return format('|cFF508cf7%s|r', name)
 	end
 end
 
@@ -75,11 +75,12 @@ function FCT:UpdateUnitFrames()
 end
 
 function FCT:AddOptions(arg1, arg2)
-	if E.Options.args.ElvFCT.args[arg1].args[arg2] then return end
+	local i = (type(arg2) == 'number' and tostring(arg2)) or arg2
+	if E.Options.args.ElvFCT.args[arg1].args[i] then return end
 
 	if arg1 == 'colors' then
-		E.Options.args.ElvFCT.args[arg1].args[arg2] = {
-			order = FCT.orders[arg2],
+		E.Options.args.ElvFCT.args[arg1].args[i] = {
+			order = FCT.orders[i],
 			name = FCT.L[ns.colors[arg2].n],
 			type = 'color',
 		}
@@ -87,7 +88,7 @@ function FCT:AddOptions(arg1, arg2)
 		E.Options.args.ElvFCT.args[arg1].args[arg2] = {
 			order = FCT.orders[arg2][1],
 			name = FCT.L[FCT.orders[arg2][2]],
-			type = "group",
+			type = 'group',
 			get = function(info)
 				if info[4] == 'advanced' or info[4] == 'exclude' then
 					return FCT.db[arg1].frames[arg2][info[4]][ info[#info] ]
@@ -118,105 +119,105 @@ function FCT:Options()
 	local L = FCT.L
 
 	FCT.options = {
-		enable = { order = 1, type = "toggle", name = L["Enable"] },
-		toggles = { order = 2, type = "group", name = "", guiInline = true, args = {
-			header = { order = 0, name = FCT:ColorOption(L["Toggles"]), type = "header" },
-			alternateIcon = { order = 1, type = "toggle", name = L["Alternate Icon"] },
-			showIcon = { order = 2, type = "toggle", name = L["Show Icon"] },
-			showName = { order = 3, type = "toggle", name = L["Show Name"] },
-			showPet = { order = 4, type = "toggle", name = L["Show Pet"] },
-			showHots = { order = 5, type = "toggle", name = L["Show Hots"] },
-			showDots = { order = 6, type = "toggle", name = L["Show Dots"] },
-			isTarget = { order = 7, type = "toggle", name = L["Is Target"] },
-			isPlayer = { order = 8, type = "toggle", name = L["From Player"] },
-			critShake = { order = 9, type = "toggle", name = L["Critical Frame Shake"] },
-			textShake = { order = 10, type = "toggle", name = L["Critical Text Shake"] },
-			cycleColors = { order = 11, type = "toggle", name = L["Cycle Spell Colors"] },
-			prefix = { order = 12, type = "input", width = "half", name = L["Critical Text Prefix"] }
+		enable = { order = 1, type = 'toggle', name = L["Enable"] },
+		toggles = { order = 2, type = 'group', name = '', guiInline = true, args = {
+			header = { order = 0, name = FCT:ColorOption(L["Toggles"]), type = 'header' },
+			alternateIcon = { order = 1, type = 'toggle', name = L["Alternate Icon"] },
+			showIcon = { order = 2, type = 'toggle', name = L["Show Icon"] },
+			showName = { order = 3, type = 'toggle', name = L["Show Name"] },
+			showPet = { order = 4, type = 'toggle', name = L["Show Pet"] },
+			showHots = { order = 5, type = 'toggle', name = L["Show Hots"] },
+			showDots = { order = 6, type = 'toggle', name = L["Show Dots"] },
+			isTarget = { order = 7, type = 'toggle', name = L["Is Target"] },
+			isPlayer = { order = 8, type = 'toggle', name = L["From Player"] },
+			critShake = { order = 9, type = 'toggle', name = L["Critical Frame Shake"] },
+			textShake = { order = 10, type = 'toggle', name = L["Critical Text Shake"] },
+			cycleColors = { order = 11, type = 'toggle', name = L["Cycle Spell Colors"] },
+			prefix = { order = 12, type = 'input', name = L["Critical Prefix"] }
 		}},
-		fonts = { order = 3, type = "group", name = "", guiInline = true, args = {
-			header = { order = 0, name = FCT:ColorOption(L["Fonts"]), type = "header" },
-			fontSize = { order = 3, name = _G.FONT_SIZE, type = "range", min = 4, max = 60, step = 1 },
-			font = { type = "select", dialogControl = 'LSM30_Font', order = 1, name = L["Font"], values = _G.AceGUIWidgetLSMlists.font },
-			fontOutline = { order = 2, name = L["Font Outline"], desc = L["Set the font outline."], type = "select", values = {
-				['NONE'] = _G.NONE,
-				['OUTLINE'] = 'OUTLINE',
-				['MONOCHROMEOUTLINE'] = 'MONOCROMEOUTLINE',
-				['THICKOUTLINE'] = 'THICKOUTLINE'
+		fonts = { order = 3, type = 'group', name = '', guiInline = true, args = {
+			header = { order = 0, name = FCT:ColorOption(L["Fonts"]), type = 'header' },
+			fontSize = { order = 3, name = _G.FONT_SIZE, type = 'range', min = 4, max = 60, step = 1 },
+			font = { type = 'select', dialogControl = 'LSM30_Font', order = 1, name = L["Font"], values = _G.AceGUIWidgetLSMlists.font },
+			fontOutline = { order = 2, name = L["Font Outline"], desc = L["Set the font outline."], type = 'select', values = {
+				NONE = _G.NONE,
+				OUTLINE = 'OUTLINE',
+				MONOCHROMEOUTLINE = 'MONOCROMEOUTLINE',
+				THICKOUTLINE = 'THICKOUTLINE'
 		}}	}},
-		settings = { order = 4, type = "group", name = "", guiInline = true, args = {
-			header = { order = 0, name =  FCT:ColorOption(L["Settings"]), type = "header" },
-			mode = { order = 1, name = L["Mode"], type = "select", values = { ['Simpy'] = L["Fade"], ['LS'] = L["Animation"] } },
-			numberStyle = { order = 2, name = L["Number Style"], type = "select", values = { ['NONE'] = _G.NONE, ['SHORT'] = L["Short"], ['BLIZZARD'] = L["Blizzard"] }},
-			iconSize = { order = 3, name = L["Icon Size"], type = "range", min = 10, max = 30, step = 1 },
-			shakeDuration = { order = 4, name = L["Shake Duration"], type = "range", min = 0, max = 1, step = 0.1 }
+		settings = { order = 4, type = 'group', name = '', guiInline = true, args = {
+			header = { order = 0, name =  FCT:ColorOption(L["Settings"]), type = 'header' },
+			mode = { order = 1, name = L["Mode"], type = 'select', values = { Simpy = L["Fade"], LS = L["Animation"] } },
+			numberStyle = { order = 2, name = L["Number Style"], type = 'select', values = { NONE = _G.NONE, SHORT = L["Short"], BLIZZARD = L["Blizzard"] }},
+			iconSize = { order = 3, name = L["Icon Size"], type = 'range', min = 10, max = 30, step = 1 },
+			shakeDuration = { order = 4, name = L["Shake Duration"], type = 'range', min = 0, max = 1, step = 0.1 }
 		}},
-		offsets = { order = 5, type = "group", name = "", guiInline = true, args = {
-			header = { order = 0, name =  FCT:ColorOption(L["Offsets"]), type = "header" },
-			textY = { order = 1, name = L["Text Y"], desc = L["Only applies to Fade mode."], type = "range", min = -100, max = 100, step = 1 },
-			textX = { order = 2, name = L["Text X"], desc = L["Only applies to Fade mode."], type = "range", min = -100, max = 100, step = 1 },
-			iconY = { order = 3, name = L["Icon Y"], type = "range", min = -100, max = 100, step = 1 },
-			iconX = { order = 4, name = L["Icon X"], type = "range", min = -100, max = 100, step = 1 },
-			spellY = { order = 5, name = L["Spell Y"], type = "range", min = -100, max = 100, step = 1 },
-			spellX = { order = 6, name = L["Spell X"], type = "range", min = -100, max = 100, step = 1 },
+		offsets = { order = 5, type = 'group', name = '', guiInline = true, args = {
+			header = { order = 0, name =  FCT:ColorOption(L["Offsets"]), type = 'header' },
+			textY = { order = 1, name = L["Text Y"], desc = L["Only applies to Fade mode."], type = 'range', min = -100, max = 100, step = 1 },
+			textX = { order = 2, name = L["Text X"], desc = L["Only applies to Fade mode."], type = 'range', min = -100, max = 100, step = 1 },
+			iconY = { order = 3, name = L["Icon Y"], type = 'range', min = -100, max = 100, step = 1 },
+			iconX = { order = 4, name = L["Icon X"], type = 'range', min = -100, max = 100, step = 1 },
+			spellY = { order = 5, name = L["Spell Y"], type = 'range', min = -100, max = 100, step = 1 },
+			spellX = { order = 6, name = L["Spell X"], type = 'range', min = -100, max = 100, step = 1 },
 		}},
-		advanced = { order = 6, type = "group", name = "", guiInline = true, args = {
-			header = { order = 0, name =  FCT:ColorOption(L["Animations"], L["Only applies on Animation mode."]), type = "header" },
-			anim = { order = 1, name = L["Animation"], type = "select", values = {
-				["fountain"] = L["Fountain"],
-				["vertical"] = L["Vertical"],
-				["horizontal"] = L["Horizontal"],
-				["diagonal"] = L["Diagonal"],
-				["static"] = L["Static"],
-				["random"] = L["Random"]
+		advanced = { order = 6, type = 'group', name = '', guiInline = true, args = {
+			header = { order = 0, name =  FCT:ColorOption(L["Animations"], L["Only applies on Animation mode."]), type = 'header' },
+			anim = { order = 1, name = L["Animation"], type = 'select', values = {
+				fountain = L["Fountain"],
+				vertical = L["Vertical"],
+				horizontal = L["Horizontal"],
+				diagonal = L["Diagonal"],
+				static = L["Static"],
+				random = L["Random"]
 			}},
-			AlternateX = { order = 2, type = "toggle", name = L["Alternate X"] },
-			AlternateY = { order = 3, type = "toggle", name = L["Alternate Y"] },
-			spacer1 = { order = 4, type = "description", name = " ", width = "full" },
-			numTexts = { order = 5, name = L["Text Amount"], type = "range", min = 1, max = 30, step = 1 },
-			radius = { order = 6, name = L["Radius"], type = "range", min = 0, max = 256, step = 1 },
-			ScrollTime = { order = 7, name = L["Scroll Time"], type = "range", min = 0, max = 5, step = 0.1 },
-			FadeTime = { order = 8, name = L["Fade Time"], type = "range", min = 0, max = 5, step = 0.1 },
-			DirectionX = { order = 9, name = L["Direction X"], type = "range", min = -100, max = 100, step = 1 },
-			DirectionY = { order = 10, name = L["Direction Y"], type = "range", min = -100, max = 100, step = 1 },
-			OffsetX = { order = 11, name = L["Offset X"], type = "range", min = -100, max = 100, step = 1 },
-			OffsetY = { order = 12, name = L["Offset Y"], type = "range", min = -100, max = 100, step = 1 },
+			AlternateX = { order = 2, type = 'toggle', name = L["Alternate X"] },
+			AlternateY = { order = 3, type = 'toggle', name = L["Alternate Y"] },
+			spacer1 = { order = 4, type = 'description', name = ' ', width = 'full' },
+			numTexts = { order = 5, name = L["Text Amount"], type = 'range', min = 1, max = 30, step = 1 },
+			radius = { order = 6, name = L["Radius"], type = 'range', min = 0, max = 256, step = 1 },
+			ScrollTime = { order = 7, name = L["Scroll Time"], type = 'range', min = 0, max = 5, step = 0.1 },
+			FadeTime = { order = 8, name = L["Fade Time"], type = 'range', min = 0, max = 5, step = 0.1 },
+			DirectionX = { order = 9, name = L["Direction X"], type = 'range', min = -100, max = 100, step = 1 },
+			DirectionY = { order = 10, name = L["Direction Y"], type = 'range', min = -100, max = 100, step = 1 },
+			OffsetX = { order = 11, name = L["Offset X"], type = 'range', min = -100, max = 100, step = 1 },
+			OffsetY = { order = 12, name = L["Offset Y"], type = 'range', min = -100, max = 100, step = 1 },
 		}}
 	}
 
-	E.Options.args.ElvFCT = { order = 6, type = 'group', name = title, childGroups = "tab", args = {
+	E.Options.args.ElvFCT = { order = 6, type = 'group', name = title, childGroups = 'tab', args = {
 		name = {
 			order = 1,
-			type = "header",
-			name = title.." "..version.." "..by,
+			type = 'header',
+			name = title..' '..version..' '..by,
 		},
 		nameplates = {
 			order = 2,
-			type = "group",
+			type = 'group',
 			name = L["NamePlates"],
 			get = function(info) return FCT.db.nameplates[ info[#info] ] end,
 			set = function(info, value) FCT.db.nameplates[ info[#info] ] = value; FCT:UpdateNamePlates() end,
-			args = { enable = { order = 1, type = "toggle", name = L["Enable"] } }
+			args = { enable = { order = 1, type = 'toggle', name = L["Enable"] } }
 		},
 		unitframes = {
 			order = 3,
-			type = "group",
+			type = 'group',
 			name = L["UnitFrames"],
 			get = function(info) return FCT.db.unitframes[ info[#info] ] end,
 			set = function(info, value) FCT.db.unitframes[ info[#info] ] = value; FCT:UpdateUnitFrames() end,
-			args = { enable = { order = 1, type = "toggle", name = L["Enable"] } }
+			args = { enable = { order = 1, type = 'toggle', name = L["Enable"] } }
 		},
 		colors = {
 			order = 4,
-			type = "group",
+			type = 'group',
 			name = L["Colors"],
 			get = function(info)
-				local t = FCT.db.colors[ info[#info] ]
-				local d = ns.colors[ info[#info] ]
+				local i = tonumber(info[#info]) or info[#info]
+				local t, d = FCT.db.colors[i], ns.colors[i]
 				return t.r, t.g, t.b, t.a, d.r, d.g, d.b, d.a
 			end,
 			set = function(info, r, g, b)
-				local t = FCT.db.colors[ info[#info] ]
+				local t = FCT.db.colors[tonumber(info[#info]) or info[#info]]
 				t.r, t.g, t.b = r, g, b
 				FCT:UpdateColors();
 			end,
@@ -237,9 +238,9 @@ end
 -- Shamelessy taken from AceDB-3.0 and stripped down by Simpy
 local function copyDefaults(dest, src)
 	for k, v in pairs(src) do
-		if type(v) == "table" then
+		if type(v) == 'table' then
 			if not rawget(dest, k) then rawset(dest, k, {}) end
-			if type(dest[k]) == "table" then copyDefaults(dest[k], v) end
+			if type(dest[k]) == 'table' then copyDefaults(dest[k], v) end
 		elseif rawget(dest, k) == nil then
 			rawset(dest, k, v)
 		end
@@ -250,7 +251,7 @@ local function removeDefaults(db, defaults)
 	setmetatable(db, nil)
 
 	for k,v in pairs(defaults) do
-		if type(v) == "table" and type(db[k]) == "table" then
+		if type(v) == 'table' and type(db[k]) == 'table' then
 			removeDefaults(db[k], v)
 			if next(db[k]) == nil then db[k] = nil end
 		elseif db[k] == defaults[k] then
@@ -291,7 +292,6 @@ end
 
 function FCT:UpdateColors()
 	for k, v in pairs(FCT.db.colors) do
-		k = tonumber(k)
 		if not ns.color[k] then
 			ns.color[k] = {}
 		end
@@ -306,54 +306,57 @@ function FCT:Initialize()
 	_G.ElvUI_FCT = FCT
 
 	FCT.orders = {
+		-- Colors
+		Prefix = -1,
+
 		-- Nameplates
-		Player = {1, "Player"},
-		FriendlyPlayer = {3, "FRIENDLY_PLAYER"},
-		FriendlyNPC = {4, "FRIENDLY_NPC"},
-		EnemyPlayer = {5, "ENEMY_PLAYER"},
-		EnemyNPC = {6, "ENEMY_NPC"},
+		Player = {1, 'Player'},
+		FriendlyPlayer = {3, 'FRIENDLY_PLAYER'},
+		FriendlyNPC = {4, 'FRIENDLY_NPC'},
+		EnemyPlayer = {5, 'ENEMY_PLAYER'},
+		EnemyNPC = {6, 'ENEMY_NPC'},
 
 		-- Unitframes
-		Target = {2, "Target"},
-		TargetTarget = {3, "TargetTarget"},
-		TargetTargetTarget = {4, "TargetTargetTarget"},
-		Focus = {5, "Focus"},
-		FocusTarget = {6, "FocusTarget"},
-		Pet = {7, "Pet"},
-		PetTarget = {8, "PetTarget"},
-		Arena = {9, "Arena"},
-		Boss = {10, "Boss"},
-		Party = {11, "Party"},
-		Raid = {12, "Raid"},
-		Raid40 = {13, "Raid-40"},
-		RaidPet = {14, "Raid Pet"},
-		Assist = {15, "Assist"},
-		Tank = {16, "Tank"},
+		Target = {2, 'Target'},
+		TargetTarget = {3, 'TargetTarget'},
+		TargetTargetTarget = {4, 'TargetTargetTarget'},
+		Focus = {5, 'Focus'},
+		FocusTarget = {6, 'FocusTarget'},
+		Pet = {7, 'Pet'},
+		PetTarget = {8, 'PetTarget'},
+		Arena = {9, 'Arena'},
+		Boss = {10, 'Boss'},
+		Party = {11, 'Party'},
+		Raid = {12, 'Raid'},
+		Raid40 = {13, 'Raid-40'},
+		RaidPet = {14, 'Raid Pet'},
+		Assist = {15, 'Assist'},
+		Tank = {16, 'Tank'},
 	}
 
 	FCT.frameTypes = {
 		-- NamePlates
-		["PLAYER"] = "Player",
-		["FRIENDLY_PLAYER"] = "FriendlyPlayer",
-		["FRIENDLY_NPC"] = "FriendlyNPC",
-		["ENEMY_PLAYER"] = "EnemyPlayer",
-		["ENEMY_NPC"] = "EnemyNPC",
+		PLAYER = 'Player',
+		FRIENDLY_PLAYER = 'FriendlyPlayer',
+		FRIENDLY_NPC = 'FriendlyNPC',
+		ENEMY_PLAYER = 'EnemyPlayer',
+		ENEMY_NPC = 'EnemyNPC',
 
 		-- Unitframes
-		["arena"] = "Arena",
-		["assist"] = "Assist",
-		["party"] = "Party",
-		["raid"] = "Raid",
-		["raid40"] = "Raid40",
-		["tank"] = "Tank",
-		["focus"] = "Focus",
-		["focustarget"] = "FocusTarget",
-		["pet"] = "Pet",
-		["pettarget"] = "PetTarget",
-		["player"] = "Player",
-		["target"] = "Target",
-		["targettarget"] = "TargetTarget",
-		["targettargettarget"] = "TargetTargetTarget",
+		arena = 'Arena',
+		assist = 'Assist',
+		party = 'Party',
+		raid = 'Raid',
+		raid40 = 'Raid40',
+		tank = 'Tank',
+		focus = 'Focus',
+		focustarget = 'FocusTarget',
+		pet = 'Pet',
+		pettarget = 'PetTarget',
+		player = 'Player',
+		target = 'Target',
+		targettarget = 'TargetTarget',
+		targettargettarget = 'TargetTargetTarget',
 	}
 
 	-- Database
@@ -368,12 +371,12 @@ function FCT:Initialize()
 	FCT:UpdateColors()
 
 	-- Disable blizzards floating combat text
-	SetCVar("floatingCombatTextCombatDamage", 0)
-	SetCVar("floatingCombatTextCombatLogPeriodicSpells", 0)
+	SetCVar('floatingCombatTextCombatDamage', 0)
+	SetCVar('floatingCombatTextCombatLogPeriodicSpells', 0)
 
 	-- Events
-	FCT:RegisterEvent("PLAYER_LOGOUT")
-	FCT:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+	FCT:RegisterEvent('PLAYER_LOGOUT')
+	FCT:RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED')
 
 	E.Libs.EP:RegisterPlugin(addon, FCT.Options)
 end
