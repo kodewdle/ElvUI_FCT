@@ -263,20 +263,6 @@ function FCT:Update(frame, fb)
 			end
 		end
 
-		local ct = ns.CT[a]
-		text:FontTemplate(fb.font, fb.fontSize + (b and 4 or 0), fb.fontOutline)
-		text:SetTextColor(unpack(d or (ct and ns.color.Standard) or FCT:GP(text, fb, b, c)))
-		text:Show()
-
-		if ct then
-			text:SetText(ct)
-		elseif b and fb.prefix ~= '' then
-			local red, green, blue = ns.color.Prefix[1] * 255, ns.color.Prefix[2] * 255, ns.color.Prefix[3] * 255
-			text:SetFormattedText('|cff%02x%02x%02x%s|r%s|cff%02x%02x%02x%s|r', red, green, blue, fb.prefix, FCT:StyleNumber(fb.numberStyle, a), red, green, blue, fb.prefix)
-		else
-			text:SetText(FCT:StyleNumber(fb.numberStyle, a))
-		end
-
 		if b then
 			if fb.critShake then
 				if not fb.owner.isShaking then
@@ -287,6 +273,23 @@ function FCT:Update(frame, fb)
 					text.isShaking = ns.HS.ShakeIt(text, fb.shakeDuration)
 				end
 			end
+
+			text:FontTemplate(fb.critFont, fb.critFontSize, fb.critFontOutline)
+		else
+			text:FontTemplate(fb.font, fb.fontSize, fb.fontOutline)
+		end
+
+		local ct = ns.CT[a]
+		text:SetTextColor(unpack(d or (ct and ns.color.Standard) or FCT:GP(text, fb, b, c)))
+		text:Show()
+
+		if ct then
+			text:SetText(ct)
+		elseif b and fb.prefix ~= '' then
+			local red, green, blue = ns.color.Prefix[1] * 255, ns.color.Prefix[2] * 255, ns.color.Prefix[3] * 255
+			text:SetFormattedText('|cff%02x%02x%02x%s|r%s|cff%02x%02x%02x%s|r', red, green, blue, fb.prefix, FCT:StyleNumber(fb.numberStyle, a), red, green, blue, fb.prefix)
+		else
+			text:SetText(FCT:StyleNumber(fb.numberStyle, a))
 		end
 
 		if fb.mode == 'Simpy' then
@@ -388,6 +391,9 @@ function FCT:SetOptions(fb, db)
 	fb.font = E.Libs.LSM:Fetch('font', db.font)
 	fb.fontSize = db.fontSize
 	fb.fontOutline = db.fontOutline
+	fb.critFont = E.Libs.LSM:Fetch('font', db.critFont)
+	fb.critFontSize = db.critFontSize
+	fb.critFontOutline = db.critFontOutline
 	fb.alternateIcon = db.alternateIcon
 	fb.shakeDuration = db.shakeDuration
 	fb.cycleColors = db.cycleColors
