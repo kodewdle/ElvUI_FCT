@@ -1,4 +1,4 @@
-## Interface: 80200
+## Interface: 80205
 ## Author: Simpy and Lightspark
 ## Version: 1.0.5
 ## Title: |cfffe7b2cElvUI|r: |cFFdd2244Floating Combat Text|r
