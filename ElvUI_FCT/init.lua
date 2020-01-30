@@ -94,6 +94,7 @@ function FCT:AddOptions(arg1, arg2)
 		E.Options.args.ElvFCT.args[arg1].args[arg2] = {
 			order = FCT.orders[arg2][1],
 			name = FCT.L[FCT.orders[arg2][2]],
+			args = FCT.options,
 			type = 'group',
 			get = function(info)
 				if info[4] == 'advanced' or info[4] == 'exclude' then
@@ -114,8 +115,7 @@ function FCT:AddOptions(arg1, arg2)
 				else
 					FCT:UpdateNamePlates()
 				end
-			end,
-			args = FCT.options
+			end
 		}
 	end
 end
@@ -199,6 +199,7 @@ function FCT:Options()
 		nameplates = {
 			order = 2,
 			type = 'group',
+			childGroups = 'tab',
 			name = L["NamePlates"],
 			get = function(info) return FCT.db.nameplates[ info[#info] ] end,
 			set = function(info, value) FCT.db.nameplates[ info[#info] ] = value; FCT:UpdateNamePlates() end,
@@ -207,6 +208,7 @@ function FCT:Options()
 		unitframes = {
 			order = 3,
 			type = 'group',
+			childGroups = 'tab',
 			name = L["UnitFrames"],
 			get = function(info) return FCT.db.unitframes[ info[#info] ] end,
 			set = function(info, value) FCT.db.unitframes[ info[#info] ] = value; FCT:UpdateUnitFrames() end,
