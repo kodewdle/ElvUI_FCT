@@ -8,10 +8,10 @@ local FCT = ns[2]
 local S = E:GetModule('Skins')
 
 local wipe, tinsert, tremove = wipe, tinsert, tremove
-local type, unpack, next, ipairs = type, unpack, next, ipairs
 local sin, cos, pi, rand = math.sin, math.cos, math.pi, math.random
-local band, guid, uisu, gsi, cf = bit.band, UnitGUID, UnitIsUnit, GetSpellInfo, CreateFrame
-local info, buln = CombatLogGetCurrentEventInfo, BreakUpLargeNumbers
+local type, unpack, next, ipairs, format = type, unpack, next, ipairs, format
+local band, guid, uisu, uhm, gsi = bit.band, UnitGUID, UnitIsUnit, UnitHealthMax, GetSpellInfo
+local info, buln, cf = CombatLogGetCurrentEventInfo, BreakUpLargeNumbers, CreateFrame
 
 ns.objects, ns.spells, ns.color = {}, {}, {}
 ns.colorStep, ns.fallback = {1,2,4,8,16,32,64}, {1,1,1}
@@ -168,17 +168,23 @@ function FCT:GP(t, fb, b, a)
 	end
 end
 
-function FCT:StyleNumber(style, number)
-	if style == 'BLIZZARD' then
-		return buln(number)
-	elseif style == 'SHORT' then
+function FCT:StyleNumber(owner, style, number)
+	if style == 'SHORT' then
 		return E:ShortValue(number)
-	else
-		return number
+	elseif style == 'PERCENT' then
+		return format('%.2f%%', (number / uhm(owner.unit)) * 100)
+	elseif style == 'BLIZZARD' then
+		return buln(number)
+	elseif style == 'BLIZZTEXT' then
+		return buln(number, true)
 	end
+
+	return number
 end
 
 function FCT:Update(frame, fb)
+	if not fb.owner:IsShown() then return end
+
 	local a, b, c, d -- amount, critical, spellSchool, dmgColor
 	local _, e, _, f, _, _, _, g, _, _, _, h, _, i, j, _, _, k, _, _, l = info()
 	-- event (2nd), sourceGUID (4th), destGUID (8th), 1st Parameter [spellId] (12th), spellSchool (14th), 1st Param (15th), 4th Param (18th), 7th Param [critical] (21st)
@@ -286,9 +292,9 @@ function FCT:Update(frame, fb)
 			text:SetText(ct)
 		elseif b and fb.prefix ~= '' then
 			local red, green, blue = ns.color.Prefix[1] * 255, ns.color.Prefix[2] * 255, ns.color.Prefix[3] * 255
-			text:SetFormattedText('|cff%02x%02x%02x%s|r%s|cff%02x%02x%02x%s|r', red, green, blue, fb.prefix, FCT:StyleNumber(fb.numberStyle, a), red, green, blue, fb.prefix)
+			text:SetFormattedText('|cff%02x%02x%02x%s|r%s|cff%02x%02x%02x%s|r', red, green, blue, fb.prefix, FCT:StyleNumber(fb.owner, fb.numberStyle, a), red, green, blue, fb.prefix)
 		else
-			text:SetText(FCT:StyleNumber(fb.numberStyle, a))
+			text:SetText(FCT:StyleNumber(fb.owner, fb.numberStyle, a))
 		end
 
 		if fb.mode == 'Simpy' then

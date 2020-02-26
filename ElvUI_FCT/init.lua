@@ -153,7 +153,7 @@ function FCT:Options()
 		settings = { order = 4, type = 'group', name = '', guiInline = true, args = {
 			header = { order = 0, name =  FCT:ColorOption(L["Settings"]), type = 'header' },
 			mode = { order = 1, name = L["Mode"], type = 'select', values = { Simpy = L["Fade"], LS = L["Animation"] } },
-			numberStyle = { order = 2, name = L["Number Style"], type = 'select', values = { NONE = _G.NONE, SHORT = L["Short"], BLIZZARD = L["Blizzard"] }},
+			numberStyle = { order = 2, name = L["Number Style"], type = 'select', values = { NONE = _G.NONE, PERCENT = L["Percent"], SHORT = L["Short"], BLIZZARD = L["Blizzard"], BLIZZTEXT = L["Blizzard Text"] }},
 			iconSize = { order = 3, name = L["Icon Size"], type = 'range', min = 10, max = 30, step = 1 },
 			shakeDuration = { order = 4, name = L["Shake Duration"], type = 'range', min = 0, max = 1, step = 0.1 }
 		}},
