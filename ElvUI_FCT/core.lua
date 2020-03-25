@@ -446,13 +446,10 @@ function FCT:COMBAT_LOG_EVENT_UNFILTERED()
 end
 
 function FCT:Toggle(frame, module, db)
-	local fb = frame.ElvFCT
-	if fb and db then
-		if db.enable and FCT.db[module].enable then
-			FCT:Enable(frame, db)
-		else
-			FCT:Disable(frame, db)
-		end
+	if module.enable and db.enable then
+		FCT:Enable(frame, db)
+	else
+		FCT:Disable(frame, db)
 	end
 end
 

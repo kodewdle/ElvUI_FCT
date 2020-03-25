@@ -282,10 +282,14 @@ function FCT:ToggleFrame(frame)
 		frame.ElvFCT = FCT:Build(frame, (self == NP and frame.RaisedElement) or frame.RaisedElementParent)
 	end
 
-	if frame.unitframeType then
-		FCT:Toggle(frame, 'unitframes', FCT:FetchDB('unitframes', frame.unitframeType))
-	elseif frame.frameType then
-		FCT:Toggle(frame, 'nameplates', FCT:FetchDB('nameplates', frame.frameType))
+	if frame.ElvFCT then
+		if frame.unitframeType then
+			local db = FCT:FetchDB('unitframes', frame.unitframeType)
+			if db then FCT:Toggle(frame, FCT.db.unitframes, db) end
+		elseif frame.frameType then
+			local db = FCT:FetchDB('nameplates', frame.frameType)
+			if db then FCT:Toggle(frame, FCT.db.nameplates, db) end
+		end
 	end
 end
 
@@ -364,6 +368,7 @@ function FCT:Initialize()
 		-- Unitframes
 		arena = 'Arena',
 		assist = 'Assist',
+		boss = 'Boss',
 		party = 'Party',
 		raid = 'Raid',
 		raid40 = 'Raid40',
@@ -397,5 +402,5 @@ function FCT:Initialize()
 end
 
 hooksecurefunc(E, 'Initialize', FCT.Initialize)
-hooksecurefunc(NP, 'UpdatePlate', FCT.ToggleFrame)
+hooksecurefunc(NP, 'Update_Health', FCT.ToggleFrame)
 hooksecurefunc(UF, 'Configure_HealthBar', FCT.ToggleFrame)
