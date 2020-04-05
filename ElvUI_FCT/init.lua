@@ -402,5 +402,5 @@ function FCT:Initialize()
 end
 
 hooksecurefunc(E, 'Initialize', FCT.Initialize)
-hooksecurefunc(NP, 'Update_Health', FCT.ToggleFrame)
+hooksecurefunc(NP, 'UpdatePlate', FCT.ToggleFrame)
 hooksecurefunc(UF, 'Configure_HealthBar', FCT.ToggleFrame)
