@@ -4,13 +4,10 @@ local UF = E:GetModule('UnitFrames')
 local addon, ns = ...
 
 local FCT = E.Libs.AceAddon:NewAddon(addon, 'AceEvent-3.0')
-ns[1] = addon
-ns[2] = FCT
+ns[1], ns[2] = addon, FCT
 
-local _G = _G
-local select, tostring = select, tostring
-local next, type, pairs, format, tonumber = next, type, pairs, format, tonumber
-local rawget, rawset, setmetatable = rawget, rawset, setmetatable
+local _G, select, tostring = _G, select, tostring
+local type, pairs, format, tonumber = type, pairs, format, tonumber
 local hooksecurefunc = hooksecurefunc
 local CreateFrame = CreateFrame
 

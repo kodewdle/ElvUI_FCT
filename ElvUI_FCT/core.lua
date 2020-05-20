@@ -57,8 +57,9 @@ local lightspark = {
 	getText = function(fb)
 		if not fb.texts then return end
 		for i = 1, #fb.texts do
-			if not fb.texts[i]:IsShown() then
-				return fb.texts[i]
+			local text = fb.texts[i]
+			if not text:IsShown() then
+				return text
 			end
 		end
 
@@ -82,12 +83,14 @@ local lightspark = {
 			wipe(frame.ElvFCT.objs)
 		end
 
-		if frame.ElvFCT.texts then
-			for i = 1, #frame.ElvFCT.texts do
-				frame.ElvFCT.texts[i]:Hide()
-				frame.ElvFCT.texts[i].Icon:Hide()
-				frame.ElvFCT.texts[i].Icon.backdrop:Hide()
-				frame.ElvFCT.texts[i].Spell:SetText('')
+		local texts = frame.ElvFCT.texts
+		if texts then
+			for i = 1, #texts do
+				local text = texts[i]
+				text:Hide()
+				text.Icon:Hide()
+				text.Icon.backdrop:Hide()
+				text.Spell:SetText('')
 			end
 		end
 	end}
@@ -342,11 +345,12 @@ function FCT:EnableMode(fb, mode)
 		if not fb.texts then fb.texts = {} end
 
 		for i=1, fb.numTexts do
-			if not fb.texts[i] then
+			local text = fb.texts[i]
+			if not text then
 				local frame = cf('Frame', fb.owner:GetDebugName()..'ElvFCT'..i, fb.parent)
 
 				local frameName = frame:GetDebugName()
-				local text = frame:CreateFontString(frameName..'Text', 'OVERLAY')
+				text = frame:CreateFontString(frameName..'Text', 'OVERLAY')
 				text:FontTemplate(fb.font, fb.fontSize, fb.fontOutline)
 				text.frame = frame
 
@@ -359,28 +363,28 @@ function FCT:EnableMode(fb, mode)
 				fb.texts[i] = text
 			end
 
-			fb.texts[i].Icon:Size(fb.iconSize)
-			fb.texts[i].Icon:Point('RIGHT', fb.texts[i], 'LEFT', fb.iconX, fb.iconY)
-			fb.texts[i].Spell:Point('BOTTOM', fb.texts[i], 'TOP', fb.spellX, fb.spellY)
+			text.Icon:Size(fb.iconSize)
+			text.Icon:Point('RIGHT', text, 'LEFT', fb.iconX, fb.iconY)
+			text.Spell:Point('BOTTOM', text, 'TOP', fb.spellX, fb.spellY)
 
-			fb.texts[i].fadeTime   = fb.FadeTime
-			fb.texts[i].xDirection = fb.DirectionX
-			fb.texts[i].yDirection = fb.DirectionY
+			text.fadeTime   = fb.FadeTime
+			text.xDirection = fb.DirectionX
+			text.yDirection = fb.DirectionY
 
-			fb.texts[i].radius     = fb.radius
-			fb.texts[i].scrollTime = fb.ScrollTime
-			fb.texts[i].alternateX = fb.AlternateX
-			fb.texts[i].alternateY = fb.AlternateY
+			text.radius     = fb.radius
+			text.scrollTime = fb.ScrollTime
+			text.alternateX = fb.AlternateX
+			text.alternateY = fb.AlternateY
 
-			fb.texts[i].x = fb.texts[i].xDirection * fb.OffsetX
-			fb.texts[i].y = fb.texts[i].yDirection * fb.OffsetY
-			fb.texts[i].GetXY = ns.LS.animations[fb.anim]
-			fb.texts[i].elapsed = 0
+			text.x = text.xDirection * fb.OffsetX
+			text.y = text.yDirection * fb.OffsetY
+			text.GetXY = ns.LS.animations[fb.anim]
+			text.elapsed = 0
 
-			fb.texts[i].Spell:SetText('')
-			fb.texts[i].Icon.backdrop:Hide()
-			fb.texts[i].Icon:Hide()
-			fb.texts[i]:Hide()
+			text.Spell:SetText('')
+			text.Icon.backdrop:Hide()
+			text.Icon:Hide()
+			text:Hide()
 		end
 
 		if not fb.owner.ElvFCTHooked then
