@@ -242,33 +242,8 @@ function FCT:Options()
 	end
 end
 
--- Shamelessy taken from AceDB-3.0 and stripped down by Simpy
-local function copyDefaults(dest, src)
-	for k, v in pairs(src) do
-		if type(v) == 'table' then
-			if not rawget(dest, k) then rawset(dest, k, {}) end
-			if type(dest[k]) == 'table' then copyDefaults(dest[k], v) end
-		elseif rawget(dest, k) == nil then
-			rawset(dest, k, v)
-		end
-	end
-end
-
-local function removeDefaults(db, defaults)
-	setmetatable(db, nil)
-
-	for k,v in pairs(defaults) do
-		if type(v) == 'table' and type(db[k]) == 'table' then
-			removeDefaults(db[k], v)
-			if next(db[k]) == nil then db[k] = nil end
-		elseif db[k] == defaults[k] then
-			db[k] = nil
-		end
-	end
-end
-
 function FCT:PLAYER_LOGOUT()
-	removeDefaults(_G.ElvFCT, FCT.data)
+	E:RemoveDefaults(_G.ElvFCT, FCT.data)
 end
 
 function FCT:FetchDB(Module, Type)
@@ -384,11 +359,11 @@ function FCT:Initialize()
 	}
 
 	-- Database
-	FCT.data = {}; copyDefaults(FCT.data, ns.defaults)
-	FCT.data.colors = {}; copyDefaults(FCT.data.colors, ns.colors)
-	for name in pairs(ns.defaults.nameplates.frames) do copyDefaults(FCT.data.nameplates.frames[name], ns.frames) end
-	for name in pairs(ns.defaults.unitframes.frames) do copyDefaults(FCT.data.unitframes.frames[name], ns.frames) end
-	FCT.db = {}; copyDefaults(FCT.db, FCT.data)
+	FCT.data = {}; E:CopyDefaults(FCT.data, ns.defaults)
+	FCT.data.colors = {}; E:CopyDefaults(FCT.data.colors, ns.colors)
+	for name in pairs(ns.defaults.nameplates.frames) do E:CopyDefaults(FCT.data.nameplates.frames[name], ns.frames) end
+	for name in pairs(ns.defaults.unitframes.frames) do E:CopyDefaults(FCT.data.unitframes.frames[name], ns.frames) end
+	FCT.db = {}; E:CopyDefaults(FCT.db, FCT.data)
 
 	_G.ElvFCT = E:CopyTable(FCT.db, _G.ElvFCT)
 
