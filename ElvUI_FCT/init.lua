@@ -23,6 +23,73 @@ local FONT_OUTLINES = {
 	THICKOUTLINE = 'THICKOUTLINE'
 }
 
+FCT.orders = {
+	colors = {
+		['1'] = 1, -- Damage
+		['2'] = 2, -- Holy
+		['4'] = 3, -- Fire
+		['8'] = 4, -- Nature
+		['16'] = 5, -- Frost
+		['32'] = 6, -- Shadow
+		['64'] = 7, -- Arcane
+		Standard = 8,
+		Physical = 9,
+		Ranged = 10,
+		Heal = 11,
+		Prefix = 12
+	},
+
+	-- Nameplates
+	Player = {1, 'Player'},
+	FriendlyPlayer = {3, 'FRIENDLY_PLAYER'},
+	FriendlyNPC = {4, 'FRIENDLY_NPC'},
+	EnemyPlayer = {5, 'ENEMY_PLAYER'},
+	EnemyNPC = {6, 'ENEMY_NPC'},
+
+	-- Unitframes
+	Target = {2, 'Target'},
+	TargetTarget = {3, 'TargetTarget'},
+	TargetTargetTarget = {4, 'TargetTargetTarget'},
+	Focus = {5, 'Focus'},
+	FocusTarget = {6, 'FocusTarget'},
+	Pet = {7, 'Pet'},
+	PetTarget = {8, 'PetTarget'},
+	Arena = {9, 'Arena'},
+	Boss = {10, 'Boss'},
+	Party = {11, 'Party'},
+	Raid = {12, 'Raid'},
+	Raid40 = {13, 'Raid-40'},
+	RaidPet = {14, 'Raid Pet'},
+	Assist = {15, 'Assist'},
+	Tank = {16, 'Tank'},
+}
+
+FCT.frameTypes = {
+	-- NamePlates
+	PLAYER = 'Player',
+	FRIENDLY_PLAYER = 'FriendlyPlayer',
+	FRIENDLY_NPC = 'FriendlyNPC',
+	ENEMY_PLAYER = 'EnemyPlayer',
+	ENEMY_NPC = 'EnemyNPC',
+
+	-- Unitframes
+	arena = 'Arena',
+	assist = 'Assist',
+	boss = 'Boss',
+	party = 'Party',
+	raid = 'Raid',
+	raid40 = 'Raid40',
+	tank = 'Tank',
+	focus = 'Focus',
+	focustarget = 'FocusTarget',
+	pet = 'Pet',
+	pettarget = 'PetTarget',
+	player = 'Player',
+	target = 'Target',
+	targettarget = 'TargetTarget',
+	targettargettarget = 'TargetTargetTarget',
+}
+
 function FCT:ColorOption(name, desc)
 	if desc then
 		return format('|cFF508cf7%s:|r |cFFffffff%s|r', name, desc)
@@ -244,7 +311,10 @@ function FCT:PLAYER_LOGOUT()
 end
 
 function FCT:FetchDB(Module, Type)
-	return FCT.db[Module].frames[FCT.frameTypes[Type]]
+	local db = FCT.db[Module]
+	if db then
+		return db.frames[FCT.frameTypes[Type]]
+	end
 end
 
 function FCT:ToggleFrame(frame)
@@ -286,75 +356,6 @@ function FCT:UpdateColors()
 end
 
 function FCT:Initialize()
-	_G.ElvUI_FCT = FCT
-
-	FCT.orders = {
-		colors = {
-			['1'] = 1, -- Damage
-			['2'] = 2, -- Holy
-			['4'] = 3, -- Fire
-			['8'] = 4, -- Nature
-			['16'] = 5, -- Frost
-			['32'] = 6, -- Shadow
-			['64'] = 7, -- Arcane
-			Standard = 8,
-			Physical = 9,
-			Ranged = 10,
-			Heal = 11,
-			Prefix = 12
-		},
-
-		-- Nameplates
-		Player = {1, 'Player'},
-		FriendlyPlayer = {3, 'FRIENDLY_PLAYER'},
-		FriendlyNPC = {4, 'FRIENDLY_NPC'},
-		EnemyPlayer = {5, 'ENEMY_PLAYER'},
-		EnemyNPC = {6, 'ENEMY_NPC'},
-
-		-- Unitframes
-		Target = {2, 'Target'},
-		TargetTarget = {3, 'TargetTarget'},
-		TargetTargetTarget = {4, 'TargetTargetTarget'},
-		Focus = {5, 'Focus'},
-		FocusTarget = {6, 'FocusTarget'},
-		Pet = {7, 'Pet'},
-		PetTarget = {8, 'PetTarget'},
-		Arena = {9, 'Arena'},
-		Boss = {10, 'Boss'},
-		Party = {11, 'Party'},
-		Raid = {12, 'Raid'},
-		Raid40 = {13, 'Raid-40'},
-		RaidPet = {14, 'Raid Pet'},
-		Assist = {15, 'Assist'},
-		Tank = {16, 'Tank'},
-	}
-
-	FCT.frameTypes = {
-		-- NamePlates
-		PLAYER = 'Player',
-		FRIENDLY_PLAYER = 'FriendlyPlayer',
-		FRIENDLY_NPC = 'FriendlyNPC',
-		ENEMY_PLAYER = 'EnemyPlayer',
-		ENEMY_NPC = 'EnemyNPC',
-
-		-- Unitframes
-		arena = 'Arena',
-		assist = 'Assist',
-		boss = 'Boss',
-		party = 'Party',
-		raid = 'Raid',
-		raid40 = 'Raid40',
-		tank = 'Tank',
-		focus = 'Focus',
-		focustarget = 'FocusTarget',
-		pet = 'Pet',
-		pettarget = 'PetTarget',
-		player = 'Player',
-		target = 'Target',
-		targettarget = 'TargetTarget',
-		targettargettarget = 'TargetTargetTarget',
-	}
-
 	-- Database
 	FCT.data = {}; E:CopyDefaults(FCT.data, ns.defaults)
 	FCT.data.colors = {}; E:CopyDefaults(FCT.data.colors, ns.colors)
@@ -362,14 +363,18 @@ function FCT:Initialize()
 	for name in pairs(ns.defaults.unitframes.frames) do E:CopyDefaults(FCT.data.unitframes.frames[name], ns.frames) end
 	FCT.db = {}; E:CopyDefaults(FCT.db, FCT.data)
 
+	-- Globals
+	_G.ElvUI_FCT = FCT
 	_G.ElvFCT = E:CopyTable(FCT.db, _G.ElvFCT)
 
+	-- Settings
 	FCT:UpdateColors()
 
 	-- Events
 	FCT:RegisterEvent('PLAYER_LOGOUT')
 	FCT:RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED')
 
+	-- Register
 	E.Libs.EP:RegisterPlugin(addon, FCT.Options)
 end
 
