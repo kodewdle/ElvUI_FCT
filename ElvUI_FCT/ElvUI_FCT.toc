@@ -1,6 +1,6 @@
 ## Interface: 80300
 ## Author: Simpy, Lightspark
-## Version: 1.09
+## Version: 1.10
 ## Title: |cff1784d1ElvUI|r |cFFdd2244Floating Combat Text|r
 ## SavedVariables: ElvFCT
 ## RequiredDeps: ElvUI
