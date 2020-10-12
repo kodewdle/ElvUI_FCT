@@ -251,9 +251,9 @@ function FCT:Update(frame, fb)
 						if fb.alternateIcon then
 							text.Icon:ClearAllPoints()
 							if text.xDirection < 0 then
-								text.Icon:SetPoint('RIGHT', text, 'LEFT', fb.iconX, fb.iconY)
+								text.Icon:Point('RIGHT', text, 'LEFT', fb.iconX, fb.iconY)
 							else
-								text.Icon:SetPoint('LEFT', text, 'RIGHT', -fb.iconX, fb.iconY)
+								text.Icon:Point('LEFT', text, 'RIGHT', -fb.iconX, fb.iconY)
 							end
 						end
 					else
@@ -327,10 +327,10 @@ function FCT:EnableMode(fb, mode)
 			fb.Text.Spell:FontTemplate(fb.font, fb.fontSize, fb.fontOutline)
 		end
 
-		fb.Text:SetPoint('CENTER', fb.parent, 'CENTER', fb.textX, fb.textY)
-		fb.Text.Spell:SetPoint('BOTTOM', fb.Text, 'TOP', fb.spellX, fb.spellY)
-		fb.Text.Icon:SetPoint('RIGHT', fb.Text, 'LEFT', fb.iconX, fb.iconY)
-		fb.Text.Icon:SetSize(fb.iconSize, fb.iconSize)
+		fb.Text:Point('CENTER', fb.parent, 'CENTER', fb.textX, fb.textY)
+		fb.Text.Spell:Point('BOTTOM', fb.Text, 'TOP', fb.spellX, fb.spellY)
+		fb.Text.Icon:Point('RIGHT', fb.Text, 'LEFT', fb.iconX, fb.iconY)
+		fb.Text.Icon:Size(fb.iconSize)
 
 		fb.Text.fadeTime   = fb.FadeTime
 		fb.Text.xDirection = fb.DirectionX
@@ -363,9 +363,9 @@ function FCT:EnableMode(fb, mode)
 				fb.texts[i] = text
 			end
 
-			text.Icon:SetSize(fb.iconSize, fb.iconSize)
-			text.Icon:SetPoint('RIGHT', text, 'LEFT', fb.iconX, fb.iconY)
-			text.Spell:SetPoint('BOTTOM', text, 'TOP', fb.spellX, fb.spellY)
+			text.Icon:Size(fb.iconSize)
+			text.Icon:Point('RIGHT', text, 'LEFT', fb.iconX, fb.iconY)
+			text.Spell:Point('BOTTOM', text, 'TOP', fb.spellX, fb.spellY)
 
 			text.fadeTime   = fb.FadeTime
 			text.xDirection = fb.DirectionX
