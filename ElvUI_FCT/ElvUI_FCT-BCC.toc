@@ -1,0 +1,11 @@
+## Interface: 20501
+## Author: Simpy, Lightspark
+## Version: 1.14
+## Title: |cff1784d1ElvUI|r |cFFdd2244Floating Combat Text|r
+## SavedVariables: ElvFCT
+## RequiredDeps: ElvUI
+
+locales\load_locales.xml
+settings.lua
+init.lua
+core.lua
