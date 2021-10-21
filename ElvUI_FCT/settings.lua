@@ -123,7 +123,8 @@ ns.frames = {
 	spellY = 0,
 	spellX = 0,
 	exclude = {
-		[145109] = true, -- Ysera's Gift (self healing)
+		[145109] = true, -- Ysera's Gift
+		[227034] = true, -- Nature's Guardian
 	},
 	advanced = {
 		anim = 'fountain',
