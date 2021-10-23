@@ -207,7 +207,7 @@ function FCT:AddOptions(arg1, arg2)
 					FCT.db.exclude[arg2].global = value
 				else
 					if value then FCT.db.exclude[arg2].global = false end
-					FCT.db.exclude[arg2][which] = value
+					FCT.db.exclude[arg2][which] = value or nil
 				end
 			end,
 		}
