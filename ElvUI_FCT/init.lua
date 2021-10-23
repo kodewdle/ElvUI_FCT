@@ -6,10 +6,13 @@ local addon, ns = ...
 local FCT = E.Libs.AceAddon:NewAddon(addon, 'AceEvent-3.0')
 ns[1], ns[2] = addon, FCT
 
-local _G, select, tostring = _G, select, tostring
+local _G, select, tostring, strfind = _G, select, tostring, strfind
 local type, pairs, format, tonumber = type, pairs, format, tonumber
+local next, wipe = next, wipe
 local hooksecurefunc = hooksecurefunc
 local CreateFrame = CreateFrame
+local GetSpellInfo = GetSpellInfo
+local GetSpellSubtext = GetSpellSubtext
 
 local Version = GetAddOnMetadata(addon, 'Version')
 local version = format('[|cFF508cf7v%s|r]', Version)
@@ -64,15 +67,15 @@ FCT.orders = {
 	Tank = {16, 'Tank'},
 }
 
-FCT.frameTypes = {
-	-- NamePlates
+FCT.nameplateTypes = {
 	PLAYER = 'Player',
 	FRIENDLY_PLAYER = 'FriendlyPlayer',
 	FRIENDLY_NPC = 'FriendlyNPC',
 	ENEMY_PLAYER = 'EnemyPlayer',
 	ENEMY_NPC = 'EnemyNPC',
+}
 
-	-- Unitframes
+FCT.unitframeTypes = {
 	arena = 'Arena',
 	assist = 'Assist',
 	boss = 'Boss',
@@ -144,31 +147,94 @@ function FCT:UpdateUnitFrames()
 	end
 end
 
+function FCT:GetSpellNameRank(id)
+	local name = tonumber(id) and GetSpellInfo(id)
+	if not name then return tostring(id) end
+
+	local rank = not E.Retail and GetSpellSubtext(id)
+	if not rank or not strfind(rank, '%d') then
+		return format('%s |cFF888888(%s)|r', name, id)
+	end
+
+	return format('%s %s[%s]|r |cFF888888(%s)|r', name, E.media.hexvaluecolor, rank, id)
+end
+
+do
+	local spellList = {}
+	function FCT:ExcludeList()
+		wipe(spellList)
+
+		for spell in pairs(FCT.db.exclude) do
+			spellList[spell] = FCT:GetSpellNameRank(spell)
+		end
+
+		if not next(spellList) then
+			spellList[''] = _G.NONE
+		end
+
+		return spellList
+	end
+end
+
 function FCT:AddOptions(arg1, arg2)
 	local i = (type(arg2) == 'number' and tostring(arg2)) or arg2
 	if E.Options.args.ElvFCT.args[arg1].args[i] then return end
 
+	local L = FCT.L
 	if arg1 == 'colors' then
 		E.Options.args.ElvFCT.args[arg1].args[i] = {
 			order = FCT.orders.colors[i],
-			name = FCT.L[ns.colors[arg2].n],
+			name = L[ns.colors[arg2].n],
 			type = 'color',
 		}
+	elseif arg1 == 'exclude' then
+		local spellName = FCT:GetSpellNameRank(arg2)
+		local option = {
+			name = spellName,
+			type = 'group',
+			order = 3,
+			args = {
+				name = { order = 1, type = 'header', name = spellName },
+				global = { order = 2, type = 'toggle', name = L["Global"] },
+				nameplates = { order = 3, type = 'group', name = L["NamePlates"], inline = true, args = {} },
+				unitframes = { order = 4, type = 'group', name = L["UnitFrames"], inline = true, args = {} }
+			},
+			get = function(info) return FCT.db.exclude[arg2][ info[#info] ] end,
+			set = function(info, value)
+				local which = info[#info]
+				if which == 'global' then
+					if value then wipe(FCT.db.exclude[arg2]) end
+					FCT.db.exclude[arg2].global = value
+				else
+					if value then FCT.db.exclude[arg2].global = false end
+					FCT.db.exclude[arg2][which] = value
+				end
+			end,
+		}
+
+		E.Options.args.ElvFCT.args[arg1].args[i] = option
+
+		for key, name in next, FCT.nameplateTypes do
+			option.args.nameplates.args[key] = { order = FCT.orders[name][1], type = 'toggle', name = L[FCT.orders[name][2]] }
+		end
+		for key, name in next, FCT.unitframeTypes do
+			option.args.unitframes.args[key] = { order = FCT.orders[name][1], type = 'toggle', name = L[FCT.orders[name][2]] }
+		end
 	else
 		E.Options.args.ElvFCT.args[arg1].args[arg2] = {
 			order = FCT.orders[arg2][1],
-			name = FCT.L[FCT.orders[arg2][2]],
+			name = L[FCT.orders[arg2][2]],
 			args = FCT.options,
 			type = 'group',
 			get = function(info)
-				if info[4] == 'advanced' or info[4] == 'exclude' then
+				if info[4] == 'advanced' then
 					return FCT.db[arg1].frames[arg2][info[4]][ info[#info] ]
 				else
 					return FCT.db[arg1].frames[arg2][ info[#info] ]
 				end
 			end,
 			set = function(info, value)
-				if info[4] == 'advanced' or info[4] == 'exclude' then
+				if info[4] == 'advanced' then
 					FCT.db[arg1].frames[arg2][info[4]][ info[#info] ] = value
 				else
 					FCT.db[arg1].frames[arg2][ info[#info] ] = value
@@ -293,7 +359,54 @@ function FCT:Options()
 				FCT:UpdateColors();
 			end,
 			args = {}
-	}	}}
+		},
+		exclude = {
+			order = 5,
+			type = 'group',
+			name = L["Exclude"],
+			args = {
+				remove = {
+					order = 1,
+					name = L["Remove Spell"],
+					type = 'select',
+					values = FCT.ExcludeList,
+					confirm = function(_, value)
+						return format(L["Remove Spell - %s"], FCT:GetSpellNameRank(value))
+					end,
+					get = function() return '' end,
+					set = function(_, value)
+						FCT.db.exclude[value] = nil
+
+						local id = tostring(value)
+						if id then E.Options.args.ElvFCT.args.exclude.args[id] = nil end
+					end
+				},
+				add = {
+					order = 2,
+					name = L["Add SpellID"],
+					type = 'input',
+					get = function(_) return '' end,
+					set = function(_, str)
+						local value = tonumber(str)
+						if not value then return end
+
+						local spellName = GetSpellInfo(value)
+						if not spellName then return end
+
+						local exists = FCT.db.exclude[value]
+						if exists then
+							wipe(exists)
+							exists.global = true
+						else
+							FCT.db.exclude[value] = { global = true }
+							FCT:AddOptions('exclude', value)
+							E.Libs.AceConfigDialog:SelectGroup('ElvUI', 'ElvFCT', 'exclude', str)
+						end
+					end
+				}
+			}
+		}
+	}}
 
 	for name in pairs(ns.defaults.nameplates.frames) do
 		FCT:AddOptions('nameplates', name)
@@ -304,6 +417,9 @@ function FCT:Options()
 	for index in pairs(ns.colors) do
 		FCT:AddOptions('colors', index)
 	end
+	for spell in pairs(FCT.db.exclude) do
+		FCT:AddOptions('exclude', spell)
+	end
 end
 
 function FCT:PLAYER_LOGOUT()
@@ -313,7 +429,7 @@ end
 function FCT:FetchDB(Module, Type)
 	local db = FCT.db[Module]
 	if db then
-		return db.frames[FCT.frameTypes[Type]]
+		return db.frames[FCT.nameplateTypes[Type] or FCT.unitframeTypes[Type]]
 	end
 end
 

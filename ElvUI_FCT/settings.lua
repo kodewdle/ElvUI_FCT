@@ -1,8 +1,8 @@
-local E = unpack(ElvUI)
 local _, ns = ...
 
 ns.defaults = {
 	colors = {},
+	exclude = {},
 	nameplates = {
 		enable = true,
 		frames = {
@@ -123,11 +123,6 @@ ns.frames = {
 	iconX = 0,
 	spellY = 0,
 	spellX = 0,
-	exclude = {
-		[145109] = E.Retail, -- Ysera's Gift
-		[227034] = E.Retail, -- Nature's Guardian
-		[342232] = E.Retail, -- Arcane Echo
-	},
 	advanced = {
 		anim = 'fountain',
 		radius = 64,

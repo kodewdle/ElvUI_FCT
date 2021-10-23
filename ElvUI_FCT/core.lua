@@ -188,19 +188,36 @@ end
 function FCT:Update(frame, fb)
 	if not fb.owner:IsShown() then return end
 
-	local a, b, c, d -- amount, critical, spellSchool, dmgColor
-	local _, e, _, f, _, _, _, g, _, _, _, h, _, i, j, _, _, k, _, _, l = info()
+	local a, b, c, d, e -- amount, critical, spellSchool, dmgColor, isSwing
+	local _, f, _, g, _, _, _, h, _, _, _, j, _, k, l, _, _, m, _, _, n = info()
 	-- event (2nd), sourceGUID (4th), destGUID (8th), 1st Parameter [spellId] (12th), spellSchool (14th), 1st Param (15th), 4th Param (18th), 7th Param [critical] (21st)
 
-	if g ~= guid(frame.unit) then return end -- needs to be the frames unit!
+	if h ~= guid(frame.unit) then return end -- needs to be the frames unit!
+
+	if f == 'SPELL_HEAL' or (fb.showHots and f == 'SPELL_PERIODIC_HEAL') then
+		a, b, d = l, m, ns.color.Heal
+	elseif f == 'RANGE_DAMAGE' then
+		a, b, d = l, n, ns.color.Ranged
+	elseif f == 'SWING_DAMAGE' then
+		a, b, d, e = j, m, ns.color.Physical, true
+	elseif f == 'SPELL_DAMAGE' or (fb.showDots and f == 'SPELL_PERIODIC_DAMAGE') then
+		a, b, c = l, n, k
+	elseif f == 'SPELL_MISSED' or f == 'RANGE_MISSED' then
+		a = l
+	elseif f == 'SWING_MISSED' then
+		a, e = j, true
+	end
+
+	local ex = not e and FCT.db.exclude[j]
+	if ex and (ex.global or ex[frame.unitframeType or frame.frameType]) then return end
 
 	local tb, pb
-	if fb.isTarget and not (g == guid('target') and uisu(frame.unit, 'target')) then
+	if fb.isTarget and not (h == guid('target') and uisu(frame.unit, 'target')) then
 		tb = true
 	end
 	if fb.isPlayer then
-		local y = g == E.myguid and uisu(frame.unit, 'player')
-		local z = f == E.myguid or (fb.showPet and f == guid('pet'))
+		local y = h == E.myguid and uisu(frame.unit, 'player')
+		local z = g == E.myguid or (fb.showPet and g == guid('pet'))
 		if y or z then -- its player
 			if fb.isPlayer == 1 and tb then tb = false end -- allow player on all
 		elseif fb.isPlayer ~= 1 then -- dont pb when we are doing this
@@ -209,22 +226,8 @@ function FCT:Update(frame, fb)
 	end
 	if tb or pb then return end
 
-	if e == 'SPELL_HEAL' or (fb.showHots and e == 'SPELL_PERIODIC_HEAL') then
-		if not fb.exclude[h] then a, b, d = j, k, ns.color.Heal end
-	elseif e == 'RANGE_DAMAGE' then
-		a, b, d = j, l, ns.color.Ranged
-	elseif e == 'SWING_DAMAGE' then
-		a, b, d = h, k, ns.color.Physical
-	elseif e == 'SPELL_DAMAGE' or (fb.showDots and e == 'SPELL_PERIODIC_DAMAGE') then
-		a, b, c = j, l, i
-	elseif e == 'SPELL_MISSED' or e == 'RANGE_MISSED' then
-		a = j
-	elseif e == 'SWING_MISSED' then
-		a = h
-	end
-
 	if (type(a) == 'number' and a > 0) or type(a) == 'string' then
-		if (fb.showIcon or fb.showName) and not (e == 'SWING_DAMAGE' or ns.spells[h]) then ns.spells[h] = {gsi(h)} end
+		if (fb.showIcon or fb.showName) and not (e or ns.spells[j]) then ns.spells[j] = {gsi(j)} end
 
 		local text
 		if fb.mode == 'Simpy' then
@@ -240,10 +243,10 @@ function FCT:Update(frame, fb)
 		end
 
 		if fb.showIcon or fb.showName then
-			local spell = ns.spells[h]
+			local spell = ns.spells[j]
 			if spell then
 				if fb.showIcon then
-					if (e ~= 'SWING_DAMAGE') and spell[3] then
+					if not e and spell[3] then
 						text.Icon:SetTexture(spell[3])
 						text.Icon.backdrop:Show()
 						text.Icon:Show()
@@ -417,7 +420,6 @@ function FCT:SetOptions(fb, db)
 	fb.isPlayer = db.isPlayer
 	fb.iconSize = db.iconSize
 	fb.showPet = db.showPet
-	fb.exclude = db.exclude
 	fb.prefix = db.prefix
 	fb.mode = db.mode
 
