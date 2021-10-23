@@ -204,9 +204,9 @@ function FCT:AddOptions(arg1, arg2)
 				local which = info[#info]
 				if which == 'global' then
 					if value then wipe(FCT.db.exclude[arg2]) end
-					FCT.db.exclude[arg2].global = value
+					FCT.db.exclude[arg2].global = value or nil
 				else
-					if value then FCT.db.exclude[arg2].global = false end
+					if value then FCT.db.exclude[arg2].global = nil end
 					FCT.db.exclude[arg2][which] = value or nil
 				end
 			end,
