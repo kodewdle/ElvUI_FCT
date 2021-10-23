@@ -1,3 +1,4 @@
+local E = unpack(ElvUI)
 local _, ns = ...
 
 ns.defaults = {
@@ -123,8 +124,9 @@ ns.frames = {
 	spellY = 0,
 	spellX = 0,
 	exclude = {
-		[145109] = true, -- Ysera's Gift
-		[227034] = true, -- Nature's Guardian
+		[145109] = E.Retail, -- Ysera's Gift
+		[227034] = E.Retail, -- Nature's Guardian
+		[342232] = E.Retail, -- Arcane Echo
 	},
 	advanced = {
 		anim = 'fountain',
