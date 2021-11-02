@@ -1,6 +1,6 @@
-## Interface: 11307
+## Interface: 11400
 ## Author: Simpy, Lightspark
-## Version: 1.15
+## Version: 1.16
 ## Title: |cff1784d1ElvUI|r |cFFdd2244Floating Combat Text|r
 ## SavedVariables: ElvFCT
 ## RequiredDeps: ElvUI
