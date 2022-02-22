@@ -1,6 +1,6 @@
-## Interface: 90105
+## Interface: 90200
 ## Author: Simpy, Lightspark
-## Version: 1.16
+## Version: 1.17
 ## Title: |cff1784d1ElvUI|r |cFFdd2244Floating Combat Text|r
 ## SavedVariables: ElvFCT
 ## RequiredDeps: ElvUI
