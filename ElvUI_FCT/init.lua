@@ -538,3 +538,4 @@ end
 hooksecurefunc(E, 'Initialize', FCT.Initialize)
 hooksecurefunc(UF, 'Configure_HealthBar', FCT.ToggleFrame)
 hooksecurefunc(NPDriver, 'OnNamePlateAdded', FCT.ToggleFrame)
+hooksecurefunc(NPDriver, 'OnUnitFactionChanged', FCT.ToggleFrame)
