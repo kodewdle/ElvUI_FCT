@@ -71,7 +71,7 @@ local lightspark = {
 				ns.LS.removeText(frame.ElvFCT, index, text)
 			else
 				text.progress = text.elapsed / text.scrollTime
-				text:SetPoint('CENTER', frame, 'CENTER', text:GetXY())
+				text:SetPoint('CENTER', frame, text:GetXY())
 
 				text.elapsed = text.elapsed + elapsed
 				text.frame:SetAlpha(ns.LS.clamp(1 - (text.elapsed - text.fadeTime) / (text.scrollTime - text.fadeTime)))
@@ -171,11 +171,11 @@ function FCT:GP(t, fb, b, a)
 	end
 end
 
-function FCT:StyleNumber(owner, style, number)
+function FCT:StyleNumber(unit, style, number)
 	if style == 'SHORT' then
 		return E:ShortValue(number)
 	elseif style == 'PERCENT' then
-		return format('%.2f%%', (number / uhm(owner.unit)) * 100)
+		return format('%.2f%%', (number / uhm(unit)) * 100)
 	elseif style == 'BLIZZARD' then
 		return buln(number)
 	elseif style == 'BLIZZTEXT' then
@@ -186,13 +186,13 @@ function FCT:StyleNumber(owner, style, number)
 end
 
 function FCT:Update(frame, fb)
-	if not fb.owner:IsShown() then return end
+	if not fb.unit or not fb.owner:IsShown() then return end
 
 	local a, b, c, d, e -- amount, critical, spellSchool, dmgColor, isSwing
 	local _, f, _, g, _, _, _, h, _, _, _, j, _, k, l, _, _, m, _, _, n = info()
 	-- event (2nd), sourceGUID (4th), destGUID (8th), 1st Parameter [spellId] (12th), spellSchool (14th), 1st Param (15th), 4th Param (18th), 7th Param [critical] (21st)
 
-	if h ~= guid(frame.unit) then return end -- needs to be the frames unit!
+	if h ~= guid(fb.unit) then return end -- needs to be the frames unit!
 
 	if f == 'SPELL_HEAL' or (fb.showHots and f == 'SPELL_PERIODIC_HEAL') then
 		a, b, d = l, m, ns.color.Heal
@@ -209,14 +209,14 @@ function FCT:Update(frame, fb)
 	end
 
 	local ex = not e and FCT.db.exclude[j]
-	if ex and (ex.global or ex[frame.unitframeType or frame.frameType]) then return end
+	if ex and (ex.global or ex[fb.frametype]) then return end
 
 	local tb, pb
-	if fb.isTarget and not (h == guid('target') and uisu(frame.unit, 'target')) then
+	if fb.isTarget and not (h == guid('target') and uisu(fb.unit, 'target')) then
 		tb = true
 	end
 	if fb.isPlayer then
-		local y = h == E.myguid and uisu(frame.unit, 'player')
+		local y = h == E.myguid and uisu(fb.unit, 'player')
 		local z = g == E.myguid or (fb.showPet and g == guid('pet'))
 		if y or z then -- its player
 			if fb.isPlayer == 1 and tb then tb = false end -- allow player on all
@@ -276,12 +276,13 @@ function FCT:Update(frame, fb)
 
 		if b then
 			if fb.critShake then
-				if not fb.owner.isShaking then
-					fb.owner.isShaking = ns.HS.ShakeIt(fb.owner, fb.shakeDuration)
+				local parent = fb.owner.unitFrame or fb.owner.UnitFrame or fb.owner
+				if not parent.isShaking then
+					parent.isShaking = ns.HS.ShakeIt(parent, fb.shakeDuration)
 				end
 			elseif fb.textShake then
-				if not text.isShaking then
-					text.isShaking = ns.HS.ShakeIt(text, fb.shakeDuration)
+				if not fb.raised.isShaking then
+					fb.raised.isShaking = ns.HS.ShakeIt(fb.raised, fb.shakeDuration)
 				end
 			end
 
@@ -298,9 +299,9 @@ function FCT:Update(frame, fb)
 			text:SetText(ct)
 		elseif b and fb.prefix ~= '' then
 			local red, green, blue = ns.color.Prefix[1] * 255, ns.color.Prefix[2] * 255, ns.color.Prefix[3] * 255
-			text:SetFormattedText('|cff%02x%02x%02x%s|r%s|cff%02x%02x%02x%s|r', red, green, blue, fb.prefix, FCT:StyleNumber(fb.owner, fb.numberStyle, a), red, green, blue, fb.prefix)
+			text:SetFormattedText('|cff%02x%02x%02x%s|r%s|cff%02x%02x%02x%s|r', red, green, blue, fb.prefix, FCT:StyleNumber(fb.unit, fb.numberStyle, a), red, green, blue, fb.prefix)
 		else
-			text:SetText(FCT:StyleNumber(fb.owner, fb.numberStyle, a))
+			text:SetText(FCT:StyleNumber(fb.unit, fb.numberStyle, a))
 		end
 
 		if fb.mode == 'Simpy' then
@@ -316,7 +317,7 @@ end end
 function FCT:EnableMode(fb, mode)
 	if mode == 'Simpy' then
 		if not fb.Frame then
-			fb.Frame = cf('Frame', fb.owner:GetDebugName()..'ElvFCT', fb.parent)
+			fb.Frame = cf('Frame', fb.owner:GetDebugName()..'ElvFCT', fb.raised)
 			fb.Frame.owner = fb.owner
 
 			local frameName = fb.Frame:GetDebugName()
@@ -330,7 +331,7 @@ function FCT:EnableMode(fb, mode)
 			fb.Text.Spell:FontTemplate(fb.font, fb.fontSize, fb.fontOutline)
 		end
 
-		fb.Text:Point('CENTER', fb.parent, 'CENTER', fb.textX, fb.textY)
+		fb.Text:Point('CENTER', fb.raised, 'CENTER', fb.textX, fb.textY)
 		fb.Text.Spell:Point('BOTTOM', fb.Text, 'TOP', fb.spellX, fb.spellY)
 		fb.Text.Icon:Point('RIGHT', fb.Text, 'LEFT', fb.iconX, fb.iconY)
 		fb.Text.Icon:Size(fb.iconSize)
@@ -350,7 +351,7 @@ function FCT:EnableMode(fb, mode)
 		for i=1, fb.numTexts do
 			local text = fb.texts[i]
 			if not text then
-				local frame = cf('Frame', fb.owner:GetDebugName()..'ElvFCT'..i, fb.parent)
+				local frame = cf('Frame', fb.owner:GetDebugName()..'ElvFCT'..i, fb.raised)
 
 				local frameName = frame:GetDebugName()
 				text = frame:CreateFontString(frameName..'Text', 'OVERLAY')

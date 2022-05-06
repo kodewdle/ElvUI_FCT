@@ -1,5 +1,4 @@
 local E, _, V, P, G = unpack(ElvUI)
-local NP = E:GetModule('NamePlates')
 local UF = E:GetModule('UnitFrames')
 local addon, ns = ...
 
@@ -9,11 +8,21 @@ ns[1], ns[2] = addon, FCT
 local _G, select, tostring, strfind = _G, select, tostring, strfind
 local type, pairs, format, tonumber = type, pairs, format, tonumber
 local next, wipe = next, wipe
-local hooksecurefunc = hooksecurefunc
+
+local UIParent = UIParent
 local CreateFrame = CreateFrame
 local GetSpellInfo = GetSpellInfo
 local GetSpellSubtext = GetSpellSubtext
+local UnitIsEnemy = UnitIsEnemy
+local UnitIsPlayer = UnitIsPlayer
+local UnitIsPVPSanctuary = UnitIsPVPSanctuary
+local UnitIsUnit = UnitIsUnit
+local UnitReaction = UnitReaction
+local GetNamePlateForUnit = C_NamePlate.GetNamePlateForUnit
+local GetNamePlates = C_NamePlate.GetNamePlates
+local hooksecurefunc = hooksecurefunc
 
+local NPDriver = NamePlateDriverFrame
 local Version = GetAddOnMetadata(addon, 'Version')
 local version = format('[|cFF508cf7v%s|r]', Version)
 local title = '|cFFdd2244Floating Combat Text|r'
@@ -102,10 +111,8 @@ function FCT:ColorOption(name, desc)
 end
 
 function FCT:UpdateNamePlates()
-	if NP.Plates then
-		for nameplate in pairs(NP.Plates) do
-			FCT:ToggleFrame(nameplate)
-		end
+	for _, nameplate in pairs(GetNamePlates()) do
+		FCT:ToggleFrame(nameplate)
 	end
 end
 
@@ -433,30 +440,64 @@ function FCT:FetchDB(Module, Type)
 	end
 end
 
-function FCT:ToggleFrame(frame)
-	if not FCT.db then return end
+function FCT:GetFrameType(unit) -- logic should match ElvUI NP:UpdatePlateType
+	if not unit then return end
 
-	if (self ~= FCT) and not frame.ElvFCT then
-		frame.ElvFCT = FCT:Build(frame, (self == NP and frame.RaisedElement) or frame.RaisedElementParent)
-	end
+	local isMe = UnitIsUnit(unit, 'player')
+	local isPVPSanctuary = UnitIsPVPSanctuary(unit)
+	local isEnemy = UnitIsEnemy('player', unit)
+	local reaction = UnitReaction('player', unit)
+	local isPlayer = UnitIsPlayer(unit)
 
-	if frame.ElvFCT then
-		if frame.unitframeType then
-			local db = FCT:FetchDB('unitframes', frame.unitframeType)
-			if db then FCT:Toggle(frame, FCT.db.unitframes, db) end
-		elseif frame.frameType then
-			local db = FCT:FetchDB('nameplates', frame.frameType)
-			if db then FCT:Toggle(frame, FCT.db.nameplates, db) end
-		end
+	if isMe then
+		return 'PLAYER'
+	elseif isPVPSanctuary then
+		return 'FRIENDLY_PLAYER'
+	elseif not isEnemy and (not reaction or reaction > 4) then
+		return (isPlayer and 'FRIENDLY_PLAYER') or 'FRIENDLY_NPC'
+	else
+		return (isPlayer and 'ENEMY_PLAYER') or 'ENEMY_NPC'
 	end
 end
 
-function FCT:Build(frame, RaisedElement)
-	local raised = CreateFrame('Frame', frame:GetDebugName()..'RaisedElvFCT', frame)
-	raised:SetFrameLevel(RaisedElement:GetFrameLevel() + 50)
-	raised:SetAllPoints()
+function FCT:ToggleFrame(frame)
+	if not FCT.db then return end
 
-	return { owner = frame, parent = raised }
+	local unit
+	if self == NPDriver then
+		unit = frame
+		frame = GetNamePlateForUnit(unit)
+
+		if not frame then
+			return -- forbidden
+		end
+	else
+		unit = frame.namePlateUnitToken
+	end
+
+	local info = frame.ElvFCT
+	if not info then
+		frame.ElvFCT = FCT:Build(frame, unit)
+		info = frame.ElvFCT
+	end
+
+	info.unit = unit or frame.unit
+	info.isNameplate = not not unit
+	info.frametype = (unit and FCT:GetFrameType(unit)) or frame.unitframeType
+
+	local db = FCT:FetchDB(info.isNameplate and 'nameplates' or 'unitframes', info.frametype)
+	if db then FCT:Toggle(frame, info.isNameplate and FCT.db.nameplates or FCT.db.unitframes, db) end
+end
+
+function FCT:Build(frame, unit)
+	local raised = CreateFrame('Frame', frame:GetDebugName()..'RaisedElvFCT', (unit and UIParent) or frame)
+	raised:SetIgnoreParentScale(true)
+	raised:SetFrameStrata('MEDIUM')
+	raised:SetScale(E.uiscale)
+	raised:SetAllPoints(frame)
+	raised:SetFrameLevel(200)
+
+	return { owner = frame, raised = raised }
 end
 
 function FCT:UpdateColors()
@@ -495,5 +536,5 @@ function FCT:Initialize()
 end
 
 hooksecurefunc(E, 'Initialize', FCT.Initialize)
-hooksecurefunc(NP, 'UpdatePlate', FCT.ToggleFrame)
 hooksecurefunc(UF, 'Configure_HealthBar', FCT.ToggleFrame)
+hooksecurefunc(NPDriver, 'OnNamePlateAdded', FCT.ToggleFrame)
