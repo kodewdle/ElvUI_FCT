@@ -35,7 +35,7 @@ ns.HS = harlemShake
 
 local lightspark = {
 	animations = {
-		fountain = function(s) return s.x + s.xDirection * s.radius * (1 - cos(pi / 2 * s.progress)), s.y + s.yDirection * s.radius * sin(pi / 2 * s.progress) end,
+		fountain = function(s) return s.x + s.xDirection * s.radius * (1 - cos(pi * 0.5 * s.progress)), s.y + s.yDirection * s.radius * sin(pi * 0.5 * s.progress) end,
 		vertical = function(s) return s.x, s.y + s.yDirection * s.radius * s.progress end,
 		horizontal = function(s) return s.x + s.xDirection * s.radius * s.progress, s.y end,
 		diagonal = function(s) return s.x + s.xDirection * s.radius * s.progress, s.y + s.yDirection * s.radius * s.progress end,
