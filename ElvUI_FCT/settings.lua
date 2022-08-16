@@ -143,7 +143,7 @@ ns.colors = {
 	Heal     = {r=0.20, g=1.00, b=0.20, n='Heal'},            --[32FF32]
 	Ranged   = {r=0.40, g=0.40, b=0.40, n='Ranged'},          --[666666]
 	Physical = {r=0.60, g=0.40, b=0.20, n='Physical'},        --[996633]
-	Standard = {r=1.00, g=1.00, b=1.00, n='Standard'},	       --[FFFFFF]
+	Standard = {r=1.00, g=1.00, b=1.00, n='Standard'},	      --[FFFFFF]
 	[01] = {r=1.00, g=0.20, b=0.20, n='Damage'}, --[FF3232]
 	[02] = {r=1.00, g=1.00, b=0.29, n='Holy'},   --[FFFF4B]
 	[04] = {r=1.00, g=0.39, b=0.00, n='Fire'},   --[FF6400]
