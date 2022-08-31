@@ -1,9 +1,9 @@
-## Interface: 90207
 ## Author: Simpy, Lightspark
-## Version: 1.20
 ## Title: |cff1784d1ElvUI|r |cFFdd2244Floating Combat Text|r
 ## SavedVariables: ElvFCT
 ## RequiredDeps: ElvUI
+## Interface: 90207
+## Version: 1.21
 
 locales\load_locales.xml
 settings.lua
