@@ -84,8 +84,9 @@ ns.defaults = {
 				spellY = 2
 			},
 			Party = {},
-			Raid = {},
-			Raid40 = {},
+			Raid1 = {},
+			Raid2 = {},
+			Raid3 = {},
 			RaidPet = {},
 			Assist = {},
 			Tank = {},

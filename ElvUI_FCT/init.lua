@@ -69,11 +69,12 @@ FCT.orders = {
 	Arena = {9, 'Arena'},
 	Boss = {10, 'Boss'},
 	Party = {11, 'Party'},
-	Raid = {12, 'Raid'},
-	Raid40 = {13, 'Raid-40'},
-	RaidPet = {14, 'Raid Pet'},
-	Assist = {15, 'Assist'},
-	Tank = {16, 'Tank'},
+	Raid1 = {12, 'Raid 1'},
+	Raid2 = {13, 'Raid 2'},
+	Raid3 = {14, 'Raid 3'},
+	RaidPet = {15, 'Raid Pet'},
+	Assist = {16, 'Assist'},
+	Tank = {17, 'Tank'},
 }
 
 FCT.nameplateTypes = {
@@ -89,8 +90,9 @@ FCT.unitframeTypes = {
 	assist = 'Assist',
 	boss = 'Boss',
 	party = 'Party',
-	raid = 'Raid',
-	raid40 = 'Raid40',
+	raid1 = 'Raid1',
+	raid2 = 'Raid2',
+	raid3 = 'Raid3',
 	tank = 'Tank',
 	focus = 'Focus',
 	focustarget = 'FocusTarget',
@@ -131,7 +133,7 @@ function FCT:UpdateUnitFrames()
 		end
 	end
 
-	-- assist, tank, party, raid, raid40, raidpet
+	-- assist, tank, party, raid1-3, raidpet
 	if UF.headers then
 		for groupName in pairs(UF.headers) do
 			local group = UF[groupName]
