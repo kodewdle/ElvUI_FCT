@@ -286,8 +286,16 @@ function FCT:Update(frame, fb)
 				end
 			end
 
+			if fb.followSize then
+				text.Icon:Size(fb.critFontSize)
+			end
+
 			text:FontTemplate(fb.critFont, fb.critFontSize, fb.critFontOutline)
 		else
+			if fb.followSize then
+				text.Icon:Size(fb.fontSize)
+			end
+
 			text:FontTemplate(fb.font, fb.fontSize, fb.fontOutline)
 		end
 
@@ -420,6 +428,7 @@ function FCT:SetOptions(fb, db)
 	fb.isTarget = db.isTarget
 	fb.isPlayer = db.isPlayer
 	fb.iconSize = db.iconSize
+	fb.followSize = db.followSize
 	fb.showPet = db.showPet
 	fb.prefix = db.prefix
 	fb.mode = db.mode

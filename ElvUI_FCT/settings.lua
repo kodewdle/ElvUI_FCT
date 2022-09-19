@@ -115,6 +115,7 @@ ns.frames = {
 	isPlayer = true,
 	showPet = true,
 	iconSize = 16,
+	followSize = false,
 	cycleColors = true,
 	numberStyle = 'SHORT',
 	prefix = '*',
