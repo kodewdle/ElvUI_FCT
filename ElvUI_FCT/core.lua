@@ -287,8 +287,10 @@ function FCT:Update(frame, fb)
 			end
 
 			text:FontTemplate(fb.critFont, fb.critFontSize, fb.critFontOutline)
+			text.Icon:Size(fb.critFontSize)
 		else
 			text:FontTemplate(fb.font, fb.fontSize, fb.fontOutline)
+			text.Icon:Size(fb.fontSize)
 		end
 
 		local ct = ns.CT[a]
