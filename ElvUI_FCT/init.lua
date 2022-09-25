@@ -205,7 +205,7 @@ function FCT:AddOptions(arg1, arg2)
 			args = {
 				name = { order = 1, type = 'header', name = spellName },
 				global = { order = 2, type = 'toggle', name = L["Global"] },
-				nameplates = { order = 3, type = 'group', name = L["NamePlates"], inline = true, args = {} },
+				nameplates = { order = 3, type = 'group', name = L["Nameplates"], inline = true, args = {} },
 				unitframes = { order = 4, type = 'group', name = L["UnitFrames"], inline = true, args = {} }
 			},
 			get = function(info) return FCT.db.exclude[arg2][ info[#info] ] end,
@@ -340,7 +340,7 @@ function FCT:Options()
 			order = 2,
 			type = 'group',
 			childGroups = 'tab',
-			name = L["NamePlates"],
+			name = L["Nameplates"],
 			get = function(info) return FCT.db.nameplates[ info[#info] ] end,
 			set = function(info, value) FCT.db.nameplates[ info[#info] ] = value; FCT:UpdateNamePlates() end,
 			args = { enable = { order = 1, type = 'toggle', name = L["Enable"] } }
