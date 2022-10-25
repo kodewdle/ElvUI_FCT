@@ -2,8 +2,8 @@
 ## Title: |cff1784d1ElvUI|r |cFFdd2244Floating Combat Text|r
 ## SavedVariables: ElvFCT
 ## RequiredDeps: ElvUI
-## Interface: 90207
-## Version: 1.22
+## Interface: 100000
+## Version: 1.23
 
 locales\load_locales.xml
 settings.lua
