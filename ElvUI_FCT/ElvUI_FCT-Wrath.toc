@@ -3,7 +3,7 @@
 ## SavedVariables: ElvFCT
 ## RequiredDeps: ElvUI
 ## Interface: 30401
-## Version: 1.26
+## Version: 1.27
 
 locales\load_locales.xml
 settings.lua
