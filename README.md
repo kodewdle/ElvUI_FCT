@@ -2,6 +2,6 @@
 
 **Credits:** [Simpy](https://github.com/kodewdle) (plugin, config, fade mode, etc) & [LS-](https://github.com/ls-) (animations).
 
-[![](https://img.shields.io/badge/Donate-Paypal-blue)](https://www.paypal.me/koditaylor)
+[![](https://img.shields.io/badge/Support-❤️-FF96D7?style=flat-square&logo=paypal)](https://paypal.me/koditaylor)
 
 ![](https://www.tukui.org/addons/Simpy/1555787046/screenshot.png)
