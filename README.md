@@ -1,4 +1,4 @@
-[Floating Combat Text](https://www.tukui.org/addons.php?id=137) an [ElvUI](https://www.tukui.org/download.php?ui=elvui) Plugin that allows you to have **Combat Feedback Text** or **Floating Combat Text** on UnitFrames and/or Nameplates.
+[Floating Combat Text](https://wowup.io/addons/2797820) is an [ElvUI](https://tukui.org/elvui) plugin that allows the placement of both floating combat text and its feedback/effect messages onto UnitFrames and Nameplates as required and defined by the player.
 
 **Credits:** [Simpy](https://github.com/kodewdle) (plugin, config, fade mode, etc) & [LS-](https://github.com/ls-) (animations).
 
