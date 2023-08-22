@@ -1,1 +1,1 @@
-*   Retail patch 10.1.5
+*   Classic Hardcore
