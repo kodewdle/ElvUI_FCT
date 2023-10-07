@@ -28,13 +28,6 @@ local version = format('[|cFF508cf7v%s|r]', Version)
 local title = '|cFFdd2244Floating Combat Text|r'
 local by = 'by |cFF8866ccSimpy|r and |cFF34dd61Lightspark|r (ls-)'
 
-local FONT_OUTLINES = {
-	NONE = _G.NONE,
-	OUTLINE = 'OUTLINE',
-	MONOCHROMEOUTLINE = 'MONOCROMEOUTLINE',
-	THICKOUTLINE = 'THICKOUTLINE'
-}
-
 FCT.orders = {
 	colors = {
 		['1'] = 1, -- Damage
@@ -261,6 +254,7 @@ end
 
 function FCT:Options()
 	FCT.L = E.Libs.ACL:GetLocale('ElvUI', E.global.general.locale or 'enUS')
+	local C = E.Config[1]
 	local L = FCT.L
 
 	FCT.options = {
@@ -283,10 +277,10 @@ function FCT:Options()
 		fonts = { order = 3, type = 'group', name = '', guiInline = true, args = {
 			header = { order = 0, name = FCT:ColorOption(L["Fonts"]), type = 'header' },
 			font = { order = 1, type = 'select', dialogControl = 'LSM30_Font', name = L["Font"], values = _G.AceGUIWidgetLSMlists.font },
-			fontOutline = { order = 2, name = L["Font Outline"], desc = L["Set the font outline."], type = 'select', values = FONT_OUTLINES},
+			fontOutline = { order = 2, name = L["Font Outline"], desc = L["Set the font outline."], type = 'select', sortByValue = true, values = C.Values.FontFlags},
 			fontSize = { order = 3, name = _G.FONT_SIZE, type = 'range', min = 4, max = 60, step = 1 },
 			critFont = { order = 4, type = 'select', dialogControl = 'LSM30_Font', name = L["Critical Font"], values = _G.AceGUIWidgetLSMlists.font },
-			critFontOutline = { order = 5, name = L["Critical Font Outline"], desc = L["Set the font outline."], type = 'select', values = FONT_OUTLINES},
+			critFontOutline = { order = 5, name = L["Critical Font Outline"], desc = L["Set the font outline."], type = 'select', sortByValue = true, values = C.Values.FontFlags},
 			critFontSize = { order = 6, name = L["Critical Font Size"], type = 'range', min = 4, max = 60, step = 1 }
 		}},
 		settings = { order = 4, type = 'group', name = '', guiInline = true, args = {
