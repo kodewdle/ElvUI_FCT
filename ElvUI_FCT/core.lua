@@ -24,43 +24,32 @@ stack.tickWait = 3 -- time before sending hot to the update
 stack.hitsWait = 2 -- time to check for rapid spells
 stack.hitAmount = 5 -- amount of hits during hitsWait
 stack.sendDelay = 0.1 -- delay of the spell being sent out
-stack.watching = {
-	-- spells here shouldnt get added to hitsSpells
-} -- rapid spells to watch
-stack.hitsSpells = {
-	-- [100] = 5; 5 charge hits within the hitWait
-} -- rapid spells count within wait time
-stack.spells = { --[[
-	[100] = {
-		[guid] = data table; holds the info from CLEU
-	}
-]]
-} -- rapid spells to count as dots
-stack.sendSpells = {
-	-- same as stack.spells, just ready to send out
-}
+stack.watching = {} -- stacks to watch
+stack.hitsSpells = {} -- stack count within wait time
+stack.spells = {} -- spells to count as stacks
+stack.sendSpells = {} -- spells pushed to be sent out
 
-stack.delaySpell = function(id, data)
-	for frame, db in next, ns.objects do
-		FCT:Update(frame, db, data)
+stack.DelaySpell = function(spell)
+	for fb in next, ns.objects do
+		FCT:Update(fb, spell)
 	end
 end
 
-stack.hasSpells = function()
-	return next(stack.watching) or next(stack.hitsSpells) or next(stack.spells) or next(stack.sendSpells)
+stack.HasSpells = function(s)
+	return next(s.watching) or next(s.hitsSpells) or next(s.spells) or next(s.sendSpells)
 end
 
-stack.checkShown = function()
-	local shown = stack:IsShown()
-	local spells = stack.hasSpells()
+stack.CheckShown = function(s)
+	local shown = s:IsShown()
+	local spells = s:HasSpells()
 	if not shown and spells then
-		stack:Show()
+		s:Show()
 	elseif shown and not spells then
-		stack:Hide()
+		s:Hide()
 	end
 end
 
-stack.watchSpells = function(s, elapsed)
+stack.WatchSpells = function(s, elapsed)
 	s.hits = (s.hits or 0) + elapsed
 	if s.hits > s.hitsWait then
 		s.hits = 0
@@ -68,7 +57,7 @@ stack.watchSpells = function(s, elapsed)
 		for hit, hits in next, s.hitsSpells do
 			local id, event = strsplit('^', hit)
 			if hits > s.hitAmount then
-				s.watching[id .. '^' .. event] = true
+				s.watching[id..'^'..event] = true
 			end
 
 			s.hitsSpells[hit] = nil
@@ -82,7 +71,7 @@ stack.watchSpells = function(s, elapsed)
 		for key, data in next, s.spells do
 			local id = strsplit('^', key)
 			for uid, spell in next, data do
-				s.sendSpells[id .. '^' .. uid] = spell -- add it to
+				s.sendSpells[id..'^'..uid] = spell -- add it to
 			end
 
 			s.spells[key] = nil -- remove it from
@@ -95,10 +84,8 @@ stack.watchSpells = function(s, elapsed)
 
 		local delay = 0
 		for key, spell in next, s.sendSpells do
-			local id = strsplit('^', key)
-
 			delay = delay + s.sendDelay
-			E:Delay(delay, s.delaySpell, id, spell)
+			E:Delay(delay, s.DelaySpell, spell)
 
 			s.sendSpells[key] = nil
 		end
@@ -106,7 +93,7 @@ stack.watchSpells = function(s, elapsed)
 end
 
 stack:Hide()
-stack:SetScript('OnUpdate', stack.watchSpells)
+stack:SetScript('OnUpdate', stack.WatchSpells)
 ns.SH = stack -- stacks handler
 
 local harlemShake = {
@@ -276,7 +263,7 @@ function FCT:StyleNumber(unit, style, number)
 	return number
 end
 
-function FCT:Update(frame, fb, data)
+function FCT:Update(fb, data)
 	local unit = fb.unit
 	if not unit or not fb.owner:IsShown() then return end
 
@@ -348,7 +335,7 @@ function FCT:Update(frame, fb, data)
 		if not amount or amount <= 0 then return end -- amount not valid
 	elseif A and fb.allowStacking and fromMe and not FCT.db.stacks.exclude[j] then
 		-- its a real hot or dot automatically add it
-		local key = j .. '^' .. f
+		local key = j..'^'..f
 		if stack.overtime and (hot or dot) and not stack.watching[key] then
 			stack.watching[key] = true
 		end
@@ -386,7 +373,7 @@ function FCT:Update(frame, fb, data)
 	end
 
 	-- dont need it running when its not watching
-	stack.checkShown()
+	stack:CheckShown()
 
 	-- handle displaying spells
 	if A or type(a) == 'string' then
@@ -641,8 +628,8 @@ function FCT:COMBAT_LOG_EVENT_UNFILTERED()
 	_, data.f, _, data.g, _, _, _, data.h, _, _, _, data.j, _, data.k, data.l, _, _, data.m, _, _, data.n = info()
 	-- event (2nd), sourceGUID (4th), destGUID (8th), 1st Parameter [spellId] (12th), spellSchool (14th), 1st Param (15th), 4th Param (18th), 7th Param [critical] (21st)
 
-	for frame, db in next, ns.objects do
-		FCT:Update(frame, db, data)
+	for fb in next, ns.objects do
+		FCT:Update(fb, data)
 	end
 end
 
@@ -657,7 +644,7 @@ function FCT:UpdateStacks(db)
 	stack.prefix = db.prefix
 
 	wipe(stack.watching)
-	stack.checkShown()
+	stack:CheckShown()
 end
 
 function FCT:Toggle(frame, module, db)
@@ -674,8 +661,8 @@ function FCT:Enable(frame, db)
 		FCT:SetOptions(fb, db)
 		FCT:EnableMode(fb, db.mode)
 
-		if not ns.objects[fb.owner] then
-			ns.objects[fb.owner] = fb
+		if not ns.objects[fb] then
+			ns.objects[fb] = true
 		end
 	end
 end
@@ -685,8 +672,8 @@ function FCT:Disable(frame)
 	if fb then
 		ns.LS.onShowHide(frame)
 
-		if ns.objects[fb.owner] then
-			ns.objects[fb.owner] = nil
+		if ns.objects[fb] then
+			ns.objects[fb] = nil
 		end
 	end
 end
