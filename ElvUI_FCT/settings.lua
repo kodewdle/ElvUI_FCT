@@ -12,6 +12,7 @@ ns.defaults = {
 		hitsWait = 5,
 		hitAmount = 5,
 		prefix = 'x',
+		exclude = {}
 	},
 	nameplates = {
 		enable = true,

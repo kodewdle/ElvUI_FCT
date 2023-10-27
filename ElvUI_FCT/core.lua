@@ -332,7 +332,7 @@ function FCT:Update(frame, fb, data)
 	if hits then
 		if not fb.allowStacking then return end -- not allowed on this frame
 		if not amount or amount <= 0 then return end -- amount not valid
-	elseif A and fb.allowStacking and fromMe then
+	elseif A and fb.allowStacking and fromMe and not FCT.db.stacks.exclude[j] then
 		-- its a real hot or dot automatically add it
 		local key = j .. '^' .. f
 		if stack.overtime and (hot or dot) and not stack.watching[key] then
