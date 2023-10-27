@@ -8,8 +8,8 @@ local FCT = ns[2]
 local S = E:GetModule('Skins')
 
 local sin, cos, pi, rand = math.sin, math.cos, math.pi, math.random
-local wipe, tinsert, tremove, strsplit = wipe, tinsert, tremove, strsplit
-local type, unpack, next, ipairs, format, CopyTable = type, unpack, next, ipairs, format, CopyTable
+local wipe, tinsert, tremove, CopyTable = wipe, tinsert, tremove, CopyTable
+local type, unpack, next, ipairs, format = type, unpack, next, ipairs, format
 local band, guid, uisu, uhm, gsi = bit.band, UnitGUID, UnitIsUnit, UnitHealthMax, GetSpellInfo
 local info, buln, cf = CombatLogGetCurrentEventInfo, BreakUpLargeNumbers, CreateFrame
 
@@ -29,9 +29,9 @@ stack.hitsSpells = {} -- stack count within wait time
 stack.spells = {} -- spells to count as stacks
 stack.sendSpells = {} -- spells pushed to be sent out
 
-stack.DelaySpell = function(spell)
+stack.DelaySpell = function(data)
 	for fb in next, ns.objects do
-		FCT:Update(fb, spell)
+		FCT:Update(fb, data)
 	end
 end
 
@@ -54,13 +54,12 @@ stack.WatchSpells = function(s, elapsed)
 	if s.hits > s.hitsWait then
 		s.hits = 0
 
-		for hit, hits in next, s.hitsSpells do
-			local id, event = strsplit('^', hit)
+		for key, hits in next, s.hitsSpells do
 			if hits > s.hitAmount then
-				s.watching[id..'^'..event] = true
+				s.watching[key] = true
 			end
 
-			s.hitsSpells[hit] = nil
+			s.hitsSpells[key] = nil
 		end
 	end
 
@@ -68,13 +67,12 @@ stack.WatchSpells = function(s, elapsed)
 	if s.ticks > stack.tickWait then
 		s.ticks = 0
 
-		for key, data in next, s.spells do
-			local id = strsplit('^', key)
-			for uid, spell in next, data do
-				s.sendSpells[id..'^'..uid] = spell -- add it to
+		for key, spell in next, s.spells do
+			for uid, data in next, spell do
+				s.sendSpells[key..'^'..uid] = data
 			end
 
-			s.spells[key] = nil -- remove it from
+			s.spells[key] = nil
 		end
 	end
 
@@ -83,9 +81,9 @@ stack.WatchSpells = function(s, elapsed)
 		s.sends = 0
 
 		local delay = 0
-		for key, spell in next, s.sendSpells do
+		for key, data in next, s.sendSpells do
 			delay = delay + s.sendDelay
-			E:Delay(delay, s.DelaySpell, spell)
+			E:Delay(delay, s.DelaySpell, data)
 
 			s.sendSpells[key] = nil
 		end
@@ -334,9 +332,9 @@ function FCT:Update(fb, data)
 		if not fb.allowStacking then return end -- not allowed on this frame
 		if not amount or amount <= 0 then return end -- amount not valid
 	elseif A and fb.allowStacking and fromMe and not FCT.db.stacks.exclude[j] then
-		-- its a real hot or dot automatically add it
-		local key = j..'^'..f
-		if stack.overtime and (hot or dot) and not stack.watching[key] then
+		local key = j..'^'..f -- neato
+		local overtime = dot or hot -- its a real hot or dot automatically add it
+		if overtime and stack.overtime and not stack.watching[key] then
 			stack.watching[key] = true
 		end
 
@@ -367,7 +365,7 @@ function FCT:Update(fb, data)
 			u.amount = (u.amount or 0) + (A or 0) -- add up the amount
 
 			return -- dont need to continue
-		elseif stack.hitsDetect then -- check if we need to stack it
+		elseif not overtime and stack.hitsDetect then -- check if we need to stack it
 			stack.hitsSpells[key] = (stack.hitsSpells[key] or 0) + 1
 		end
 	end
