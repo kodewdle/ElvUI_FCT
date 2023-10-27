@@ -46,6 +46,20 @@ stack.delaySpell = function(id, data)
 	end
 end
 
+stack.hasSpells = function()
+	return next(stack.watching) or next(stack.hitsSpells) or next(stack.spells) or next(stack.sendSpells)
+end
+
+stack.checkShown = function()
+	local shown = stack:IsShown()
+	local spells = stack.hasSpells()
+	if not shown and spells then
+		stack:Show()
+	elseif shown and not spells then
+		stack:Hide()
+	end
+end
+
 stack.watchSpells = function(s, elapsed)
 	s.hits = (s.hits or 0) + elapsed
 	if s.hits > s.hitsWait then
@@ -372,13 +386,7 @@ function FCT:Update(frame, fb, data)
 	end
 
 	-- dont need it running when its not watching
-	if next(stack.watching) then
-		if not stack:IsShown() then
-			stack:Show()
-		end
-	elseif stack:IsShown() then
-		stack:Hide()
-	end
+	stack.checkShown()
 
 	-- handle displaying spells
 	if A or type(a) == 'string' then
@@ -648,8 +656,8 @@ function FCT:UpdateStacks(db)
 	stack.showCrits = db.showCrits
 	stack.prefix = db.prefix
 
-	stack:Hide()
 	wipe(stack.watching)
+	stack.checkShown()
 end
 
 function FCT:Toggle(frame, module, db)
