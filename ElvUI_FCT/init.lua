@@ -276,19 +276,20 @@ function FCT:Options()
 			isTarget = { order = 7, type = 'toggle', name = L["Is Target"] },
 			isPlayer = { order = 8, type = 'toggle', name = L["From Player"] },
 			allowStacking = { order = 9, type = 'toggle', name = L["Allow Stacking"] },
-			critShake = { order = 10, type = 'toggle', name = L["Critical Frame Shake"] },
-			textShake = { order = 11, type = 'toggle', name = L["Critical Text Shake"] },
-			cycleColors = { order = 12, type = 'toggle', name = L["Cycle Spell Colors"] },
-			prefix = { order = 13, type = 'input', name = L["Critical Prefix"] }
+			cycleColors = { order = 10, type = 'toggle', name = L["Cycle Spell Colors"] },
+			critShake = { order = 11, type = 'toggle', name = L["Critical Frame Shake"] },
+			textShake = { order = 12, type = 'toggle', name = L["Critical Text Shake"] }
 		}},
 		fonts = { order = 3, type = 'group', name = '', guiInline = true, args = {
 			header = { order = 0, name = FCT:ColorOption(L["Fonts"]), type = 'header' },
 			font = { order = 1, type = 'select', dialogControl = 'LSM30_Font', name = L["Font"], values = _G.AceGUIWidgetLSMlists.font },
 			fontOutline = { order = 2, name = L["Font Outline"], desc = L["Set the font outline."], type = 'select', sortByValue = true, values = C.Values.FontFlags},
 			fontSize = { order = 3, name = _G.FONT_SIZE, type = 'range', min = 4, max = 60, step = 1 },
-			critFont = { order = 4, type = 'select', dialogControl = 'LSM30_Font', name = L["Critical Font"], values = _G.AceGUIWidgetLSMlists.font },
-			critFontOutline = { order = 5, name = L["Critical Font Outline"], desc = L["Set the font outline."], type = 'select', sortByValue = true, values = C.Values.FontFlags},
-			critFontSize = { order = 6, name = L["Critical Font Size"], type = 'range', min = 4, max = 60, step = 1 }
+			spacer1 = { order = 4, type = 'description', name = ' ', width = 'full' },
+			critFont = { order = 5, type = 'select', dialogControl = 'LSM30_Font', name = L["Critical Font"], values = _G.AceGUIWidgetLSMlists.font },
+			critFontOutline = { order = 6, name = L["Critical Font Outline"], desc = L["Set the font outline."], type = 'select', sortByValue = true, values = C.Values.FontFlags},
+			critFontSize = { order = 7, name = L["Critical Font Size"], type = 'range', min = 4, max = 60, step = 1 },
+			prefix = { order = 8, type = 'input', name = L["Critical Prefix"] }
 		}},
 		settings = { order = 4, type = 'group', name = '', guiInline = true, args = {
 			header = { order = 0, name =  FCT:ColorOption(L["Settings"]), type = 'header' },
