@@ -91,6 +91,7 @@ stack.watchSpells = function(s, elapsed)
 	end
 end
 
+stack:Hide()
 stack:SetScript('OnUpdate', stack.watchSpells)
 ns.SH = stack -- stacks handler
 
@@ -370,6 +371,15 @@ function FCT:Update(frame, fb, data)
 		end
 	end
 
+	-- dont need it running when its not watching
+	if next(stack.watching) then
+		if not stack:IsShown() then
+			stack:Show()
+		end
+	elseif stack:IsShown() then
+		stack:Hide()
+	end
+
 	-- handle displaying spells
 	if A or type(a) == 'string' then
 		if (fb.showIcon or fb.showName) and not (e or ns.spells[j]) then ns.spells[j] = {gsi(j)} end
@@ -638,6 +648,7 @@ function FCT:UpdateStacks(db)
 	stack.showCrits = db.showCrits
 	stack.prefix = db.prefix
 
+	stack:Hide()
 	wipe(stack.watching)
 end
 
