@@ -28,6 +28,10 @@ local version = format('[|cFF508cf7v%s|r]', Version)
 local title = '|cFFdd2244Floating Combat Text|r'
 local by = 'by |cFF8866ccSimpy|r and |cFF34dd61Lightspark|r (ls-)'
 
+local subsetting = {
+	advanced = true
+}
+
 FCT.orders = {
 	colors = {
 		['1'] = 1, -- Damage
@@ -229,15 +233,17 @@ function FCT:AddOptions(arg1, arg2)
 			args = FCT.options,
 			type = 'group',
 			get = function(info)
-				if info[4] == 'advanced' then
-					return FCT.db[arg1].frames[arg2][info[4]][ info[#info] ]
+				local sub = info[4]
+				if subsetting[sub] then
+					return FCT.db[arg1].frames[arg2][sub][ info[#info] ]
 				else
 					return FCT.db[arg1].frames[arg2][ info[#info] ]
 				end
 			end,
 			set = function(info, value)
-				if info[4] == 'advanced' then
-					FCT.db[arg1].frames[arg2][info[4]][ info[#info] ] = value
+				local sub = info[4]
+				if subsetting[sub] then
+					FCT.db[arg1].frames[arg2][sub][ info[#info] ] = value
 				else
 					FCT.db[arg1].frames[arg2][ info[#info] ] = value
 				end
@@ -269,10 +275,11 @@ function FCT:Options()
 			showDots = { order = 6, type = 'toggle', name = L["Show Dots"] },
 			isTarget = { order = 7, type = 'toggle', name = L["Is Target"] },
 			isPlayer = { order = 8, type = 'toggle', name = L["From Player"] },
-			critShake = { order = 9, type = 'toggle', name = L["Critical Frame Shake"] },
-			textShake = { order = 10, type = 'toggle', name = L["Critical Text Shake"] },
-			cycleColors = { order = 11, type = 'toggle', name = L["Cycle Spell Colors"] },
-			prefix = { order = 12, type = 'input', name = L["Critical Prefix"] }
+			allowStacking = { order = 9, type = 'toggle', name = L["Allow Stacking"] },
+			critShake = { order = 10, type = 'toggle', name = L["Critical Frame Shake"] },
+			textShake = { order = 11, type = 'toggle', name = L["Critical Text Shake"] },
+			cycleColors = { order = 12, type = 'toggle', name = L["Cycle Spell Colors"] },
+			prefix = { order = 13, type = 'input', name = L["Critical Prefix"] }
 		}},
 		fonts = { order = 3, type = 'group', name = '', guiInline = true, args = {
 			header = { order = 0, name = FCT:ColorOption(L["Fonts"]), type = 'header' },
@@ -291,7 +298,7 @@ function FCT:Options()
 			followSize = { order = 4, name = L["Icon Follow Text Size"], type = 'toggle' },
 			shakeDuration = { order = 5, name = L["Shake Duration"], type = 'range', min = 0, max = 1, step = 0.1 }
 		}},
-		offsets = { order = 5, type = 'group', name = '', guiInline = true, args = {
+		offsets = { order = 6, type = 'group', name = '', guiInline = true, args = {
 			header = { order = 0, name =  FCT:ColorOption(L["Offsets"]), type = 'header' },
 			textY = { order = 1, name = L["Text Y"], desc = L["Only applies to Fade mode."], type = 'range', min = -100, max = 100, step = 1 },
 			textX = { order = 2, name = L["Text X"], desc = L["Only applies to Fade mode."], type = 'range', min = -100, max = 100, step = 1 },
@@ -300,7 +307,7 @@ function FCT:Options()
 			spellY = { order = 5, name = L["Spell Y"], type = 'range', min = -100, max = 100, step = 1 },
 			spellX = { order = 6, name = L["Spell X"], type = 'range', min = -100, max = 100, step = 1 },
 		}},
-		advanced = { order = 6, type = 'group', name = '', guiInline = true, args = {
+		advanced = { order = 7, type = 'group', name = '', guiInline = true, args = {
 			header = { order = 0, name =  FCT:ColorOption(L["Animations"], L["Only applies on Animation mode."]), type = 'header' },
 			anim = { order = 1, name = L["Animation"], type = 'select', values = {
 				fountain = L["Fountain"],
@@ -364,8 +371,25 @@ function FCT:Options()
 			end,
 			args = {}
 		},
+		stacks = { order = 5, type = 'group', name = L["Stacks"],
+			args = {
+				sendDelay = { order = 1, name = L["Send Delay"], desc = L["How far apart each stack will display."], type = 'range', min = 0.01, max = 10, step = 0.01, bigStep = 0.1 },
+				tickWait = { order = 2, name = L["Tick Wait"], desc = L["How long to gather stacks."], type = 'range', min = 0.01, max = 30, step = 0.01, bigStep = 0.1 },
+				hitsWait = { order = 3, name = L["Hits Wait"], desc = L["How long to gather hits."], type = 'range', min = 0.01, max = 30, step = 0.01, bigStep = 0.1 },
+				hitAmount = { order = 4, name = L["Hits Amount"], desc = L["How many hits until it is considered a stacking aura."], type = 'range', min = 2, max = 30, step = 1 },
+				prefix = { order = 10, type = 'input', name = L["Stack Prefix"] },
+				overtime = { order = 11, type = 'toggle', name = L["Overtime Spells"], desc = L["Heals over time and Damage over time spells to stack."] },
+				showCrits = { order = 12, type = 'toggle', name = L["Show Crits"], desc = L["Display criticals beside stack count."]},
+				hitsDetect = { order = 13, type = 'toggle', name = L["Detect Hits"], desc = L["Required to gather fast spells to stack."] }
+			},
+			get = function(info) return FCT.db.stacks[ info[#info] ] end,
+			set = function(info, value)
+				FCT.db.stacks[ info[#info] ] = value
+
+				FCT:UpdateStacks(FCT.db.stacks)
+			end},
 		exclude = {
-			order = 5,
+			order = 6,
 			type = 'group',
 			name = L["Exclude"],
 			args = {
@@ -523,6 +547,7 @@ function FCT:Initialize()
 
 	-- Settings
 	FCT:UpdateColors()
+	FCT:UpdateStacks(FCT.db.stacks)
 
 	-- Events
 	FCT:RegisterEvent('PLAYER_LOGOUT')

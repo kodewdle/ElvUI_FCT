@@ -3,6 +3,16 @@ local _, ns = ...
 ns.defaults = {
 	colors = {},
 	exclude = {},
+	stacks = {
+		overtime = true,
+		showCrits = false,
+		sendDelay = 0.3,
+		tickWait = 5,
+		hitsDetect = true,
+		hitsWait = 5,
+		hitAmount = 5,
+		prefix = 'x',
+	},
 	nameplates = {
 		enable = true,
 		frames = {
@@ -13,6 +23,8 @@ ns.defaults = {
 				alternateIcon = true,
 				isTarget = true,
 				showIcon = true,
+				showHots = true,
+				showDots = true,
 				iconX = -5,
 				spellY = 5
 			},
@@ -22,6 +34,8 @@ ns.defaults = {
 				alternateIcon = true,
 				isTarget = true,
 				showIcon = true,
+				showHots = true,
+				showDots = true,
 				iconX = -5,
 				spellY = 5
 			},
@@ -31,6 +45,8 @@ ns.defaults = {
 				alternateIcon = true,
 				isTarget = true,
 				showIcon = true,
+				showHots = true,
+				showDots = true,
 				iconX = -5,
 				spellY = 5
 			},
@@ -40,6 +56,8 @@ ns.defaults = {
 				alternateIcon = true,
 				isTarget = true,
 				showIcon = true,
+				showHots = true,
+				showDots = true,
 				iconX = -5,
 				spellY = 5
 			},
@@ -51,12 +69,16 @@ ns.defaults = {
 			Player = {
 				enable = true,
 				showName = true,
+				showHots = true,
+				showDots = true,
 				iconX = -5,
 				spellY = 2
 			},
 			Target = {
 				enable = true,
 				showName = true,
+				showHots = true,
+				showDots = true,
 				iconX = -5,
 				spellY = 2
 			},
@@ -80,6 +102,8 @@ ns.defaults = {
 			Boss = {
 				enable = true,
 				showIcon = true,
+				showHots = true,
+				showDots = true,
 				iconX = -5,
 				spellY = 2
 			},
@@ -103,6 +127,7 @@ ns.frames = {
 	critFontSize = 18,
 	critFontOutline = 'OUTLINE',
 	mode = 'Simpy',
+	allowStacking = true,
 	alternateIcon = false,
 	shakeDuration = 0.25,
 	critShake = false,
@@ -141,6 +166,7 @@ ns.frames = {
 }
 
 ns.colors = {
+	Stack    = {r=0.46, g=0.33, b=1.00, n='Stack Prefix'},    --[7755FF]
 	Prefix   = {r=0.00, g=0.60, b=1.00, n='Critical Prefix'}, --[0099FF]
 	Heal     = {r=0.20, g=1.00, b=0.20, n='Heal'},            --[32FF32]
 	Ranged   = {r=0.40, g=0.40, b=0.40, n='Ranged'},          --[666666]
