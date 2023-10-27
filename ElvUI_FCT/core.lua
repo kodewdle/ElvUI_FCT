@@ -91,7 +91,6 @@ stack.watchSpells = function(s, elapsed)
 	end
 end
 
-_G.stacks = stack
 stack:SetScript('OnUpdate', stack.watchSpells)
 ns.SH = stack -- stacks handler
 
