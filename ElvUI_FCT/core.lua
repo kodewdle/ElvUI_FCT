@@ -19,8 +19,6 @@ ns.CT = E:CopyTable({}, _G.CombatFeedbackText)
 ns.CT.MISFIRE = _G.COMBAT_TEXT_MISFIRE
 ns.IF = {}
 
--- ADD EXCLUED FOR STACKS TOO
-
 local stack = CreateFrame('Frame')
 stack.tickWait = 3 -- time before sending hot to the update
 stack.hitsWait = 2 -- time to check for rapid spells
@@ -46,8 +44,6 @@ stack.delaySpell = function(id, data)
 	for frame, db in next, ns.objects do
 		FCT:Update(frame, db, data)
 	end
-
-	print(id, '> sent spell')
 end
 
 stack.watchSpells = function(s, elapsed)
@@ -59,8 +55,6 @@ stack.watchSpells = function(s, elapsed)
 			local id, event = strsplit('^', hit)
 			if hits > s.hitAmount then
 				s.watching[id .. '^' .. event] = true
-
-				print(id, '> watching spell')
 			end
 
 			s.hitsSpells[hit] = nil
@@ -78,8 +72,6 @@ stack.watchSpells = function(s, elapsed)
 			end
 
 			s.spells[key] = nil -- remove it from
-
-			print(id, '> sending to send')
 		end
 	end
 
@@ -93,8 +85,6 @@ stack.watchSpells = function(s, elapsed)
 
 			delay = delay + s.sendDelay
 			E:Delay(delay, s.delaySpell, id, spell)
-
-			print(id, '> queue spell')
 
 			s.sendSpells[key] = nil
 		end
@@ -347,8 +337,6 @@ function FCT:Update(frame, fb, data)
 		local key = j .. '^' .. f
 		if stack.overtime and (hot or dot) and not stack.watching[key] then
 			stack.watching[key] = true
-
-			print(key, '> watching dot/hot')
 		end
 
 		if stack.watching[key] then
@@ -364,8 +352,6 @@ function FCT:Update(frame, fb, data)
 			if not p then
 				p = CopyTable(data)
 				s[h] = p
-
-				print('data added for >', h)
 			end
 
 			local u = p[unit]
