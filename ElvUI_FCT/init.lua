@@ -275,10 +275,11 @@ function FCT:Options()
 			showDots = { order = 6, type = 'toggle', name = L["Show Dots"] },
 			isTarget = { order = 7, type = 'toggle', name = L["Is Target"] },
 			isPlayer = { order = 8, type = 'toggle', name = L["From Player"] },
-			allowStacking = { order = 9, type = 'toggle', name = L["Allow Stacking"] },
-			cycleColors = { order = 10, type = 'toggle', name = L["Cycle Spell Colors"] },
+			stackingSelf = { order = 9, type = 'toggle', name = L["Stacking Self"] },
+			stackingOthers = { order = 10, type = 'toggle', name = L["Stacking Others"] },
 			critShake = { order = 11, type = 'toggle', name = L["Critical Frame Shake"] },
-			textShake = { order = 12, type = 'toggle', name = L["Critical Text Shake"] }
+			textShake = { order = 12, type = 'toggle', name = L["Critical Text Shake"] },
+			cycleColors = { order = 13, type = 'toggle', name = L["Cycle Spell Colors"] }
 		}},
 		fonts = { order = 3, type = 'group', name = '', guiInline = true, args = {
 			header = { order = 0, name = FCT:ColorOption(L["Fonts"]), type = 'header' },

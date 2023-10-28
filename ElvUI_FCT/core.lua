@@ -303,7 +303,7 @@ function FCT:Update(fb, data)
 
 	-- check if the source is us
 	local petUID = guid('pet')
-	local fromMe = g == E.myguid or g == petUID
+	local sourceMe = g == E.myguid or g == petUID
 
 	-- handle blocking spells
 	local ex = not e and FCT.db.exclude[j]
@@ -329,9 +329,9 @@ function FCT:Update(fb, data)
 
 	-- handle stacking spells
 	if hits then
-		if not fb.allowStacking then return end -- not allowed on this frame
+		if not fb.stackingSelf then return end -- not allowed on this frame
 		if not amount or amount <= 0 then return end -- amount not valid
-	elseif A and fb.allowStacking and fromMe and not FCT.db.stacks.exclude[j] then
+	elseif A and not FCT.db.stacks.exclude[j] and ((fb.stackingSelf and sourceMe) or (fb.stackingOthers and not sourceMe)) then
 		local key = j..'^'..f -- neato
 		local overtime = dot or hot -- its a real hot or dot automatically add it
 		if overtime and stack.overtime and not stack.watching[key] then
@@ -582,7 +582,8 @@ function FCT:SetOptions(fb, db)
 	fb.critFontOutline = db.critFontOutline
 	fb.alternateIcon = db.alternateIcon
 	fb.shakeDuration = db.shakeDuration
-	fb.allowStacking = db.allowStacking
+	fb.stackingSelf = db.stackingSelf
+	fb.stackingOthers = db.stackingOthers
 	fb.cycleColors = db.cycleColors
 	fb.numberStyle = db.numberStyle
 	fb.critShake = db.critShake

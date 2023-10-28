@@ -72,6 +72,7 @@ ns.defaults = {
 				showName = true,
 				showHots = true,
 				showDots = true,
+				stackingOthers = true,
 				iconX = -5,
 				spellY = 2
 			},
@@ -80,6 +81,7 @@ ns.defaults = {
 				showName = true,
 				showHots = true,
 				showDots = true,
+				stackingOthers = true,
 				iconX = -5,
 				spellY = 2
 			},
@@ -103,8 +105,6 @@ ns.defaults = {
 			Boss = {
 				enable = true,
 				showIcon = true,
-				showHots = true,
-				showDots = true,
 				iconX = -5,
 				spellY = 2
 			},
@@ -128,7 +128,8 @@ ns.frames = {
 	critFontSize = 18,
 	critFontOutline = 'OUTLINE',
 	mode = 'Simpy',
-	allowStacking = true,
+	stackingSelf = true,
+	stackingOthers = false,
 	alternateIcon = false,
 	shakeDuration = 0.25,
 	critShake = false,
