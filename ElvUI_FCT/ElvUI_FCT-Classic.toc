@@ -3,7 +3,7 @@
 ## SavedVariables: ElvFCT
 ## RequiredDeps: ElvUI
 ## Interface: 11404
-## Version: 1.35
+## Version: 1.36
 ## IconTexture: Interface\AddOns\ElvUI_FCT\Button
 
 locales\load_locales.xml
