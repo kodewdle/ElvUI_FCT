@@ -28,6 +28,10 @@ local version = format('[|cFF508cf7v%s|r]', Version)
 local title = '|cFFdd2244Floating Combat Text|r'
 local by = 'by |cFF8866ccSimpy|r and |cFF34dd61Lightspark|r (ls-)'
 
+local subsetting = {
+	advanced = true
+}
+
 FCT.orders = {
 	colors = {
 		['1'] = 1, -- Damage
@@ -163,10 +167,10 @@ end
 
 do
 	local spellList = {}
-	function FCT:ExcludeList()
+	function FCT:ExcludeList(db)
 		wipe(spellList)
 
-		for spell in pairs(FCT.db.exclude) do
+		for spell in pairs(db) do
 			spellList[spell] = FCT:GetSpellNameRank(spell)
 		end
 
@@ -180,41 +184,41 @@ end
 
 function FCT:AddOptions(arg1, arg2)
 	local i = (type(arg2) == 'number' and tostring(arg2)) or arg2
-	if E.Options.args.ElvFCT.args[arg1].args[i] then return end
+	local path = E.Options.args.ElvFCT.args[arg1]
 
 	local L = FCT.L
-	if arg1 == 'colors' then
-		E.Options.args.ElvFCT.args[arg1].args[i] = {
+	local db = FCT.db[arg1]
+	if arg1 == 'stacks' then
+		path.args.exclude.args.spells.values[arg2] = FCT:GetSpellNameRank(arg2)
+	elseif path.args[i] then
+		return
+	elseif arg1 == 'colors' then
+		path.args[i] = {
 			order = FCT.orders.colors[i],
 			name = L[ns.colors[arg2].n],
 			type = 'color',
 		}
 	elseif arg1 == 'exclude' then
 		local spellName = FCT:GetSpellNameRank(arg2)
-		local option = {
-			name = spellName,
-			type = 'group',
-			order = 3,
-			args = {
-				name = { order = 1, type = 'header', name = spellName },
-				global = { order = 2, type = 'toggle', name = L["Global"] },
-				nameplates = { order = 3, type = 'group', name = L["Nameplates"], inline = true, args = {} },
-				unitframes = { order = 4, type = 'group', name = L["UnitFrames"], inline = true, args = {} }
-			},
-			get = function(info) return FCT.db.exclude[arg2][ info[#info] ] end,
-			set = function(info, value)
-				local which = info[#info]
-				if which == 'global' then
-					if value then wipe(FCT.db.exclude[arg2]) end
-					FCT.db.exclude[arg2].global = value or nil
-				else
-					if value then FCT.db.exclude[arg2].global = nil end
-					FCT.db.exclude[arg2][which] = value or nil
-				end
-			end,
-		}
+		local option = { order = 3, type = 'group', name = spellName, args = {
+			name = { order = 1, type = 'header', name = spellName },
+			global = { order = 2, type = 'toggle', name = L["Global"] },
+			nameplates = { order = 3, type = 'group', name = L["Nameplates"], inline = true, args = {} },
+			unitframes = { order = 4, type = 'group', name = L["UnitFrames"], inline = true, args = {} }
+		}}
 
-		E.Options.args.ElvFCT.args[arg1].args[i] = option
+		path.args[i] = option
+		option.get = function(info) return db[arg2][ info[#info] ] end
+		option.set = function(info, value)
+			local which = info[#info]
+			if which == 'global' then
+				if value then wipe(db[arg2]) end
+				db[arg2].global = value or nil
+			else
+				if value then db[arg2].global = nil end
+				db[arg2][which] = value or nil
+			end
+		end
 
 		for key, name in next, FCT.nameplateTypes do
 			option.args.nameplates.args[key] = { order = FCT.orders[name][1], type = 'toggle', name = L[FCT.orders[name][2]] }
@@ -223,23 +227,25 @@ function FCT:AddOptions(arg1, arg2)
 			option.args.unitframes.args[key] = { order = FCT.orders[name][1], type = 'toggle', name = L[FCT.orders[name][2]] }
 		end
 	else
-		E.Options.args.ElvFCT.args[arg1].args[arg2] = {
+		path.args[arg2] = {
 			order = FCT.orders[arg2][1],
 			name = L[FCT.orders[arg2][2]],
 			args = FCT.options,
 			type = 'group',
 			get = function(info)
-				if info[4] == 'advanced' then
-					return FCT.db[arg1].frames[arg2][info[4]][ info[#info] ]
+				local sub = info[4]
+				if subsetting[sub] then
+					return db.frames[arg2][sub][ info[#info] ]
 				else
-					return FCT.db[arg1].frames[arg2][ info[#info] ]
+					return db.frames[arg2][ info[#info] ]
 				end
 			end,
 			set = function(info, value)
-				if info[4] == 'advanced' then
-					FCT.db[arg1].frames[arg2][info[4]][ info[#info] ] = value
+				local sub = info[4]
+				if subsetting[sub] then
+					db.frames[arg2][sub][ info[#info] ] = value
 				else
-					FCT.db[arg1].frames[arg2][ info[#info] ] = value
+					db.frames[arg2][ info[#info] ] = value
 				end
 
 				if arg1 == 'unitframes' then
@@ -269,19 +275,22 @@ function FCT:Options()
 			showDots = { order = 6, type = 'toggle', name = L["Show Dots"] },
 			isTarget = { order = 7, type = 'toggle', name = L["Is Target"] },
 			isPlayer = { order = 8, type = 'toggle', name = L["From Player"] },
-			critShake = { order = 9, type = 'toggle', name = L["Critical Frame Shake"] },
-			textShake = { order = 10, type = 'toggle', name = L["Critical Text Shake"] },
-			cycleColors = { order = 11, type = 'toggle', name = L["Cycle Spell Colors"] },
-			prefix = { order = 12, type = 'input', name = L["Critical Prefix"] }
+			stackingSelf = { order = 9, type = 'toggle', name = E.NewSign..L["Stacking Self"] },
+			stackingOthers = { order = 10, type = 'toggle', name = E.NewSign..L["Stacking Others"] },
+			critShake = { order = 11, type = 'toggle', name = L["Critical Frame Shake"] },
+			textShake = { order = 12, type = 'toggle', name = L["Critical Text Shake"] },
+			cycleColors = { order = 13, type = 'toggle', name = L["Cycle Spell Colors"] }
 		}},
 		fonts = { order = 3, type = 'group', name = '', guiInline = true, args = {
 			header = { order = 0, name = FCT:ColorOption(L["Fonts"]), type = 'header' },
 			font = { order = 1, type = 'select', dialogControl = 'LSM30_Font', name = L["Font"], values = _G.AceGUIWidgetLSMlists.font },
 			fontOutline = { order = 2, name = L["Font Outline"], desc = L["Set the font outline."], type = 'select', sortByValue = true, values = C.Values.FontFlags},
 			fontSize = { order = 3, name = _G.FONT_SIZE, type = 'range', min = 4, max = 60, step = 1 },
-			critFont = { order = 4, type = 'select', dialogControl = 'LSM30_Font', name = L["Critical Font"], values = _G.AceGUIWidgetLSMlists.font },
-			critFontOutline = { order = 5, name = L["Critical Font Outline"], desc = L["Set the font outline."], type = 'select', sortByValue = true, values = C.Values.FontFlags},
-			critFontSize = { order = 6, name = L["Critical Font Size"], type = 'range', min = 4, max = 60, step = 1 }
+			spacer1 = { order = 4, type = 'description', name = ' ', width = 'full' },
+			critFont = { order = 5, type = 'select', dialogControl = 'LSM30_Font', name = L["Critical Font"], values = _G.AceGUIWidgetLSMlists.font },
+			critFontOutline = { order = 6, name = L["Critical Font Outline"], desc = L["Set the font outline."], type = 'select', sortByValue = true, values = C.Values.FontFlags},
+			critFontSize = { order = 7, name = L["Critical Font Size"], type = 'range', min = 4, max = 60, step = 1 },
+			prefix = { order = 8, type = 'input', name = L["Critical Prefix"] }
 		}},
 		settings = { order = 4, type = 'group', name = '', guiInline = true, args = {
 			header = { order = 0, name =  FCT:ColorOption(L["Settings"]), type = 'header' },
@@ -291,7 +300,7 @@ function FCT:Options()
 			followSize = { order = 4, name = L["Icon Follow Text Size"], type = 'toggle' },
 			shakeDuration = { order = 5, name = L["Shake Duration"], type = 'range', min = 0, max = 1, step = 0.1 }
 		}},
-		offsets = { order = 5, type = 'group', name = '', guiInline = true, args = {
+		offsets = { order = 6, type = 'group', name = '', guiInline = true, args = {
 			header = { order = 0, name =  FCT:ColorOption(L["Offsets"]), type = 'header' },
 			textY = { order = 1, name = L["Text Y"], desc = L["Only applies to Fade mode."], type = 'range', min = -100, max = 100, step = 1 },
 			textX = { order = 2, name = L["Text X"], desc = L["Only applies to Fade mode."], type = 'range', min = -100, max = 100, step = 1 },
@@ -300,7 +309,7 @@ function FCT:Options()
 			spellY = { order = 5, name = L["Spell Y"], type = 'range', min = -100, max = 100, step = 1 },
 			spellX = { order = 6, name = L["Spell X"], type = 'range', min = -100, max = 100, step = 1 },
 		}},
-		advanced = { order = 6, type = 'group', name = '', guiInline = true, args = {
+		advanced = { order = 7, type = 'group', name = '', guiInline = true, args = {
 			header = { order = 0, name =  FCT:ColorOption(L["Animations"], L["Only applies on Animation mode."]), type = 'header' },
 			anim = { order = 1, name = L["Animation"], type = 'select', values = {
 				fountain = L["Fountain"],
@@ -364,8 +373,66 @@ function FCT:Options()
 			end,
 			args = {}
 		},
+		stacks = { order = 5, type = 'group', name = E.NewSign..L["Stacks"], args = {
+			sendDelay = { order = 1, name = L["Send Delay"], desc = L["How far apart each stack will display."], type = 'range', min = 0.01, max = 10, step = 0.01, bigStep = 0.1 },
+			tickWait = { order = 2, name = L["Tick Wait"], desc = L["How long to gather stacks."], type = 'range', min = 0.01, max = 30, step = 0.01, bigStep = 0.1 },
+			hitsWait = { order = 3, name = L["Hits Wait"], desc = L["How long to gather hits."], type = 'range', min = 0.01, max = 30, step = 0.01, bigStep = 0.1 },
+			hitAmount = { order = 4, name = L["Hits Amount"], desc = L["How many hits until it is considered a stacking aura."], type = 'range', min = 2, max = 30, step = 1 },
+			prefix = { order = 10, type = 'input', name = L["Stack Prefix"] },
+			overtime = { order = 11, type = 'toggle', name = L["Overtime Spells"], desc = L["Heals over time and Damage over time spells to stack."] },
+			showCrits = { order = 12, type = 'toggle', name = L["Show Crits"], desc = L["Display criticals beside stack count."]},
+			hitsDetect = { order = 13, type = 'toggle', name = L["Detect Hits"], desc = L["Required to gather fast spells to stack."] },
+			spacer1 = { order = 14, type = 'description', name = ' ', width = 'full' },
+			exclude = { order = -1, type = 'group', name = L["Exclude"], inline = true, args = {
+				remove = {
+					order = 1,
+					name = L["Remove Spell"],
+					type = 'select',
+					values = function() return FCT:ExcludeList(FCT.db.stacks.exclude) end,
+					confirm = function(_, value) return format(L["Remove Spell - %s"], FCT:GetSpellNameRank(value)) end,
+					get = function() return '' end,
+					set = function(_, value)
+						FCT.db.stacks.exclude[value] = nil
+						E.Options.args.ElvFCT.args.stacks.args.exclude.args.spells.values[value] = nil
+					end
+				},
+				add = {
+					order = 2,
+					name = L["Add SpellID"],
+					type = 'input',
+					get = function(_) return '' end,
+					set = function(_, str)
+						local value = tonumber(str)
+						if not value then return end
+
+						local spellName = GetSpellInfo(value)
+						if not spellName then return end
+
+						FCT.db.stacks.exclude[value] = true
+						FCT:AddOptions('stacks', value)
+					end
+				},
+				spells = {
+					order = 5,
+					name = '',
+					values = {},
+					type = 'multiselect',
+					hidden = function() return not next(FCT.db.stacks.exclude) end,
+					get = function(_, value) return FCT.db.stacks.exclude[value] end,
+					set = function(_, value)
+						FCT.db.stacks.exclude[value] = not FCT.db.stacks.exclude[value]
+						FCT:AddOptions('stacks', value)
+					end
+				}}
+			}},
+			get = function(info) return FCT.db.stacks[ info[#info] ] end,
+			set = function(info, value)
+				FCT.db.stacks[ info[#info] ] = value
+
+				FCT:UpdateStacks(FCT.db.stacks)
+			end},
 		exclude = {
-			order = 5,
+			order = 6,
 			type = 'group',
 			name = L["Exclude"],
 			args = {
@@ -373,10 +440,8 @@ function FCT:Options()
 					order = 1,
 					name = L["Remove Spell"],
 					type = 'select',
-					values = FCT.ExcludeList,
-					confirm = function(_, value)
-						return format(L["Remove Spell - %s"], FCT:GetSpellNameRank(value))
-					end,
+					values = function() return FCT:ExcludeList(FCT.db.exclude) end,
+					confirm = function(_, value) return format(L["Remove Spell - %s"], FCT:GetSpellNameRank(value)) end,
 					get = function() return '' end,
 					set = function(_, value)
 						FCT.db.exclude[value] = nil
@@ -423,6 +488,9 @@ function FCT:Options()
 	end
 	for spell in pairs(FCT.db.exclude) do
 		FCT:AddOptions('exclude', spell)
+	end
+	for spell in pairs(FCT.db.stacks.exclude) do
+		FCT:AddOptions('stacks', spell)
 	end
 end
 
@@ -523,6 +591,7 @@ function FCT:Initialize()
 
 	-- Settings
 	FCT:UpdateColors()
+	FCT:UpdateStacks(FCT.db.stacks)
 
 	-- Events
 	FCT:RegisterEvent('PLAYER_LOGOUT')

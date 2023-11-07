@@ -7,8 +7,8 @@ local _, ns = ...
 local FCT = ns[2]
 local S = E:GetModule('Skins')
 
-local wipe, tinsert, tremove = wipe, tinsert, tremove
 local sin, cos, pi, rand = math.sin, math.cos, math.pi, math.random
+local wipe, tinsert, tremove, CopyTable = wipe, tinsert, tremove, CopyTable
 local type, unpack, next, ipairs, format = type, unpack, next, ipairs, format
 local band, guid, uisu, uhm, gsi = bit.band, UnitGUID, UnitIsUnit, UnitHealthMax, GetSpellInfo
 local info, buln, cf = CombatLogGetCurrentEventInfo, BreakUpLargeNumbers, CreateFrame
@@ -17,6 +17,82 @@ ns.objects, ns.spells, ns.color = {}, {}, {}
 ns.colorStep, ns.fallback = {1,2,4,8,16,32,64}, {1,1,1}
 ns.CT = E:CopyTable({}, _G.CombatFeedbackText)
 ns.CT.MISFIRE = _G.COMBAT_TEXT_MISFIRE
+ns.IF = {}
+
+local stack = CreateFrame('Frame')
+stack.tickWait = 3 -- time before sending hot to the update
+stack.hitsWait = 2 -- time to check for rapid spells
+stack.hitAmount = 5 -- amount of hits during hitsWait
+stack.sendDelay = 0.1 -- delay of the spell being sent out
+stack.watching = {} -- stacks to watch
+stack.hitsSpells = {} -- stack count within wait time
+stack.spells = {} -- spells to count as stacks
+stack.sendSpells = {} -- spells pushed to be sent out
+
+stack.DelaySpell = function(data)
+	for fb in next, ns.objects do
+		FCT:Update(fb, data)
+	end
+end
+
+stack.HasSpells = function(s)
+	return next(s.watching) or next(s.hitsSpells) or next(s.spells) or next(s.sendSpells)
+end
+
+stack.CheckShown = function(s)
+	local shown = s:IsShown()
+	local spells = s:HasSpells()
+	if not shown and spells then
+		s:Show()
+	elseif shown and not spells then
+		s:Hide()
+	end
+end
+
+stack.WatchSpells = function(s, elapsed)
+	s.hits = (s.hits or 0) + elapsed
+	if s.hits > s.hitsWait then
+		s.hits = 0
+
+		for key, hits in next, s.hitsSpells do
+			if hits > s.hitAmount then
+				s.watching[key] = true
+			end
+
+			s.hitsSpells[key] = nil
+		end
+	end
+
+	s.ticks = (s.ticks or 0) + elapsed
+	if s.ticks > stack.tickWait then
+		s.ticks = 0
+
+		for key, spell in next, s.spells do
+			for uid, data in next, spell do
+				s.sendSpells[key..'^'..uid] = data
+			end
+
+			s.spells[key] = nil
+		end
+	end
+
+	s.sends = (s.sends or 0) + elapsed
+	if s.sends > 0.1 then
+		s.sends = 0
+
+		local delay = 0
+		for key, data in next, s.sendSpells do
+			delay = delay + s.sendDelay
+			E:Delay(delay, s.DelaySpell, data)
+
+			s.sendSpells[key] = nil
+		end
+	end
+end
+
+stack:Hide()
+stack:SetScript('OnUpdate', stack.WatchSpells)
+ns.SH = stack -- stacks handler
 
 local harlemShake = {
 	StopIt = function(object)
@@ -185,22 +261,39 @@ function FCT:StyleNumber(unit, style, number)
 	return number
 end
 
-function FCT:Update(frame, fb)
-	if not fb.unit or not fb.owner:IsShown() then return end
+function FCT:Update(fb, data)
+	local unit = fb.unit
+	if not unit or not fb.owner:IsShown() then return end
 
 	local a, b, c, d, e -- amount, critical, spellSchool, dmgColor, isSwing
-	local _, f, _, g, _, _, _, h, _, _, _, j, _, k, l, _, _, m, _, _, n = info()
-	-- event (2nd), sourceGUID (4th), destGUID (8th), 1st Parameter [spellId] (12th), spellSchool (14th), 1st Param (15th), 4th Param (18th), 7th Param [critical] (21st)
+	local f, g, h, j, k, l, m, n = data.f, data.g, data.h, data.j, data.k, data.l, data.m, data.n
 
-	if h ~= guid(fb.unit) then return end -- needs to be the frames unit!
+	-- needs to be the frames unit!
+	if h ~= guid(unit) then return end
 
-	if f == 'SPELL_HEAL' or (fb.showHots and f == 'SPELL_PERIODIC_HEAL') then
+	-- stack data for the unit
+	local udata = data[unit]
+	local hits, crits, amount
+	if udata then
+		hits, crits, amount = udata.hits, udata.crits, udata.amount
+	end
+
+	-- check hot and dots
+	local dot = f == 'SPELL_PERIODIC_DAMAGE'
+	local hot = f == 'SPELL_PERIODIC_HEAL'
+
+	-- not showing on this unit
+	local blockOvertime = (dot and not fb.showDots) or (hot and not fb.showHots)
+	if blockOvertime then return end
+
+	-- convert data
+	if f == 'SPELL_HEAL' or (fb.showHots and hot) then
 		a, b, d = l, m, ns.color.Heal
 	elseif f == 'RANGE_DAMAGE' then
 		a, b, d = l, n, ns.color.Ranged
 	elseif f == 'SWING_DAMAGE' then
 		a, b, d, e = j, m, ns.color.Physical, true
-	elseif f == 'SPELL_DAMAGE' or (fb.showDots and f == 'SPELL_PERIODIC_DAMAGE') then
+	elseif f == 'SPELL_DAMAGE' or (fb.showDots and dot) then
 		a, b, c = l, n, k
 	elseif f == 'SPELL_MISSED' or f == 'RANGE_MISSED' then
 		a = l
@@ -208,16 +301,21 @@ function FCT:Update(frame, fb)
 		a, e = j, true
 	end
 
+	-- check if the source is us
+	local petUID = guid('pet')
+	local sourceMe = g == E.myguid or g == petUID
+
+	-- handle blocking spells
 	local ex = not e and FCT.db.exclude[j]
 	if ex and (ex.global or ex[fb.frametype]) then return end
 
-	local tb, pb
-	if fb.isTarget and not (h == guid('target') and uisu(fb.unit, 'target')) then
+	local tb, pb -- target block, player block
+	if fb.isTarget and not (h == guid('target') and uisu(unit, 'target')) then
 		tb = true
 	end
 	if fb.isPlayer then
-		local y = h == E.myguid and uisu(fb.unit, 'player')
-		local z = g == E.myguid or (fb.showPet and g == guid('pet'))
+		local y = h == E.myguid and uisu(unit, 'player')
+		local z = g == E.myguid or (fb.showPet and g == petUID)
 		if y or z then -- its player
 			if fb.isPlayer == 1 and tb then tb = false end -- allow player on all
 		elseif fb.isPlayer ~= 1 then -- dont pb when we are doing this
@@ -226,7 +324,57 @@ function FCT:Update(frame, fb)
 	end
 	if tb or pb then return end
 
-	if (type(a) == 'number' and a > 0) or type(a) == 'string' then
+	-- just verify its an amount first
+	local A = (type(a) == 'number' and a > 0) and a
+
+	-- handle stacking spells
+	if hits then
+		if not fb.stackingSelf then return end -- not allowed on this frame
+		if not amount or amount <= 0 then return end -- amount not valid
+	elseif A and not FCT.db.stacks.exclude[j] and ((fb.stackingSelf and sourceMe) or (fb.stackingOthers and not sourceMe)) then
+		local key = j..'^'..f -- neato
+		local overtime = dot or hot -- its a real hot or dot automatically add it
+		if overtime and stack.overtime and not stack.watching[key] then
+			stack.watching[key] = true
+		end
+
+		if stack.watching[key] then
+			-- spell full data
+			local s = stack.spells[key]
+			if not s then -- if its not in spells, add it
+				s = {}
+				stack.spells[key] = s
+			end
+
+			-- spell unit data
+			local p = s[h]
+			if not p then
+				p = CopyTable(data)
+				s[h] = p
+			end
+
+			local u = p[unit]
+			if not u then
+				u = {}
+				p[unit] = u
+			end
+
+			-- handle increases
+			u.hits = (u.hits or 0) + 1 -- amount of hits
+			u.crits = (u.crits or 0) + (b and 1 or 0) -- amount of crits
+			u.amount = (u.amount or 0) + (A or 0) -- add up the amount
+
+			return -- dont need to continue
+		elseif not overtime and stack.hitsDetect then -- check if we need to stack it
+			stack.hitsSpells[key] = (stack.hitsSpells[key] or 0) + 1
+		end
+	end
+
+	-- dont need it running when its not watching
+	stack:CheckShown()
+
+	-- handle displaying spells
+	if A or type(a) == 'string' then
 		if (fb.showIcon or fb.showName) and not (e or ns.spells[j]) then ns.spells[j] = {gsi(j)} end
 
 		local text
@@ -274,6 +422,10 @@ function FCT:Update(frame, fb)
 			end
 		end
 
+		if hits then
+			b = nil -- ignore crit stuff during stacking
+		end
+
 		if b then
 			if fb.critShake then
 				local parent = fb.owner.unitFrame or fb.owner.UnitFrame or fb.owner
@@ -305,17 +457,30 @@ function FCT:Update(frame, fb)
 
 		if ct then
 			text:SetText(ct)
+		elseif hits then
+			if hits > 1 then
+				local red, green, blue = ns.color.Stack[1] * 255, ns.color.Stack[2] * 255, ns.color.Stack[3] * 255
+				local _r, _g, _b = ns.color.Prefix[1] * 255, ns.color.Prefix[2] * 255, ns.color.Prefix[3] * 255
+
+				local allowCrits = stack.showCrits and crits > 0
+				text:SetFormattedText('%s|cff%02x%02x%02x%s%s|r|cff%02x%02x%02x%s%s|r', FCT:StyleNumber(unit, fb.numberStyle, amount), red, green, blue, stack.prefix, hits, _r, _g, _b, allowCrits and fb.prefix or '', allowCrits and crits or '')
+			elseif crits > 0 then
+				local red, green, blue = ns.color.Prefix[1] * 255, ns.color.Prefix[2] * 255, ns.color.Prefix[3] * 255
+				text:SetFormattedText('|cff%02x%02x%02x%s|r%s|cff%02x%02x%02x%s|r', red, green, blue, fb.prefix, FCT:StyleNumber(unit, fb.numberStyle, amount), red, green, blue, fb.prefix)
+			else
+				text:SetText(FCT:StyleNumber(unit, fb.numberStyle, amount))
+			end
 		elseif b and fb.prefix ~= '' then
 			local red, green, blue = ns.color.Prefix[1] * 255, ns.color.Prefix[2] * 255, ns.color.Prefix[3] * 255
-			text:SetFormattedText('|cff%02x%02x%02x%s|r%s|cff%02x%02x%02x%s|r', red, green, blue, fb.prefix, FCT:StyleNumber(fb.unit, fb.numberStyle, a), red, green, blue, fb.prefix)
+			text:SetFormattedText('|cff%02x%02x%02x%s|r%s|cff%02x%02x%02x%s|r', red, green, blue, fb.prefix, FCT:StyleNumber(unit, fb.numberStyle, a), red, green, blue, fb.prefix)
 		else
-			text:SetText(FCT:StyleNumber(fb.unit, fb.numberStyle, a))
+			text:SetText(FCT:StyleNumber(unit, fb.numberStyle, a))
 		end
 
 		if fb.mode == 'Simpy' then
 			if not fb.FadeOut then fb.FadeOut = { mode = 'OUT' } else fb.FadeOut.fadeTimer = nil end
 			if not fb.FaderIn then fb.FaderIn = { mode = 'IN' } else fb.FaderIn.fadeTimer = nil end
-			ns.SI.FadeIn(fb.FaderIn, fb.Frame, 0.2, text.fadeTime + (b and 0.3 or 0), 0.4, 0.0, 0.8)
+			ns.SI.FadeIn(fb.FaderIn, fb.Frame, 0.2, text.fadeTime + (hits and 0.5 or (b and 0.3) or 0), 0.4, 0.0, 0.8)
 		elseif fb.mode == 'LS' then
 			tinsert(fb.objs, text)
 			text.frame:SetAlpha(1)
@@ -417,6 +582,8 @@ function FCT:SetOptions(fb, db)
 	fb.critFontOutline = db.critFontOutline
 	fb.alternateIcon = db.alternateIcon
 	fb.shakeDuration = db.shakeDuration
+	fb.stackingSelf = db.stackingSelf
+	fb.stackingOthers = db.stackingOthers
 	fb.cycleColors = db.cycleColors
 	fb.numberStyle = db.numberStyle
 	fb.critShake = db.critShake
@@ -428,8 +595,8 @@ function FCT:SetOptions(fb, db)
 	fb.isTarget = db.isTarget
 	fb.isPlayer = db.isPlayer
 	fb.iconSize = db.iconSize
-	fb.followSize = db.followSize
 	fb.showPet = db.showPet
+	fb.followSize = db.followSize
 	fb.prefix = db.prefix
 	fb.mode = db.mode
 
@@ -456,9 +623,27 @@ function FCT:SetOptions(fb, db)
 end
 
 function FCT:COMBAT_LOG_EVENT_UNFILTERED()
-	for object, texts in next, ns.objects do
-		FCT:Update(object, texts)
+	local data, _ = ns.IF -- update the table before using it
+	_, data.f, _, data.g, _, _, _, data.h, _, _, _, data.j, _, data.k, data.l, _, _, data.m, _, _, data.n = info()
+	-- event (2nd), sourceGUID (4th), destGUID (8th), 1st Parameter [spellId] (12th), spellSchool (14th), 1st Param (15th), 4th Param (18th), 7th Param [critical] (21st)
+
+	for fb in next, ns.objects do
+		FCT:Update(fb, data)
 	end
+end
+
+function FCT:UpdateStacks(db)
+	stack.sendDelay = db.sendDelay
+	stack.tickWait = db.tickWait
+	stack.hitsWait = db.hitsWait
+	stack.hitAmount = db.hitAmount
+	stack.hitsDetect = db.hitsDetect
+	stack.overtime = db.overtime
+	stack.showCrits = db.showCrits
+	stack.prefix = db.prefix
+
+	wipe(stack.watching)
+	stack:CheckShown()
 end
 
 function FCT:Toggle(frame, module, db)
@@ -475,8 +660,8 @@ function FCT:Enable(frame, db)
 		FCT:SetOptions(fb, db)
 		FCT:EnableMode(fb, db.mode)
 
-		if not ns.objects[fb.owner] then
-			ns.objects[fb.owner] = fb
+		if not ns.objects[fb] then
+			ns.objects[fb] = true
 		end
 	end
 end
@@ -486,8 +671,8 @@ function FCT:Disable(frame)
 	if fb then
 		ns.LS.onShowHide(frame)
 
-		if ns.objects[fb.owner] then
-			ns.objects[fb.owner] = nil
+		if ns.objects[fb] then
+			ns.objects[fb] = nil
 		end
 	end
 end
