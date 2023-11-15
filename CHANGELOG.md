@@ -1,2 +1,1 @@
-*   Stacking of spells is supported now
-*   Retail patch 10.2
+*   Classic Era patch 1.15
