@@ -1,1 +1,1 @@
-*   Classic Era patch 1.15
+*   Retail patch 10.2.5
