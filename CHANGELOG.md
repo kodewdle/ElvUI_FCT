@@ -1,1 +1,1 @@
-*   Classic patch 1.15.1
+*   Retail patch 10.2.6
