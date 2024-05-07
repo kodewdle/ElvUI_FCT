@@ -1,1 +1,2 @@
-*   Retail patch 10.2.6
+*   Retail patch 10.2.7
+*   Cataclysm support
