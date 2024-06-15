@@ -275,8 +275,8 @@ function FCT:Options()
 			showDots = { order = 6, type = 'toggle', name = L["Show Dots"] },
 			isTarget = { order = 7, type = 'toggle', name = L["Is Target"] },
 			isPlayer = { order = 8, type = 'toggle', name = L["From Player"] },
-			stackingSelf = { order = 9, type = 'toggle', name = E.NewSign..L["Stacking Self"] },
-			stackingOthers = { order = 10, type = 'toggle', name = E.NewSign..L["Stacking Others"] },
+			stackingSelf = { order = 9, type = 'toggle', name = L["Stacking Self"] },
+			stackingOthers = { order = 10, type = 'toggle', name = L["Stacking Others"] },
 			critShake = { order = 11, type = 'toggle', name = L["Critical Frame Shake"] },
 			textShake = { order = 12, type = 'toggle', name = L["Critical Text Shake"] },
 			cycleColors = { order = 13, type = 'toggle', name = L["Cycle Spell Colors"] }
@@ -373,7 +373,7 @@ function FCT:Options()
 			end,
 			args = {}
 		},
-		stacks = { order = 5, type = 'group', name = E.NewSign..L["Stacks"], args = {
+		stacks = { order = 5, type = 'group', name = L["Stacks"], args = {
 			sendDelay = { order = 1, name = L["Send Delay"], desc = L["How far apart each stack will display."], type = 'range', min = 0.01, max = 10, step = 0.01, bigStep = 0.1 },
 			tickWait = { order = 2, name = L["Tick Wait"], desc = L["How long to gather stacks."], type = 'range', min = 0.01, max = 30, step = 0.01, bigStep = 0.1 },
 			hitsWait = { order = 3, name = L["Hits Wait"], desc = L["How long to gather hits."], type = 'range', min = 0.01, max = 30, step = 0.01, bigStep = 0.1 },
