@@ -7,10 +7,11 @@ local _, ns = ...
 local FCT = ns[2]
 local S = E:GetModule('Skins')
 
+local _G = _G
 local sin, cos, pi, rand = math.sin, math.cos, math.pi, math.random
 local wipe, tinsert, tremove, CopyTable = wipe, tinsert, tremove, CopyTable
 local type, unpack, next, ipairs, format = type, unpack, next, ipairs, format
-local band, guid, uisu, uhm, gsi = bit.band, UnitGUID, UnitIsUnit, UnitHealthMax, GetSpellInfo
+local band, guid, uisu, uhm = bit.band, UnitGUID, UnitIsUnit, UnitHealthMax
 local info, buln, cf = CombatLogGetCurrentEventInfo, BreakUpLargeNumbers, CreateFrame
 
 ns.objects, ns.spells, ns.color = {}, {}, {}
@@ -18,6 +19,23 @@ ns.colorStep, ns.fallback = {1,2,4,8,16,32,64}, {1,1,1}
 ns.CT = E:CopyTable({}, _G.CombatFeedbackText)
 ns.CT.MISFIRE = _G.COMBAT_TEXT_MISFIRE
 ns.IF = {}
+
+local gsi
+do	-- backwards compatibility for GetSpellInfo
+	local C_Spell_GetSpellInfo = C_Spell.GetSpellInfo
+	gsi = function(spellID)
+		if not spellID then return end
+
+		if _G.GetSpellInfo then
+			return _G.GetSpellInfo(spellID)
+		else
+			local data = C_Spell_GetSpellInfo(spellID)
+			if data then
+				return data.name, nil, data.iconID, data.castTime, data.minRange, data.maxRange, data.spellID, data.originalIconID
+			end
+		end
+	end
+end
 
 local stack = CreateFrame('Frame')
 stack.tickWait = 3 -- time before sending hot to the update
