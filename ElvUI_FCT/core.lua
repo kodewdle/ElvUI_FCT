@@ -20,23 +20,6 @@ ns.CT = E:CopyTable({}, _G.CombatFeedbackText)
 ns.CT.MISFIRE = _G.COMBAT_TEXT_MISFIRE
 ns.IF = {}
 
-local gsi
-do	-- backwards compatibility for GetSpellInfo
-	local C_Spell_GetSpellInfo = C_Spell.GetSpellInfo
-	gsi = function(spellID)
-		if not spellID then return end
-
-		if _G.GetSpellInfo then
-			return _G.GetSpellInfo(spellID)
-		else
-			local data = C_Spell_GetSpellInfo(spellID)
-			if data then
-				return data.name, nil, data.iconID, data.castTime, data.minRange, data.maxRange, data.spellID, data.originalIconID
-			end
-		end
-	end
-end
-
 local stack = CreateFrame('Frame')
 stack.tickWait = 3 -- time before sending hot to the update
 stack.hitsWait = 2 -- time to check for rapid spells
@@ -393,7 +376,7 @@ function FCT:Update(fb, data)
 
 	-- handle displaying spells
 	if A or type(a) == 'string' then
-		if (fb.showIcon or fb.showName) and not (e or ns.spells[j]) then ns.spells[j] = {gsi(j)} end
+		if (fb.showIcon or fb.showName) and not (e or ns.spells[j]) then ns.spells[j] = { E:GetSpellInfo(j) } end
 
 		local text
 		if fb.mode == 'Simpy' then
