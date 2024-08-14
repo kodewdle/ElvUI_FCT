@@ -23,7 +23,7 @@ local GetNamePlates = C_NamePlate.GetNamePlates
 local hooksecurefunc = hooksecurefunc
 
 local NPDriver = NamePlateDriverFrame
-local Version = GetAddOnMetadata(addon, 'Version')
+local Version = C_AddOns.GetAddOnMetadata(addon, 'Version')
 local version = format('[|cFF508cf7v%s|r]', Version)
 local title = '|cFFdd2244Floating Combat Text|r'
 local by = 'by |cFF8866ccSimpy|r and |cFF34dd61Lightspark|r (ls-)'
