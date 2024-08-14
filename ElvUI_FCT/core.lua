@@ -267,7 +267,7 @@ function FCT:Update(fb, data)
 	if not unit or not fb.owner:IsShown() then return end
 
 	local a, b, c, d, e -- amount, critical, spellSchool, dmgColor, isSwing
-	local f, g, h, j, k, l, m, n = data.f, data.g, data.h, data.j, data.k, data.l, data.m, data.n
+	local f, g, h, j, k, l, m, n, o = data.f, data.g, data.h, data.j, data.k, data.l, data.m, data.n, data.o
 
 	-- needs to be the frames unit!
 	if h ~= guid(unit) then return end
@@ -289,13 +289,13 @@ function FCT:Update(fb, data)
 
 	-- convert data
 	if f == 'SPELL_HEAL' or (fb.showHots and hot) then
-		a, b, d = l, m, ns.color.Heal
+		a, b, d = l, n, ns.color.Heal
 	elseif f == 'RANGE_DAMAGE' then
-		a, b, d = l, n, ns.color.Ranged
+		a, b, d = l, o, ns.color.Ranged
 	elseif f == 'SWING_DAMAGE' then
-		a, b, d, e = j, m, ns.color.Physical, true
+		a, b, d, e = j, n, ns.color.Physical, true
 	elseif f == 'SPELL_DAMAGE' or (fb.showDots and dot) then
-		a, b, c = l, n, k
+		a, b, c = l, o, m or k
 	elseif f == 'SPELL_MISSED' or f == 'RANGE_MISSED' then
 		a = l
 	elseif f == 'SWING_MISSED' then
@@ -628,8 +628,8 @@ end
 
 function FCT:COMBAT_LOG_EVENT_UNFILTERED()
 	local data, _ = ns.IF -- update the table before using it
-	_, data.f, _, data.g, _, _, _, data.h, _, _, _, data.j, _, data.k, data.l, _, _, data.m, _, _, data.n = info()
-	-- event (2nd), sourceGUID (4th), destGUID (8th), 1st Parameter [spellId] (12th), spellSchool (14th), 1st Param (15th), 4th Param (18th), 7th Param [critical] (21st)
+	_, data.f, _, data.g, _, _, _, data.h, _, _, _, data.j, _, data.k, data.l, _, data.m, data.n, _, _, data.o = info()
+	-- event (2nd), sourceGUID (4th), destGUID (8th), 1st Parameter [spellId] (12th), spellSchool (14th), 1st Param (15th), spellAlternative (17th), 4th Param (18th), 7th Param [critical] (21st)
 
 	for fb in next, ns.objects do
 		FCT:Update(fb, data)
