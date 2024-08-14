@@ -294,10 +294,12 @@ function FCT:Options()
 		settings = { order = 4, type = 'group', name = '', guiInline = true, args = {
 			header = { order = 0, name =  FCT:ColorOption(L["Settings"]), type = 'header' },
 			mode = { order = 1, name = L["Mode"], type = 'select', values = { Simpy = L["Fade"], LS = L["Animation"] } },
-			numberStyle = { order = 2, name = L["Number Style"], type = 'select', values = { NONE = _G.NONE, PERCENT = L["Percent"], SHORT = L["Short"], BLIZZARD = L["Blizzard"], BLIZZTEXT = L["Blizzard Text"] }},
-			iconSize = { order = 3, name = L["Icon Size"], type = 'range', min = 10, max = 30, step = 1 },
+			frameStrata = { order = 2, name = L["Frame Strata"], type = 'select', values = { BACKGROUND = 'BACKGROUND', LOW = 'LOW', MEDIUM = 'MEDIUM', HIGH = 'HIGH' } },
+			frameLevel = { order = 3, name = L["Frame Level"], type = 'range', min = 1, max = 256, step = 1 },
 			followSize = { order = 4, name = L["Icon Follow Text Size"], type = 'toggle' },
-			shakeDuration = { order = 5, name = L["Shake Duration"], type = 'range', min = 0, max = 1, step = 0.1 }
+			numberStyle = { order = 5, name = L["Number Style"], type = 'select', values = { NONE = _G.NONE, PERCENT = L["Percent"], SHORT = L["Short"], BLIZZARD = L["Blizzard"], BLIZZTEXT = L["Blizzard Text"] }},
+			iconSize = { order = 6, name = L["Icon Size"], type = 'range', min = 10, max = 30, step = 1 },
+			shakeDuration = { order = 7, name = L["Shake Duration"], type = 'range', min = 0, max = 1, step = 0.1 }
 		}},
 		offsets = { order = 6, type = 'group', name = '', guiInline = true, args = {
 			header = { order = 0, name =  FCT:ColorOption(L["Offsets"]), type = 'header' },
@@ -306,7 +308,7 @@ function FCT:Options()
 			iconY = { order = 3, name = L["Icon Y"], type = 'range', min = -100, max = 100, step = 1 },
 			iconX = { order = 4, name = L["Icon X"], type = 'range', min = -100, max = 100, step = 1 },
 			spellY = { order = 5, name = L["Spell Y"], type = 'range', min = -100, max = 100, step = 1 },
-			spellX = { order = 6, name = L["Spell X"], type = 'range', min = -100, max = 100, step = 1 },
+			spellX = { order = 6, name = L["Spell X"], type = 'range', min = -100, max = 100, step = 1 }
 		}},
 		advanced = { order = 7, type = 'group', name = '', guiInline = true, args = {
 			header = { order = 0, name =  FCT:ColorOption(L["Animations"], L["Only applies on Animation mode."]), type = 'header' },
@@ -556,10 +558,8 @@ end
 function FCT:Build(frame, unit)
 	local raised = CreateFrame('Frame', frame:GetDebugName()..'RaisedElvFCT', (unit and UIParent) or frame)
 	raised:SetIgnoreParentScale(true)
-	raised:SetFrameStrata('MEDIUM')
 	raised:SetScale(E.uiscale)
 	raised:SetAllPoints(frame)
-	raised:SetFrameLevel(200)
 
 	return { owner = frame, raised = raised }
 end

@@ -592,6 +592,9 @@ function FCT:EnableMode(fb, mode)
 end
 
 function FCT:SetOptions(fb, db)
+	fb.raised:SetFrameStrata(db.frameStrata or 'MEDIUM')
+	fb.raised:SetFrameLevel(db.frameLevel or 200)
+
 	fb.font = E.Libs.LSM:Fetch('font', db.font)
 	fb.fontSize = db.fontSize
 	fb.fontOutline = db.fontOutline
