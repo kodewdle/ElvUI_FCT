@@ -629,7 +629,7 @@ end
 function FCT:COMBAT_LOG_EVENT_UNFILTERED()
 	local data, _ = ns.IF -- update the table before using it
 	_, data.f, _, data.g, _, _, _, data.h, _, _, _, data.j, _, data.k, data.l, _, data.m, data.n, _, _, data.o = info()
-	-- event (2nd), sourceGUID (4th), destGUID (8th), 1st Parameter [spellId] (12th), spellSchool (14th), 1st Param (15th), spellAlternative (17th), 4th Param (18th), 7th Param [critical] (21st)
+	-- event (2nd), sourceGUID (4th), destGUID (8th), 1st Parameter [spellId] (12th), spellSchool (14th), 1st Param (15th), spellSchoolAlternative (17th), 4th Param (18th), 7th Param [critical] (21st)
 
 	for fb in next, ns.objects do
 		FCT:Update(fb, data)
