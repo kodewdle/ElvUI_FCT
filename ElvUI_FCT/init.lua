@@ -11,7 +11,6 @@ local next, wipe = next, wipe
 
 local UIParent = UIParent
 local CreateFrame = CreateFrame
-local GetSpellInfo = GetSpellInfo
 local GetSpellSubtext = GetSpellSubtext
 local UnitIsEnemy = UnitIsEnemy
 local UnitIsPlayer = UnitIsPlayer
@@ -154,7 +153,7 @@ function FCT:UpdateUnitFrames()
 end
 
 function FCT:GetSpellNameRank(id)
-	local name = tonumber(id) and GetSpellInfo(id)
+	local name = tonumber(id) and E:GetSpellInfo(id)
 	if not name then return tostring(id) end
 
 	local rank = not E.Retail and GetSpellSubtext(id)
@@ -405,7 +404,7 @@ function FCT:Options()
 						local value = tonumber(str)
 						if not value then return end
 
-						local spellName = GetSpellInfo(value)
+						local spellName = E:GetSpellInfo(value)
 						if not spellName then return end
 
 						FCT.db.stacks.exclude[value] = true
@@ -459,7 +458,7 @@ function FCT:Options()
 						local value = tonumber(str)
 						if not value then return end
 
-						local spellName = GetSpellInfo(value)
+						local spellName = E:GetSpellInfo(value)
 						if not spellName then return end
 
 						local exists = FCT.db.exclude[value]
