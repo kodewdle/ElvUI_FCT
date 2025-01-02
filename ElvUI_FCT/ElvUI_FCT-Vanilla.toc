@@ -2,7 +2,7 @@
 ## Title: |cff1784d1ElvUI|r |cFFdd2244Floating Combat Text|r
 ## SavedVariables: ElvFCT
 ## RequiredDeps: ElvUI
-## Interface: 11503
+## Interface: 11505
 ## Version: 1.46
 ## IconTexture: Interface\AddOns\ElvUI_FCT\Button
 
