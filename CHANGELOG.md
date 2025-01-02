@@ -1,1 +1,1 @@
-*   Cataclysm classic 4.4.1
+*   Retail patch 11.0.7
