@@ -1,1 +1,1 @@
-*   Mists of Pandaria support
+*   Retail patch 11.2
