@@ -2,8 +2,8 @@
 ## Title: |cff1784d1ElvUI|r |cFFdd2244Floating Combat Text|r
 ## SavedVariables: ElvFCT
 ## RequiredDeps: ElvUI
-## Interface: 50501
-## Version: 1.54
+## Interface: 50502
+## Version: 1.55
 ## IconTexture: Interface\AddOns\ElvUI_FCT\Button
 
 locales\load_locales.xml

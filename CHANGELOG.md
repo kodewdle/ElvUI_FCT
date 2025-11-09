@@ -1,1 +1,1 @@
-*   Retail patch 11.2.5
+*   Going to miss this addon in Midnight
