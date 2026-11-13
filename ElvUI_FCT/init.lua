@@ -11,7 +11,7 @@ local next, wipe = next, wipe
 
 local UIParent = UIParent
 local CreateFrame = CreateFrame
-local GetSpellSubtext = GetSpellSubtext
+local GetSpellSubtext = ns.isForever and C_Spell.GetSpellSubtext or GetSpellSubtext
 local UnitIsEnemy = UnitIsEnemy
 local UnitIsPlayer = UnitIsPlayer
 local UnitIsPVPSanctuary = UnitIsPVPSanctuary
@@ -156,7 +156,7 @@ function FCT:GetSpellNameRank(id)
 	local name = tonumber(id) and E:GetSpellInfo(id)
 	if not name then return tostring(id) end
 
-	local rank = not E.Retail and GetSpellSubtext(id)
+	local rank = not E.Retail and GetSpellSubtext and GetSpellSubtext(id)
 	if not rank or not strfind(rank, '%d') then
 		return format('%s |cFF888888(%s)|r', name, id)
 	end
@@ -478,6 +478,8 @@ function FCT:Options()
 		}
 	}}
 
+	if ns.isForever then FCT:ConfigureForeverOptions() end
+
 	for name in pairs(ns.defaults.nameplates.frames) do
 		FCT:AddOptions('nameplates', name)
 	end
@@ -594,13 +596,19 @@ function FCT:Initialize()
 
 	-- Events
 	FCT:RegisterEvent('PLAYER_LOGOUT')
-	FCT:RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED')
+	if ns.isForever then
+		FCT:InitializeForever()
+	else
+		FCT:RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED')
+	end
 
 	-- Register
 	E.Libs.EP:RegisterPlugin(addon, FCT.Options)
 end
 
 hooksecurefunc(E, 'Initialize', FCT.Initialize)
-hooksecurefunc(UF, 'Configure_HealthBar', FCT.ToggleFrame)
-hooksecurefunc(NPDriver, 'OnNamePlateAdded', FCT.ToggleFrame)
-hooksecurefunc(NPDriver, 'OnUnitFactionChanged', FCT.ToggleFrame)
+if not ns.isForever then
+	hooksecurefunc(UF, 'Configure_HealthBar', FCT.ToggleFrame)
+	hooksecurefunc(NPDriver, 'OnNamePlateAdded', FCT.ToggleFrame)
+	hooksecurefunc(NPDriver, 'OnUnitFactionChanged', FCT.ToggleFrame)
+end

@@ -1,0 +1,25 @@
+## Author: Simpy, Lightspark
+## Title: |cff1784d1ElvUI|r |cFFdd2244Floating Combat Text|r
+## SavedVariables: ElvFCT
+## RequiredDeps: ElvUI
+## Interface: 16001
+## Version: 1.56
+## IconTexture: Interface\AddOns\ElvUI_FCT\Button
+
+locales\load_locales.xml
+settings.lua
+Forever\Bootstrap.lua
+init.lua
+Forever\Init.lua
+core.lua
+Forever\Render.lua
+Forever\NameplateSCT\LineKind.lua
+Forever\NameplateSCT\Adapter.lua
+Forever\NameplateSCT\Pairing.lua
+Forever\NameplateSCT\TickSpells.lua
+Forever\NameplateSCT\DirectSpells.lua
+Forever\NameplateSCT\Identity.lua
+Forever\NameplateSCT\Flow.lua
+Forever\NameplateSCT\LogFilter.lua
+Forever\FilterSetup.lua
+Forever\Events.lua
