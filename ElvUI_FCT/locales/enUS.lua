@@ -2,6 +2,15 @@
 local L = ElvUI[1].Libs.ACL:NewLocale("ElvUI", "enUS", true, true)
 
 L["Alternate Icon"] = true
+L["Hide Blizzard damage numbers"] = true
+L["My actions"] = true
+L["Combat log filter ready for player and pet damage."] = true
+L["Configure the '%s' combat log filter to identify your hits and your pet's hits."] = true
+L["To identify your hits, select '%s' in the Combat Log tab, then reopen these options."] = true
+L["Restore the '%s' filter in the Combat Log settings, then reopen these options."] = true
+L["Open the Combat Log tab to load its filters, then reopen these options."] = true
+L["Configure combat log and reload"] = true
+L["Select '%s', limit its sources to you and your pet, enable damage and miss messages, update its event colors, and reload the UI?"] = true
 L["Alternate X"] = true
 L["Alternate Y"] = true
 L["Animation"] = true

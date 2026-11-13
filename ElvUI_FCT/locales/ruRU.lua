@@ -2,6 +2,15 @@
 local L = ElvUI[1].Libs.ACL:NewLocale("ElvUI", "ruRU")
 
 L["Alternate Icon"] = "Альтернативный значок"
+L["Hide Blizzard damage numbers"] = "Скрывать цифры урона Blizzard"
+L["My actions"] = "Мои действия"
+L["Combat log filter ready for player and pet damage."] = "Фильтр журнала боя настроен для урона игрока и питомца."
+L["Configure the '%s' combat log filter to identify your hits and your pet's hits."] = "Настройте фильтр «%s», чтобы распознавать ваши удары и удары питомца."
+L["To identify your hits, select '%s' in the Combat Log tab, then reopen these options."] = "Чтобы распознавать ваши удары, выберите «%s» на вкладке журнала боя и снова откройте эти настройки."
+L["Restore the '%s' filter in the Combat Log settings, then reopen these options."] = "Восстановите фильтр «%s» в настройках журнала боя и снова откройте эти настройки."
+L["Open the Combat Log tab to load its filters, then reopen these options."] = "Откройте вкладку журнала боя, чтобы загрузить фильтры, и снова откройте эти настройки."
+L["Configure combat log and reload"] = "Настроить журнал боя и перезагрузить интерфейс"
+L["Select '%s', limit its sources to you and your pet, enable damage and miss messages, update its event colors, and reload the UI?"] = "Выбрать фильтр «%s», оставить источниками вас и вашего питомца, включить сообщения об уроне и промахах, обновить цвета событий и перезагрузить интерфейс?"
 L["Alternate X"] = "Чередовать X"
 L["Alternate Y"] = "Чередовать Y"
 L["Animation"] = "Анимация"

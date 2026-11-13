@@ -175,7 +175,7 @@ ns.LS = lightspark
 
 local Simpy = {
 	FadeOut = function(a,d,f,e)
-		local z = a.owner.ElvFCT.FadeOut
+		local z = a.feedback.FadeOut
 		z.timeToFade = d
 		z.startAlpha = f
 		z.endAlpha = e
@@ -262,6 +262,43 @@ function FCT:StyleNumber(unit, style, number)
 	return number
 end
 
+-- Collect one eligible hit. The caller provides the destination and frame keys
+-- that are stable on its client. Return true once a hit is deferred.
+function stack:Collect(key, destination, frameKey, data, amount, critical, overtime)
+	if overtime and self.overtime then self.watching[key] = true end
+	if self.watching[key] then
+		local spells = self.spells[key]
+		if not spells then
+			spells = {}
+			self.spells[key] = spells
+		end
+
+		local pending = spells[destination]
+		if not pending then
+			if ns.isForever then
+				pending = E:CopyTable({}, data)
+				pending.stackGUID = destination
+			else
+				pending = CopyTable(data)
+			end
+			spells[destination] = pending
+		end
+
+		local counts = pending[frameKey]
+		if not counts then
+			counts = { hits = 0, crits = 0, amount = 0 }
+			pending[frameKey] = counts
+		end
+		counts.hits = counts.hits + 1
+		counts.crits = counts.crits + (critical and 1 or 0)
+		counts.amount = counts.amount + amount
+		if ns.isForever then self:CheckShown() end
+		return true
+	elseif not overtime and self.hitsDetect then
+		self.hitsSpells[key] = (self.hitsSpells[key] or 0) + 1
+	end
+end
+
 function FCT:Update(fb, data)
 	local unit = fb.unit
 	if not unit or not fb.owner:IsShown() then return end
@@ -333,175 +370,156 @@ function FCT:Update(fb, data)
 		if not fb.stackingSelf then return end -- not allowed on this frame
 		if not amount or amount <= 0 then return end -- amount not valid
 	elseif A and not FCT.db.stacks.exclude[j] and ((fb.stackingSelf and sourceMe) or (fb.stackingOthers and not sourceMe)) then
-		local key = j..'^'..f -- neato
-		local overtime = dot or hot -- its a real hot or dot automatically add it
-		if overtime and stack.overtime and not stack.watching[key] then
-			stack.watching[key] = true
-		end
+		if stack:Collect(j..'^'..f, h, unit, data, A, b, dot or hot) then return end
+	end
 
-		if stack.watching[key] then
-			-- spell full data
-			local s = stack.spells[key]
-			if not s then -- if its not in spells, add it
-				s = {}
-				stack.spells[key] = s
+	stack:CheckShown()
+	if A or type(a) == 'string' then
+		FCT:Display(fb, unit, {
+			amount = a, critical = b, school = c, color = d, spellID = j, swing = e,
+			label = ns.CT[a], stack = udata,
+		})
+	end
+end
+
+function FCT:Display(fb, unit, hit)
+	local value, critical, totals = hit.amount, hit.critical, hit.stack
+	if hit.spellID and not hit.swing and (fb.showIcon or fb.showName) and not ns.spells[hit.spellID] then ns.spells[hit.spellID] = { E:GetSpellInfo(hit.spellID) } end
+
+	local text
+	if fb.mode == 'Simpy' then
+		text = fb.Text
+		if not text then return end
+	elseif fb.mode == 'LS' then
+		text = ns.LS.getText(fb)
+		if not text then return end
+
+		if text.alternateX then text.xDirection = -text.xDirection end
+		if text.alternateY then text.yDirection = -text.yDirection end
+		text.elapsed = 0
+	end
+
+	if fb.showIcon or fb.showName then
+		local spell = ns.spells[hit.spellID]
+		local icon = hit.icon or (not hit.swing and spell and spell[3])
+		if spell or icon then
+			if fb.showIcon then
+				if icon then
+					text.Icon:SetTexture(icon)
+					text.Icon.backdrop:Show()
+					text.Icon:Show()
+
+					if fb.alternateIcon then
+						text.Icon:ClearAllPoints()
+						if text.xDirection < 0 then
+							text.Icon:Point('RIGHT', text, 'LEFT', fb.iconX, fb.iconY)
+						else
+							text.Icon:Point('LEFT', text, 'RIGHT', -fb.iconX, fb.iconY)
+						end
+					end
+				else
+					text.Icon.backdrop:Hide()
+					text.Icon:Hide()
+				end
 			end
-
-			-- spell unit data
-			local p = s[h]
-			if not p then
-				p = CopyTable(data)
-				s[h] = p
+			if fb.showName then
+				text.Spell:SetText(spell and spell[1] or '')
 			end
-
-			local u = p[unit]
-			if not u then
-				u = {}
-				p[unit] = u
-			end
-
-			-- handle increases
-			u.hits = (u.hits or 0) + 1 -- amount of hits
-			u.crits = (u.crits or 0) + (b and 1 or 0) -- amount of crits
-			u.amount = (u.amount or 0) + (A or 0) -- add up the amount
-
-			return -- dont need to continue
-		elseif not overtime and stack.hitsDetect then -- check if we need to stack it
-			stack.hitsSpells[key] = (stack.hitsSpells[key] or 0) + 1
+		else
+			text.Icon:Hide()
+			text.Icon.backdrop:Hide()
+			text.Spell:SetText('')
 		end
 	end
 
-	-- dont need it running when its not watching
-	stack:CheckShown()
+	if totals then
+		critical = nil -- ignore crit stuff during stacking
+	end
 
-	-- handle displaying spells
-	if A or type(a) == 'string' then
-		if (fb.showIcon or fb.showName) and not (e or ns.spells[j]) then ns.spells[j] = { E:GetSpellInfo(j) } end
-
-		local text
-		if fb.mode == 'Simpy' then
-			text = fb.Text
-			if not text then return end
-		elseif fb.mode == 'LS' then
-			text = ns.LS.getText(fb)
-			if not text then return end
-
-			if text.alternateX then text.xDirection = -text.xDirection end
-			if text.alternateY then text.yDirection = -text.yDirection end
-			text.elapsed = 0
-		end
-
-		if fb.showIcon or fb.showName then
-			local spell = ns.spells[j]
-			if spell then
-				if fb.showIcon then
-					if not e and spell[3] then
-						text.Icon:SetTexture(spell[3])
-						text.Icon.backdrop:Show()
-						text.Icon:Show()
-
-						if fb.alternateIcon then
-							text.Icon:ClearAllPoints()
-							if text.xDirection < 0 then
-								text.Icon:Point('RIGHT', text, 'LEFT', fb.iconX, fb.iconY)
-							else
-								text.Icon:Point('LEFT', text, 'RIGHT', -fb.iconX, fb.iconY)
-							end
-						end
-					else
-						text.Icon.backdrop:Hide()
-						text.Icon:Hide()
-					end
-				end
-				if fb.showName then
-					text.Spell:SetText(spell[1] or '')
-				end
+	if critical then
+		if fb.critShake then
+			local parent
+			if ns.isForever then
+				parent = fb.isNameplate and fb.raised or fb.owner
 			else
-				text.Icon:Hide()
-				text.Icon.backdrop:Hide()
-				text.Spell:SetText('')
+				parent = fb.owner.unitFrame or fb.owner.UnitFrame or fb.owner
+			end
+			if not parent.isShaking then
+				parent.isShaking = ns.HS.ShakeIt(parent, fb.shakeDuration)
+			end
+		elseif fb.textShake then
+			if not fb.raised.isShaking then
+				fb.raised.isShaking = ns.HS.ShakeIt(fb.raised, fb.shakeDuration)
 			end
 		end
 
-		if hits then
-			b = nil -- ignore crit stuff during stacking
+		if fb.followSize then
+			text.Icon:Size(fb.critFontSize)
 		end
 
-		if b then
-			if fb.critShake then
-				local parent = fb.owner.unitFrame or fb.owner.UnitFrame or fb.owner
-				if not parent.isShaking then
-					parent.isShaking = ns.HS.ShakeIt(parent, fb.shakeDuration)
-				end
-			elseif fb.textShake then
-				if not fb.raised.isShaking then
-					fb.raised.isShaking = ns.HS.ShakeIt(fb.raised, fb.shakeDuration)
-				end
-			end
-
-			if fb.followSize then
-				text.Icon:Size(fb.critFontSize)
-			end
-
-			text:FontTemplate(fb.critFont, fb.critFontSize, fb.critFontOutline)
-		else
-			if fb.followSize then
-				text.Icon:Size(fb.fontSize)
-			end
-
-			text:FontTemplate(fb.font, fb.fontSize, fb.fontOutline)
+		text:FontTemplate(fb.critFont, fb.critFontSize, fb.critFontOutline)
+	else
+		if fb.followSize then
+			text.Icon:Size(fb.fontSize)
 		end
 
-		local ct = ns.CT[a]
-		text:SetTextColor(unpack(d or (ct and ns.color.Standard) or FCT:GP(text, fb, b, c)))
-		text:Show()
+		text:FontTemplate(fb.font, fb.fontSize, fb.fontOutline)
+	end
 
-		if ct then
-			text:SetText(ct)
-		elseif hits then
-			if hits > 1 then
-				local red, green, blue = ns.color.Stack[1] * 255, ns.color.Stack[2] * 255, ns.color.Stack[3] * 255
-				local _r, _g, _b = ns.color.Prefix[1] * 255, ns.color.Prefix[2] * 255, ns.color.Prefix[3] * 255
+	local label = hit.label
+	text:SetTextColor(unpack(hit.color or (label and ns.color.Standard) or FCT:GP(text, fb, critical, hit.school)))
+	text:Show()
 
-				local allowCrits = stack.showCrits and crits > 0
-				text:SetFormattedText('%s|cff%02x%02x%02x%s%s|r|cff%02x%02x%02x%s%s|r', FCT:StyleNumber(unit, fb.numberStyle, amount), red, green, blue, stack.prefix, hits, _r, _g, _b, allowCrits and fb.prefix or '', allowCrits and crits or '')
-			elseif crits > 0 then
-				local red, green, blue = ns.color.Prefix[1] * 255, ns.color.Prefix[2] * 255, ns.color.Prefix[3] * 255
-				text:SetFormattedText('|cff%02x%02x%02x%s|r%s|cff%02x%02x%02x%s|r', red, green, blue, fb.prefix, FCT:StyleNumber(unit, fb.numberStyle, amount), red, green, blue, fb.prefix)
-			else
-				text:SetText(FCT:StyleNumber(unit, fb.numberStyle, amount))
-			end
-		elseif b and fb.prefix ~= '' then
+	if hit.restricted then
+		text:SetText(value)
+	elseif label then
+		text:SetText(label)
+	elseif totals then
+		if totals.hits > 1 then
+			local red, green, blue = ns.color.Stack[1] * 255, ns.color.Stack[2] * 255, ns.color.Stack[3] * 255
+			local _r, _g, _b = ns.color.Prefix[1] * 255, ns.color.Prefix[2] * 255, ns.color.Prefix[3] * 255
+
+			local allowCrits = stack.showCrits and totals.crits > 0
+			text:SetFormattedText('%s|cff%02x%02x%02x%s%s|r|cff%02x%02x%02x%s%s|r', FCT:StyleNumber(unit, fb.numberStyle, totals.amount), red, green, blue, stack.prefix, totals.hits, _r, _g, _b, allowCrits and fb.prefix or '', allowCrits and totals.crits or '')
+		elseif totals.crits > 0 then
 			local red, green, blue = ns.color.Prefix[1] * 255, ns.color.Prefix[2] * 255, ns.color.Prefix[3] * 255
-			text:SetFormattedText('|cff%02x%02x%02x%s|r%s|cff%02x%02x%02x%s|r', red, green, blue, fb.prefix, FCT:StyleNumber(unit, fb.numberStyle, a), red, green, blue, fb.prefix)
+			text:SetFormattedText('|cff%02x%02x%02x%s|r%s|cff%02x%02x%02x%s|r', red, green, blue, fb.prefix, FCT:StyleNumber(unit, fb.numberStyle, totals.amount), red, green, blue, fb.prefix)
 		else
-			text:SetText(FCT:StyleNumber(unit, fb.numberStyle, a))
+			text:SetText(FCT:StyleNumber(unit, fb.numberStyle, totals.amount))
 		end
+	elseif critical and fb.prefix ~= '' then
+		local red, green, blue = ns.color.Prefix[1] * 255, ns.color.Prefix[2] * 255, ns.color.Prefix[3] * 255
+		text:SetFormattedText('|cff%02x%02x%02x%s|r%s|cff%02x%02x%02x%s|r', red, green, blue, fb.prefix, FCT:StyleNumber(unit, fb.numberStyle, value), red, green, blue, fb.prefix)
+	else
+		text:SetText(FCT:StyleNumber(unit, fb.numberStyle, value))
+	end
 
-		if fb.mode == 'Simpy' then
-			if not fb.FadeOut then fb.FadeOut = { mode = 'OUT' } else fb.FadeOut.fadeTimer = nil end
-			if not fb.FaderIn then fb.FaderIn = { mode = 'IN' } else fb.FaderIn.fadeTimer = nil end
-			ns.SI.FadeIn(fb.FaderIn, fb.Frame, 0.2, text.fadeTime + (hits and 0.5 or (b and 0.3) or 0), 0.4, 0.0, 0.8)
-		elseif fb.mode == 'LS' then
-			tinsert(fb.objs, text)
-			text.frame:SetAlpha(1)
-		end
-end end
+	if fb.mode == 'Simpy' then
+		if not fb.FadeOut then fb.FadeOut = { mode = 'OUT' } else fb.FadeOut.fadeTimer = nil end
+		if not fb.FaderIn then fb.FaderIn = { mode = 'IN' } else fb.FaderIn.fadeTimer = nil end
+		ns.SI.FadeIn(fb.FaderIn, fb.Frame, 0.2, text.fadeTime + (totals and 0.5 or (critical and 0.3) or 0), 0.4, 0.0, 0.8)
+	elseif fb.mode == 'LS' then
+		tinsert(fb.objs, text)
+		text.frame:SetAlpha(1)
+		if ns.isForever then fb.raised:SetScript('OnUpdate', ns.LS.onUpdate) end
+	end
+end
 
 function FCT:EnableMode(fb, mode)
 	if mode == 'Simpy' then
 		if not fb.Frame then
-			fb.Frame = cf('Frame', fb.owner:GetDebugName()..'ElvFCT', fb.raised)
-			fb.Frame.owner = fb.owner
-
-			local frameName = fb.Frame:GetDebugName()
-			fb.Text = fb.Frame:CreateFontString(frameName..'Text', 'OVERLAY')
+			local name
+			if not ns.isForever then name = fb.owner:GetDebugName()..'ElvFCT' end
+			fb.Frame = cf('Frame', name, fb.raised)
+			fb.Frame.feedback = fb
+			local frameName = name and fb.Frame:GetDebugName()
+			fb.Text = fb.Frame:CreateFontString(frameName and frameName..'Text', 'OVERLAY')
 			fb.Text:FontTemplate(fb.font, fb.fontSize, fb.fontOutline)
 
-			fb.Text.Icon = fb.Frame:CreateTexture(frameName..'Icon')
+			fb.Text.Icon = fb.Frame:CreateTexture(frameName and frameName..'Icon')
 			S:HandleIcon(fb.Text.Icon, true)
 
-			fb.Text.Spell = fb.Frame:CreateFontString(frameName..'Spell', 'OVERLAY')
+			fb.Text.Spell = fb.Frame:CreateFontString(frameName and frameName..'Spell', 'OVERLAY')
 			fb.Text.Spell:FontTemplate(fb.font, fb.fontSize, fb.fontOutline)
 		end
 
@@ -525,17 +543,18 @@ function FCT:EnableMode(fb, mode)
 		for i=1, fb.numTexts do
 			local text = fb.texts[i]
 			if not text then
-				local frame = cf('Frame', fb.owner:GetDebugName()..'ElvFCT'..i, fb.raised)
-
-				local frameName = frame:GetDebugName()
-				text = frame:CreateFontString(frameName..'Text', 'OVERLAY')
+				local name
+				if not ns.isForever then name = fb.owner:GetDebugName()..'ElvFCT'..i end
+				local frame = cf('Frame', name, fb.raised)
+				local frameName = name and frame:GetDebugName()
+				text = frame:CreateFontString(frameName and frameName..'Text', 'OVERLAY')
 				text:FontTemplate(fb.font, fb.fontSize, fb.fontOutline)
 				text.frame = frame
 
-				text.Icon = frame:CreateTexture(frameName..'Icon')
+				text.Icon = frame:CreateTexture(frameName and frameName..'Icon')
 				S:HandleIcon(text.Icon, true)
 
-				text.Spell = frame:CreateFontString(frameName..'Spell', 'OVERLAY')
+				text.Spell = frame:CreateFontString(frameName and frameName..'Spell', 'OVERLAY')
 				text.Spell:FontTemplate(fb.font, fb.fontSize, fb.fontOutline)
 
 				fb.texts[i] = text
@@ -565,7 +584,9 @@ function FCT:EnableMode(fb, mode)
 			text:Hide()
 		end
 
-		if not fb.owner.ElvFCTHooked then
+		if ns.isForever then
+			fb.raised:SetScript('OnHide', ns.LS.onShowHide)
+		elseif not fb.owner.ElvFCTHooked then
 			fb.owner:HookScript('OnHide', ns.LS.onShowHide)
 			fb.owner:HookScript('OnShow', ns.LS.onShowHide)
 			fb.owner:HookScript('OnUpdate', ns.LS.onUpdate)
